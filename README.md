@@ -1,13 +1,9 @@
-<!DOCTYPE html>
+
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Capsula</title>
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap');
 :root{
@@ -1616,10 +1612,15 @@ select.pf option{background:var(--bg2);color:var(--text);}
 
 <div class="toast" id="toast"></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
 // ─────────────────────────── FIREBASE ─────────────────────────────────────
 const firebaseConfig = {
-  apiKey: "AIzaSyCUfXo02vS1Czy18L1-pTY4sDh463dnIKY",
+  apiKey: "AIzaSyDXxiqon0Q-E_AYLxT1Yhz01Kwb7WTuTJw",
   authDomain: "capsula-6b5b8.firebaseapp.com",
   projectId: "capsula-6b5b8",
   storageBucket: "capsula-6b5b8.firebasestorage.app",
@@ -1739,8 +1740,10 @@ function authErrMsg(code){
     'auth/too-many-requests':'Çok fazla deneme. Bir süre bekle',
     'auth/popup-closed-by-user':'Giriş iptal edildi',
     'auth/network-request-failed':'Bağlantı hatası',
+    'auth/invalid-api-key':'Geçersiz API key — lütfen geliştiriciye bildirin',
+    'auth/api-key-not-valid':'API key geçersiz — config hatası',
   };
-  return msgs[code]||'Bir hata oluştu: '+code;
+  return msgs[code]||'Hata kodu: '+code;
 }
 
 // ── FIRESTORE SYNC ─────────────────────────────────────────────────────────
