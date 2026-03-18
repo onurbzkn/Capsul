@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
@@ -1180,6 +1180,11 @@ select.pf option{background:var(--bg2);color:var(--text);}
           <button onclick="savePinCode()" style="background:var(--accent);border:none;border-radius:7px;padding:8px 13px;cursor:pointer;font-family:'Sora',sans-serif;font-size:.72rem;color:#fff;">Kaydet</button>
         </div>
       </div>
+      <div class="settings-row" style="margin-top:10px;">
+        <span class="settings-row-label">Şifre Değiştir</span>
+        <button onclick="sendPasswordChangeEmail()" id="changePasswordBtn" style="background:rgba(124,111,247,.12);border:1px solid rgba(124,111,247,.25);border-radius:8px;padding:5px 12px;font-size:.65rem;color:var(--accent2);cursor:pointer;font-family:'Sora',sans-serif;transition:all .2s;">Link Gönder</button>
+      </div>
+      <div style="font-size:.6rem;color:var(--text3);margin-top:4px;line-height:1.5;">Email adresine şifre değiştirme linki gönderilir.</div>
     </div>
   </div>
 </div>
@@ -1770,9 +1775,29 @@ function authGoogle(){
 function authForgotPassword(){
   const email=document.getElementById('authEmailInput').value.trim();
   if(!email){setAuthError('Önce email adresini gir');return;}
-  auth.sendPasswordResetEmail(email)
-    .then(()=>{ document.getElementById('authError').style.color='var(--easy)';setAuthError('Şifre sıfırlama emaili gönderildi'); })
-    .catch(e=>setAuthError(authErrMsg(e.code)));
+  const errEl=document.getElementById('authError');
+  errEl.style.color='var(--text3)';
+  setAuthError('Gönderiliyor...');
+  auth.sendPasswordResetEmail(email,{
+    url: window.location.href, // Sıfırlamadan sonra geri dönsün
+    handleCodeInApp: false
+  })
+  .then(()=>{
+    errEl.style.color='var(--easy)';
+    setAuthError('✓ Sıfırlama linki gönderildi! Spam klasörünü de kontrol et.');
+  })
+  .catch(e=>{
+    errEl.style.color='var(--hard)';
+    setAuthError(authErrMsg(e.code));
+  });
+}
+
+// İçerideyken şifre değiştirme
+function sendPasswordChangeEmail(){
+  if(!currentUser?.email){showToast('Email bulunamadı');return;}
+  auth.sendPasswordResetEmail(currentUser.email,{url:window.location.href})
+    .then(()=>showToast('Şifre değiştirme linki emailine gönderildi ✓'))
+    .catch(e=>showToast('Hata: '+authErrMsg(e.code)));
 }
 
 function authSignOut(){
@@ -1805,9 +1830,10 @@ function startFirestoreSync(uid){
     .onSnapshot(doc=>{
       if(doc.exists){
         const remote = doc.data();
-        // Sadece içerik verilerini güncelle, profili ayrı tut
+        const savedAvatar=D.profile.avatar; // Avatar'ı koru
         const keys=['todos','completedTodos','trash','contentTrash','calPlans','notes','diary','kanban','reading','schedule','exams','notebook'];
         keys.forEach(k=>{if(remote[k]!==undefined)D[k]=remote[k];});
+        D.profile.avatar=savedAvatar; // Avatar'ı geri yükle
         localStorage.setItem('capsula_v4',JSON.stringify(D));
         renderTodos();renderNotes();renderDiary();renderDashboard();
         renderCalendar();renderKanban();renderReading();
@@ -2504,12 +2530,18 @@ function updateProfileUI(){
 
 function handleAvatarUpload(e){
   const file=e.target.files[0];if(!file)return;
+  // Önce boyutu kontrol et
+  if(file.size>2*1024*1024){showToast('Fotoğraf 2MB\'dan küçük olmalı');return;}
   const r=new FileReader();
   r.onload=ev=>{
-    D.profile.avatar=ev.target.result;saveData();updateProfileUI();
+    D.profile.avatar=ev.target.result;
+    // Avatar SADECE localStorage'a kaydedilsin, Firestore'a gitmesin
+    localStorage.setItem('capsula_v4',JSON.stringify(D));
+    updateProfileUI();
     const img=document.getElementById('profileAvatarImg');
     img.src=ev.target.result;img.style.display='block';
     document.getElementById('profileAvatarInitials').style.display='none';
+    showToast('Fotoğraf güncellendi ✓');
   };
   r.readAsDataURL(file);
 }
