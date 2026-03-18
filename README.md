@@ -592,6 +592,9 @@ main{flex:1;overflow:hidden;position:relative;}
 .drawer-item.danger:hover{color:var(--hard);background:rgba(248,113,113,.05);}
 .trash-badge{margin-left:auto;font-size:.48rem;font-family:'JetBrains Mono',monospace;background:rgba(248,113,113,.12);color:var(--hard);border-radius:7px;padding:1px 6px;border:1px solid rgba(248,113,113,.2);}
 .drawer-footer{padding:12px 18px;border-top:1px solid var(--border);font-size:.5rem;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+.lang-btn{padding:3px 8px;border-radius:8px;border:1px solid var(--border);background:none;font-size:.62rem;color:var(--text3);cursor:pointer;transition:all .18s;font-family:'Sora',sans-serif;}
+.lang-btn:hover{border-color:var(--border2);color:var(--text2);}
+.lang-btn.active{background:rgba(124,111,247,.15);border-color:rgba(124,111,247,.35);color:var(--accent2);}
 
 /* ── MODALS ──────────────────────────────────────────────────────────────── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .28s;backdrop-filter:blur(8px);}
@@ -1035,26 +1038,42 @@ select.pf option{background:var(--bg2);color:var(--text);}
 <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-header">
-    <div class="drawer-avatar" id="drawerAvatar"><img id="drawerAvatarImg" src="" style="display:none"><span id="drawerAvatarInitials">KY</span></div>
-    <div><div class="drawer-user-name" id="drawerUserName">Kullanıcı</div><div class="drawer-user-email" id="drawerUserEmail"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="8ce3fee2e9e7cce9fce3fff8eda2efe3e1">[email&#160;protected]</a></div></div>
+    <div class="drawer-avatar" id="drawerAvatar" onclick="openFromDrawer('profile');toggleDrawer();" style="cursor:pointer;"><img id="drawerAvatarImg" src="" style="display:none"><span id="drawerAvatarInitials">KY</span></div>
+    <div style="flex:1;min-width:0;">
+      <div class="drawer-user-name" id="drawerUserName">Kullanıcı</div>
+      <div class="drawer-user-email" id="drawerUserEmail"></div>
+    </div>
+    <button onclick="authSignOut()" title="Çıkış Yap" style="background:none;border:none;color:var(--text3);cursor:pointer;padding:6px;border-radius:8px;transition:all .18s;flex-shrink:0;" onmouseover="this.style.color='var(--hard)';this.style.background='rgba(248,113,113,.08)'" onmouseout="this.style.color='var(--text3)';this.style.background='none'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:18px;height:18px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
+  </div>
+  <!-- Dil seçici -->
+  <div style="padding:8px 14px;border-bottom:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap;">
+    <span style="font-size:.48rem;letter-spacing:.15em;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;display:flex;align-items:center;margin-right:2px;">Dil:</span>
+    <button class="lang-btn active" id="langBtn-tr" onclick="setLang('tr')">🇹🇷 TR</button>
+    <button class="lang-btn" id="langBtn-en" onclick="setLang('en')">🇬🇧 EN</button>
+    <button class="lang-btn" id="langBtn-de" onclick="setLang('de')">🇩🇪 DE</button>
+    <button class="lang-btn" id="langBtn-fr" onclick="setLang('fr')">🇫🇷 FR</button>
+    <button class="lang-btn" id="langBtn-es" onclick="setLang('es')">🇪🇸 ES</button>
+    <button class="lang-btn" id="langBtn-ar" onclick="setLang('ar')">🇸🇦 AR</button>
   </div>
   <div class="drawer-menu">
-    <div class="drawer-section-label">Genel</div>
-    <button class="drawer-item" onclick="openFromDrawer('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profilim</button>
-    <button class="drawer-item" onclick="openFromDrawer('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Ayarlar</button>
-    <button class="drawer-item" onclick="openCalendarFromDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Takvim</button>
-    <button class="drawer-item" onclick="openFromDrawer('trash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Çöp Kutusu<span class="trash-badge" id="trashBadge" style="display:none">0</span></button>
-    <button class="drawer-item" onclick="openBackupModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Yedekle & Geri Yükle</button>
-    <button class="drawer-item" onclick="openFriends()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Arkadaşlar<span id="friendRequestBadge" style="display:none;margin-left:auto;min-width:18px;height:18px;font-size:.52rem;border-radius:9px;background:var(--accent);color:#fff;align-items:center;justify-content:center;padding:0 4px;font-family:'JetBrains Mono',monospace;"></span></button>
-    <button class="drawer-item" onclick="authSignOut()" id="signOutBtn" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Çıkış Yap</button>
-    <button class="drawer-item" id="drawerReminderBtn" onclick="openReminderModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Hatırlatıcılar<span id="drawerReminderBadge" style="display:none;margin-left:auto;min-width:18px;height:18px;font-size:.52rem;border-radius:9px;background:var(--hard);color:#fff;align-items:center;justify-content:center;padding:0 4px;font-family:JetBrains Mono,monospace;"></span></button>
+    <div class="drawer-section-label" id="dl-general">Genel</div>
+    <button class="drawer-item" onclick="openFromDrawer('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span id="dl-profile">Profilim</span></button>
+    <button class="drawer-item" onclick="openFromDrawer('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg><span id="dl-settings">Ayarlar</span></button>
+    <button class="drawer-item" onclick="openCalendarFromDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span id="dl-calendar">Takvim</span></button>
+    <button class="drawer-item" onclick="openFromDrawer('trash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg><span id="dl-trash">Çöp Kutusu</span><span class="trash-badge" id="trashBadge" style="display:none">0</span></button>
+    <button class="drawer-item" onclick="openBackupModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span id="dl-backup">Yedekle & Geri Yükle</span></button>
+    <button class="drawer-item" onclick="openFriends()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span id="dl-friends">Arkadaşlar</span><span id="friendRequestBadge" style="display:none;margin-left:auto;min-width:18px;height:18px;font-size:.52rem;border-radius:9px;background:var(--accent);color:#fff;align-items:center;justify-content:center;padding:0 4px;font-family:'JetBrains Mono',monospace;"></span></button>
+    <button class="drawer-item" id="drawerReminderBtn" onclick="openReminderModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span id="dl-reminders">Hatırlatıcılar</span><span id="drawerReminderBadge" style="display:none;margin-left:auto;min-width:18px;height:18px;font-size:.52rem;border-radius:9px;background:var(--hard);color:#fff;align-items:center;justify-content:center;padding:0 4px;font-family:JetBrains Mono,monospace;"></span></button>
     <div class="drawer-divider"></div>
-    <div class="drawer-section-label">Hakkında</div>
-    <button class="drawer-item" onclick="openFromDrawer('privacy')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Gizlilik Politikası</button>
-    <button class="drawer-item" onclick="openFromDrawer('terms')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Kullanım Koşulları</button>
-    <button class="drawer-item" onclick="openFromDrawer('help')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Yardım</button>
+    <div class="drawer-section-label" id="dl-about">Hakkında</div>
+    <button class="drawer-item" onclick="openFromDrawer('privacy')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span id="dl-privacy">Gizlilik Politikası</span></button>
+    <button class="drawer-item" onclick="openFromDrawer('terms')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span id="dl-terms">Kullanım Koşulları</span></button>
+    <button class="drawer-item" onclick="openFromDrawer('help')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span id="dl-help">Yardım</span></button>
     <div class="drawer-divider"></div>
-    <button class="drawer-item danger" onclick="clearAllData()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Tüm Verileri Sil</button>
+    <button class="drawer-item danger" onclick="clearAllData()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg><span id="dl-cleardata">Tüm Verileri Sil</span></button>
+    <button class="drawer-item" id="signOutBtn" onclick="authSignOut()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span id="dl-signout">Çıkış Yap</span></button>
   </div>
   <div class="drawer-footer">Capsula v4 · Pro / Ana / Öğrenci</div>
 </div>
@@ -1797,6 +1816,8 @@ function loadUserData(uid){
         D.profile.goal=p.goal||'';
         D.profile.badge=p.badge||'student';
         D.profile.username=p.username||'';
+        // Email otomatik Firebase'den al
+        D.profile.email=currentUser.email||p.email||'';
         saveData();
         updateProfileUI();
         updateFriendRequestBadge(p.friendRequests||[]);
@@ -1995,7 +2016,7 @@ auth.onAuthStateChanged(user=>{
 
 function initApp(){
   hideAuthScreen();
-  initPinToggle();autoTrash();updTrashBadge();updateProfileUI();initReminders();
+  initPinToggle();autoTrash();updTrashBadge();updateProfileUI();initReminders();initLang();
   setMode(curMode);
   renderTodos();renderNotes();renderDiary();renderDashboard();renderCalendar();
   renderKanban();renderReading();renderSchedule();renderExams();renderNotebook();renderPro();
@@ -3136,7 +3157,126 @@ function showWelcomeCard(){
   document.body.appendChild(card);
 }
 
-// ─────────────────────────── TAKVİM GENİŞLETME ────────────────────────────
+// ─────────────────────────── DİL SİSTEMİ ─────────────────────────────────
+const LANGS={
+  tr:{
+    general:'Genel',profile:'Profilim',settings:'Ayarlar',calendar:'Takvim',
+    trash:'Çöp Kutusu',backup:'Yedekle & Geri Yükle',friends:'Arkadaşlar',
+    reminders:'Hatırlatıcılar',about:'Hakkında',privacy:'Gizlilik Politikası',
+    terms:'Kullanım Koşulları',help:'Yardım',cleardata:'Tüm Verileri Sil',
+    signout:'Çıkış Yap',
+    addTodo:'Yeni görev...',notes:'Notlar',diary:'Günlük',search:'Arama',
+    save:'Kaydet',cancel:'İptal',add:'Ekle',
+    today:'Bugün',overdue:'Gecikmiş',
+    noTask:'Bugün için görev yok.',
+    pro:'Pro',home:'Ana',student:'Öğrenci',
+    greeting_morning:'Günaydın,',greeting_afternoon:'İyi günler,',
+    greeting_evening:'İyi akşamlar,',greeting_night:'İyi geceler,',
+  },
+  en:{
+    general:'General',profile:'My Profile',settings:'Settings',calendar:'Calendar',
+    trash:'Trash',backup:'Backup & Restore',friends:'Friends',
+    reminders:'Reminders',about:'About',privacy:'Privacy Policy',
+    terms:'Terms of Use',help:'Help',cleardata:'Delete All Data',
+    signout:'Sign Out',
+    addTodo:'New task...',notes:'Notes',diary:'Journal',search:'Search',
+    save:'Save',cancel:'Cancel',add:'Add',
+    today:'Today',overdue:'Overdue',
+    noTask:'No tasks for today.',
+    pro:'Pro',home:'Home',student:'Student',
+    greeting_morning:'Good morning,',greeting_afternoon:'Good afternoon,',
+    greeting_evening:'Good evening,',greeting_night:'Good night,',
+  },
+  de:{
+    general:'Allgemein',profile:'Mein Profil',settings:'Einstellungen',calendar:'Kalender',
+    trash:'Papierkorb',backup:'Sichern & Wiederherstellen',friends:'Freunde',
+    reminders:'Erinnerungen',about:'Über',privacy:'Datenschutz',
+    terms:'Nutzungsbedingungen',help:'Hilfe',cleardata:'Alle Daten löschen',
+    signout:'Abmelden',
+    addTodo:'Neue Aufgabe...',notes:'Notizen',diary:'Tagebuch',search:'Suche',
+    save:'Speichern',cancel:'Abbrechen',add:'Hinzufügen',
+    today:'Heute',overdue:'Überfällig',
+    noTask:'Keine Aufgaben für heute.',
+    pro:'Pro',home:'Start',student:'Student',
+    greeting_morning:'Guten Morgen,',greeting_afternoon:'Guten Tag,',
+    greeting_evening:'Guten Abend,',greeting_night:'Gute Nacht,',
+  },
+  fr:{
+    general:'Général',profile:'Mon Profil',settings:'Paramètres',calendar:'Calendrier',
+    trash:'Corbeille',backup:'Sauvegarder & Restaurer',friends:'Amis',
+    reminders:'Rappels',about:'À propos',privacy:'Confidentialité',
+    terms:'Conditions',help:'Aide',cleardata:'Supprimer tout',
+    signout:'Se déconnecter',
+    addTodo:'Nouvelle tâche...',notes:'Notes',diary:'Journal',search:'Recherche',
+    save:'Enregistrer',cancel:'Annuler',add:'Ajouter',
+    today:"Aujourd'hui",overdue:'En retard',
+    noTask:"Pas de tâches aujourd'hui.",
+    pro:'Pro',home:'Accueil',student:'Étudiant',
+    greeting_morning:'Bonjour,',greeting_afternoon:'Bon après-midi,',
+    greeting_evening:'Bonsoir,',greeting_night:'Bonne nuit,',
+  },
+  es:{
+    general:'General',profile:'Mi Perfil',settings:'Ajustes',calendar:'Calendario',
+    trash:'Papelera',backup:'Copia de seguridad',friends:'Amigos',
+    reminders:'Recordatorios',about:'Acerca de',privacy:'Privacidad',
+    terms:'Términos',help:'Ayuda',cleardata:'Borrar todo',
+    signout:'Cerrar sesión',
+    addTodo:'Nueva tarea...',notes:'Notas',diary:'Diario',search:'Buscar',
+    save:'Guardar',cancel:'Cancelar',add:'Añadir',
+    today:'Hoy',overdue:'Atrasado',
+    noTask:'No hay tareas para hoy.',
+    pro:'Pro',home:'Inicio',student:'Estudiante',
+    greeting_morning:'Buenos días,',greeting_afternoon:'Buenas tardes,',
+    greeting_evening:'Buenas tardes,',greeting_night:'Buenas noches,',
+  },
+  ar:{
+    general:'عام',profile:'ملفي',settings:'الإعدادات',calendar:'التقويم',
+    trash:'المهملات',backup:'نسخ احتياطي',friends:'الأصدقاء',
+    reminders:'التذكيرات',about:'حول',privacy:'الخصوصية',
+    terms:'الشروط',help:'المساعدة',cleardata:'حذف كل البيانات',
+    signout:'تسجيل الخروج',
+    addTodo:'مهمة جديدة...',notes:'ملاحظات',diary:'يوميات',search:'بحث',
+    save:'حفظ',cancel:'إلغاء',add:'إضافة',
+    today:'اليوم',overdue:'متأخر',
+    noTask:'لا توجد مهام اليوم.',
+    pro:'احترافي',home:'الرئيسية',student:'طالب',
+    greeting_morning:'صباح الخير،',greeting_afternoon:'مساء الخير،',
+    greeting_evening:'مساء الخير،',greeting_night:'تصبح على خير،',
+  },
+};
+let curLang='tr';
+
+function setLang(lang){
+  curLang=lang;
+  localStorage.setItem('capsula_lang',lang);
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.id==='langBtn-'+lang));
+  const L=LANGS[lang]||LANGS.tr;
+  // RTL desteği
+  document.body.dir=lang==='ar'?'rtl':'ltr';
+  // Drawer
+  const ids={
+    'dl-general':L.general,'dl-profile':L.profile,'dl-settings':L.settings,
+    'dl-calendar':L.calendar,'dl-trash':L.trash,'dl-backup':L.backup,
+    'dl-friends':L.friends,'dl-reminders':L.reminders,'dl-about':L.about,
+    'dl-privacy':L.privacy,'dl-terms':L.terms,'dl-help':L.help,
+    'dl-cleardata':L.cleardata,'dl-signout':L.signout,
+  };
+  Object.entries(ids).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.textContent=txt;});
+  // Mod butonları
+  document.getElementById('modeHome').querySelector('svg')?.nextSibling;
+  // Todo input
+  const ti=document.getElementById('todoInput');if(ti)ti.placeholder=L.addTodo;
+  // Arama
+  const si=document.getElementById('searchInput');if(si)si.placeholder=lang==='tr'?'Not, günlük veya görev ara...':lang==='en'?'Search notes, journal or tasks...':lang==='de'?'Notizen, Tagebuch oder Aufgaben suchen...':lang==='fr'?'Rechercher notes, journal ou tâches...':lang==='es'?'Buscar notas, diario o tareas...':'ابحث في الملاحظات أو المهام...';
+  // Dashboard yenile
+  renderDashboard();
+}
+
+function initLang(){
+  const saved=localStorage.getItem('capsula_lang')||'tr';
+  setLang(saved);
+}
+
 let calView='month';
 
 function setCalView(v){
