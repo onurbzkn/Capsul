@@ -507,6 +507,34 @@ main{flex:1;overflow:hidden;position:relative;}
 .sdash-exam-name{font-size:.8rem;font-weight:400;color:var(--text);}
 .sdash-exam-date{font-size:.6rem;font-family:'JetBrains Mono',monospace;color:var(--text3);margin-top:1px;}
 .sdash-exam-diff{font-size:.6rem;font-family:'JetBrains Mono',monospace;white-space:nowrap;}
+/* ── SLIDES ──────────────────────────────────────────────────────────────── */
+.slides-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.slides-cats{display:flex;gap:6px;flex:1;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
+.slides-cats::-webkit-scrollbar{display:none;}
+.slide-cat-btn{padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:none;font-size:.65rem;color:var(--text3);cursor:pointer;white-space:nowrap;font-family:'Sora',sans-serif;transition:all .18s;flex-shrink:0;}
+.slide-cat-btn.active{background:rgba(124,111,247,.15);border-color:rgba(124,111,247,.4);color:var(--accent2);}
+.slides-upload-btn{display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:10px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;color:#fff;font-size:.72rem;font-family:'Sora',sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:opacity .2s;}
+.slides-upload-btn:hover{opacity:.85;}
+.slides-search-bar{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:8px 12px;margin-bottom:14px;transition:border-color .2s;}
+.slides-search-bar:focus-within{border-color:rgba(124,111,247,.4);}
+.slides-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding-bottom:80px;}
+.slide-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;transition:all .2s;position:relative;}
+.slide-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3);border-color:var(--border2);}
+.slide-thumb{width:100%;height:110px;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.slide-thumb canvas{width:100%;height:100%;object-fit:cover;}
+.slide-thumb-placeholder{display:flex;flex-direction:column;align-items:center;gap:6px;opacity:.5;}
+.slide-info{padding:9px 10px;}
+.slide-name{font-size:.75rem;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.slide-meta{font-size:.58rem;font-family:'JetBrains Mono',monospace;color:var(--text3);margin-top:3px;display:flex;align-items:center;justify-content:space-between;}
+.slide-cat-tag{font-size:.52rem;padding:2px 7px;border-radius:8px;background:rgba(124,111,247,.12);color:var(--accent2);border:1px solid rgba(124,111,247,.2);}
+.slide-actions{position:absolute;top:6px;right:6px;display:flex;gap:4px;opacity:0;transition:opacity .18s;}
+.slide-card:hover .slide-actions{opacity:1;}
+.slide-action-btn{width:26px;height:26px;border-radius:7px;background:rgba(13,13,18,.85);backdrop-filter:blur(8px);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);transition:all .18s;}
+.slide-action-btn:hover{background:var(--bg3);}
+.slide-empty{grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--text3);font-size:.75rem;font-weight:300;line-height:1.8;}
+/* Yanıp sönen fab */
+@keyframes fabPulse{0%,100%{box-shadow:0 8px 28px rgba(167,139,250,.5),0 0 0 3px rgba(255,255,255,.12);}50%{box-shadow:0 8px 28px rgba(248,113,113,.6),0 0 0 6px rgba(248,113,113,.15);}}
+.nav-center-fab.has-msg{animation:fabPulse 2.4s ease-in-out infinite;}
 /* ── CHAT ────────────────────────────────────────────────────────────────── */
 .chat-layout{display:flex;flex-direction:column;height:calc(100vh - var(--header-h) - var(--nav-h));gap:0;margin:-16px;padding:0;}
 .chat-list-panel{display:flex;flex-direction:column;height:100%;}
@@ -832,7 +860,7 @@ select.pf option{background:var(--bg2);color:var(--text);}
         <button class="mode-btn m-pro" id="modePro" onclick="setMode('pro')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Pro
         </button>
-        <button class="mode-btn m-home active" id="modeHome" onclick="setMode('home')">
+        <button class="mode-btn m-home active" id="modeHome" onclick="setMode('home');setTimeout(()=>switchPage('slides'),50)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Ana
         </button>
         <button class="mode-btn m-uni" id="modeUni" onclick="setMode('uni')">
@@ -937,6 +965,23 @@ select.pf option{background:var(--bg2);color:var(--text);}
       </div>
       <div id="calQuote"></div>
       <div id="calEvents"></div>
+    </div>
+
+    <!-- SLIDES -->
+    <div class="page" id="page-slides">
+      <div class="slides-header">
+        <div class="slides-cats" id="slidesCats"></div>
+        <button class="slides-upload-btn" onclick="document.getElementById('slidesFileInput').click()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          PDF Yükle
+        </button>
+        <input type="file" id="slidesFileInput" accept=".pdf" multiple style="display:none" onchange="uploadSlides(event)">
+      </div>
+      <div class="slides-search-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:15px;height:15px;flex-shrink:0;color:var(--text3);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="slidesSearchInput" placeholder="Slayt adı veya kategori ara..." oninput="renderSlides()" style="flex:1;background:none;border:none;outline:none;font-family:'Sora',sans-serif;font-size:.8rem;color:var(--text);">
+      </div>
+      <div id="slidesGrid" class="slides-grid"></div>
     </div>
 
     <!-- CHAT -->
@@ -1736,6 +1781,7 @@ select.pf option{background:var(--bg2);color:var(--text);}
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
 // ─────────────────────────── FIREBASE ─────────────────────────────────────
 const firebaseConfig = {
@@ -2285,6 +2331,9 @@ if(!D.reading)D.reading=[];
 if(!D.schedule)D.schedule=[];
 if(!D.exams)D.exams=[];
 if(!D.notebook)D.notebook=[];
+if(!D.slides)D.slides=[];
+// PDF.js worker
+if(typeof pdfjsLib!=='undefined')pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 if(!D.contentTrash)D.contentTrash=[];
 if(!D.trash)D.trash=[];
 function saveData(){localStorage.setItem('capsula_v4',JSON.stringify(D));}
@@ -2301,7 +2350,7 @@ const ICO_SEARCH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 const ICO_CHAT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
 const MODES={
   home:[
-    {id:'home',lbl:'Ana',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>'},
+    {id:'slides',lbl:'Slayt',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>'},
     {id:'todo',lbl:'Görev',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>'},
     {id:'chat',lbl:'Sohbet',ico:ICO_CHAT,center:true},
     {id:'notes',lbl:'Not',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'},
@@ -2322,7 +2371,7 @@ const MODES={
     {id:'pomodoro',lbl:'Pomodoro',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'},
   ],
 };
-const PAGE_TITLES={home:'Ana Ekran',todo:'Görevler',notes:'Notlar',diary:'Günlük',search:'Arama',calendar:'Takvim',pomodoro:'Pomodoro',kanban:'Kanban',weekly:'Haftalık Özet',reading:'Okuma Listesi',pro:'Profesyonel',schedule:'Ders Programı',exams:'Sınav Takvimi',notebook:'Not Defteri',chat:'Sohbet'};
+const PAGE_TITLES={home:'Ana Ekran',slides:'Slaytlar',todo:'Görevler',notes:'Notlar',diary:'Günlük',search:'Arama',calendar:'Takvim',pomodoro:'Pomodoro',kanban:'Kanban',weekly:'Haftalık Özet',reading:'Okuma Listesi',pro:'Profesyonel',schedule:'Ders Programı',exams:'Sınav Takvimi',notebook:'Not Defteri',chat:'Sohbet'};
 
 function setMode(mode){
   curMode=mode;
@@ -2366,6 +2415,7 @@ function switchPage(page){
   if(page==='exams')renderExams();
   if(page==='notebook')renderNotebook();
   if(page==='chat'){renderChatPage();if(activeChatUid)openChat(activeChatUid);}
+  if(page==='slides')renderSlides();
   if(page==='search'){document.getElementById('search-results').innerHTML='';setTimeout(()=>{const inp=document.getElementById('searchInput');if(inp){inp.value='';inp.focus();}},200);}
   if(page==='pro')renderPro();
 }
@@ -3130,6 +3180,210 @@ function renderReading(){
   document.getElementById('readingList').innerHTML=html||'<div class="empty-state">Okuma listesi boş.<br>Üstten kitap ekle.</div>';
 }
 
+// ─────────────────────────── SLIDES ───────────────────────────────────────
+// D.slides = [{id, name, category, pages, size, addedAt, base64(ilk sayfa thumb)}]
+let slidesCurCat='Tümü';
+
+function uploadSlides(e){
+  const files=[...e.target.files];
+  if(!files.length)return;
+  let done=0;
+  files.forEach(file=>{
+    if(!file.name.toLowerCase().endsWith('.pdf')){showToast('Sadece PDF destekleniyor');return;}
+    if(file.size>20*1024*1024){showToast(file.name+' çok büyük (max 20MB)');return;}
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const base64=ev.target.result;
+      // PDF.js ile ilk sayfayı render et
+      pdfjsLib.getDocument({data:atob(base64.split(',')[1])}).promise.then(pdf=>{
+        return pdf.getPage(1).then(page=>{
+          const vp=page.getViewport({scale:0.5});
+          const canvas=document.createElement('canvas');
+          canvas.width=vp.width;canvas.height=vp.height;
+          return page.render({canvasContext:canvas.getContext('2d'),viewport:vp}).promise.then(()=>{
+            const thumb=canvas.toDataURL('image/jpeg',0.7);
+            const slide={
+              id:Date.now()+Math.random(),
+              name:file.name.replace(/\.pdf$/i,''),
+              category:'Genel',
+              pages:pdf.numPages,
+              size:file.size,
+              addedAt:new Date().toISOString(),
+              thumb,
+              base64 // tam PDF
+            };
+            if(!D.slides)D.slides=[];
+            D.slides.unshift(slide);
+            localStorage.setItem('capsula_v4',JSON.stringify(D));
+            done++;
+            if(done===files.length){showToast(done+' PDF eklendi ✓');renderSlides();}
+          });
+        });
+      }).catch(()=>{
+        // PDF.js yüklü değilse thumbsuz kaydet
+        const slide={id:Date.now()+Math.random(),name:file.name.replace(/\.pdf$/i,''),category:'Genel',pages:'?',size:file.size,addedAt:new Date().toISOString(),thumb:'',base64};
+        if(!D.slides)D.slides=[];
+        D.slides.unshift(slide);
+        localStorage.setItem('capsula_v4',JSON.stringify(D));
+        done++;
+        if(done===files.length){showToast(done+' PDF eklendi');renderSlides();}
+      });
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value='';
+}
+
+function renderSlides(){
+  if(!D.slides)D.slides=[];
+  const q=(document.getElementById('slidesSearchInput')?.value||'').toLowerCase();
+  // Kategoriler
+  const cats=['Tümü',...new Set(D.slides.map(s=>s.category||'Genel'))];
+  const catEl=document.getElementById('slidesCats');
+  if(catEl){
+    catEl.innerHTML=cats.map(c=>`<button class="slide-cat-btn${c===slidesCurCat?' active':''}" onclick="slidesCurCat='${c}';renderSlides()">${c}</button>`
+    +(c==='Tümü'?`<button class="slide-cat-btn" onclick="addSlideCat()" style="border-style:dashed;">+ Kategori</button>`:'')).join('');
+  }
+  // Filtrele
+  let slides=D.slides;
+  if(slidesCurCat!=='Tümü')slides=slides.filter(s=>(s.category||'Genel')===slidesCurCat);
+  if(q)slides=slides.filter(s=>s.name.toLowerCase().includes(q)||(s.category||'').toLowerCase().includes(q));
+  const grid=document.getElementById('slidesGrid');
+  if(!grid)return;
+  if(!slides.length){
+    grid.innerHTML=`<div class="slide-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:40px;height:40px;opacity:.3;margin-bottom:12px;"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div>Henüz slayt yok</div><div style="font-size:.62rem;margin-top:4px;opacity:.6;">PDF Yükle butonuna basarak ekleyebilirsin</div></div>`;
+    return;
+  }
+  grid.innerHTML=slides.map(s=>`
+    <div class="slide-card" onclick="openSlide('${s.id}')">
+      <div class="slide-thumb">
+        ${s.thumb?`<img src="${s.thumb}" style="width:100%;height:100%;object-fit:cover;">`:`<div class="slide-thumb-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:32px;height:32px;"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><span style="font-size:.6rem;font-family:'JetBrains Mono',monospace;">${s.pages} sayfa</span></div>`}
+      </div>
+      <div class="slide-actions">
+        <div class="slide-action-btn" onclick="event.stopPropagation();changeSlideCat('${s.id}')" title="Kategori değiştir">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        </div>
+        <div class="slide-action-btn" onclick="event.stopPropagation();shareSlide('${s.id}')" title="Paylaş">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </div>
+        <div class="slide-action-btn" onclick="event.stopPropagation();deleteSlide('${s.id}')" title="Sil" style="color:var(--hard);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        </div>
+      </div>
+      <div class="slide-info">
+        <div class="slide-name">${escHtml(s.name)}</div>
+        <div class="slide-meta">
+          <span>${s.pages} sayfa · ${(s.size/1024/1024).toFixed(1)}MB</span>
+          <span class="slide-cat-tag">${escHtml(s.category||'Genel')}</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function openSlide(id){
+  const s=D.slides.find(x=>x.id==id);if(!s||!s.base64)return;
+  // PDF'i yeni sekmede veya modal içinde aç
+  const blob=dataURLtoBlob(s.base64);
+  const url=URL.createObjectURL(blob);
+  // Tam ekran modal
+  const modal=document.createElement('div');
+  modal.style.cssText='position:fixed;inset:0;z-index:4000;background:#000;display:flex;flex-direction:column;';
+  modal.innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(13,13,18,.95);border-bottom:1px solid var(--border);flex-shrink:0;">
+      <button onclick="this.closest('div[style]').remove();URL.revokeObjectURL('${url}')" style="background:none;border:none;color:var(--text2);cursor:pointer;padding:4px 8px;border-radius:8px;font-size:.8rem;font-family:'Sora',sans-serif;display:flex;align-items:center;gap:6px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:16px;height:16px;"><polyline points="15 18 9 12 15 6"/></svg> Geri
+      </button>
+      <div style="flex:1;font-size:.82rem;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(s.name)}</div>
+      <span style="font-size:.6rem;font-family:'JetBrains Mono',monospace;color:var(--text3);">${s.pages} sayfa</span>
+    </div>
+    <iframe src="${url}" style="flex:1;border:none;width:100%;background:#1a1a1a;"></iframe>`;
+  document.body.appendChild(modal);
+}
+
+function dataURLtoBlob(dataURL){
+  const arr=dataURL.split(',');
+  const mime=arr[0].match(/:(.*?);/)[1];
+  const bstr=atob(arr[1]);
+  let n=bstr.length;
+  const u8=new Uint8Array(n);
+  while(n--)u8[n]=bstr.charCodeAt(n);
+  return new Blob([u8],{type:mime});
+}
+
+function addSlideCat(){
+  const name=prompt('Yeni kategori adı:');
+  if(!name?.trim())return;
+  slidesCurCat=name.trim();
+  renderSlides();
+}
+
+function changeSlideCat(id){
+  const s=D.slides.find(x=>x.id==id);if(!s)return;
+  const cats=[...new Set(D.slides.map(x=>x.category||'Genel')),'+ Yeni kategori'];
+  const cur=s.category||'Genel';
+  const chosen=prompt(`Kategori seç (şu an: ${cur})\n${cats.join(', ')}\n\nYeni kategori adı yaz:`);
+  if(!chosen?.trim())return;
+  s.category=chosen.trim();
+  localStorage.setItem('capsula_v4',JSON.stringify(D));
+  renderSlides();
+}
+
+function deleteSlide(id){
+  showConfirm('Bu slaytı silmek istediğine emin misin?',()=>{
+    D.slides=D.slides.filter(x=>x.id!=id);
+    localStorage.setItem('capsula_v4',JSON.stringify(D));
+    renderSlides();
+    showToast('Slayt silindi');
+  });
+}
+
+function shareSlide(id){
+  const s=D.slides.find(x=>x.id==id);if(!s)return;
+  if(!currentUser){showToast('Paylaşmak için giriş yap');return;}
+  // Arkadaş listesini çek ve seçtir
+  if(!D.profile.friends?.length){showToast('Henüz arkadaşın yok');return;}
+  db.collection('users').doc(currentUser.uid).get().then(doc=>{
+    const friends=doc.data()?.friends||[];
+    if(!friends.length){showToast('Henüz arkadaşın yok');return;}
+    const promises=friends.map(uid=>db.collection('users').doc(uid).get());
+    Promise.all(promises).then(docs=>{
+      const modal=document.createElement('div');
+      modal.className='modal-overlay';modal.style.display='flex';
+      modal.innerHTML=`<div class="modal-box" style="padding:20px;">
+        <button class="modal-close-btn" onclick="this.closest('.modal-overlay').remove()">✕</button>
+        <div class="plabel" style="margin-bottom:12px;">Slaytı Paylaş — ${escHtml(s.name)}</div>
+        ${docs.map(d=>{const u=d.data();return`<div onclick="sendSlideToFriend('${id}','${d.id}');this.closest('.modal-overlay').remove();" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;cursor:pointer;background:var(--bg3);margin-bottom:6px;">
+          ${userAvatarHtml(u,36)}
+          <div><div style="font-size:.8rem;color:var(--text);">${escHtml(u.name||'')}</div><div style="font-size:.62rem;color:var(--text3);">@${u.username||''}</div></div>
+        </div>`;}).join('')}
+      </div>`;
+      document.body.appendChild(modal);
+    });
+  });
+}
+
+function sendSlideToFriend(slideId,toUid){
+  const s=D.slides.find(x=>x.id==slideId);if(!s)return;
+  const cid=convId(currentUser.uid,toUid);
+  const msg=`📄 **${s.name}** adlı slaytı paylaştı`;
+  const batch=db.batch();
+  const msgRef=db.collection('conversations').doc(cid).collection('messages').doc();
+  batch.set(msgRef,{
+    text:msg,senderId:currentUser.uid,
+    sentAt:firebase.firestore.FieldValue.serverTimestamp(),
+    type:'slide',slideThumb:s.thumb||'',slideName:s.name
+  });
+  batch.set(db.collection('conversations').doc(cid),{
+    members:[currentUser.uid,toUid],
+    lastMsg:`📄 ${s.name}`,
+    lastMsgAt:firebase.firestore.FieldValue.serverTimestamp(),
+    lastSenderId:currentUser.uid,
+    [`unreadCount.${toUid}`]:firebase.firestore.FieldValue.increment(1),
+    [`unreadCount.${currentUser.uid}`]:0
+  },{merge:true});
+  batch.commit().then(()=>showToast('Slayt gönderildi ✓')).catch(console.warn);
+}
+
 // ─────────────────────────── CHAT ─────────────────────────────────────────
 let activeChatUid=null;
 let activeChatUnsub=null;
@@ -3152,62 +3406,95 @@ function loadConversations(){
     .where('members','array-contains',uid)
     .orderBy('lastMsgAt','desc')
     .onSnapshot(snap=>{
-      if(snap.empty){
-        document.getElementById('chatConvList').innerHTML='<div class="chat-empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:36px;height:36px;opacity:.3;margin-bottom:12px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div>Henüz sohbet yok</div><div style="font-size:.65rem;margin-top:4px;opacity:.6;">Arkadaşının profiline gir ve<br>\'Mesaj Gönder\' butonuna bas</div></div>';
-        return;
-      }
       let totalUnread=0;
-      const items=snap.docs.map(doc=>{
+      const convItems=snap.docs.map(doc=>{
         const d=doc.data();
         const otherUid=d.members.find(m=>m!==uid);
         const unread=d.unreadCount?.[uid]||0;
         totalUnread+=unread;
         return{id:doc.id,otherUid,data:d,unread};
       });
-      // Diğer kullanıcıların profillerini çek
-      const promises=items.map(item=>db.collection('users').doc(item.otherUid).get());
-      Promise.all(promises).then(docs=>{
-        let html='';
-        docs.forEach((udoc,i)=>{
-          const u=udoc.exists?udoc.data():{name:'Kullanıcı',username:'',avatarThumb:''};
-          const item=items[i];
-          const d=item.data;
-          const isActive=activeChatUid===item.otherUid;
-          const timeStr=d.lastMsgAt?fmtChatTime(d.lastMsgAt.toDate?.()||new Date(d.lastMsgAt)):'';
-          const avatarHtml=u.avatarThumb
-            ?`<img src="${u.avatarThumb}">`
-            :`<span>${(u.name||'?').slice(0,2).toUpperCase()}</span>`;
-          html+=`<div class="chat-conv-item${isActive?' active':''}" onclick="openChat('${item.otherUid}')">
-            <div class="chat-conv-avatar">${avatarHtml}</div>
-            <div class="chat-conv-info">
-              <div class="chat-conv-name">${escHtml(u.name||'')}</div>
-              <div class="chat-conv-preview">${escHtml(d.lastMsg||'')}</div>
-            </div>
-            <div class="chat-conv-meta">
-              <div class="chat-conv-time">${timeStr}</div>
-              ${item.unread>0?`<div class="chat-conv-badge">${item.unread}</div>`:''}
-            </div>
-          </div>`;
+
+      // Arkadaş listesini de çek — konuşması olmayanlar da görünsün
+      db.collection('users').doc(uid).get().then(myDoc=>{
+        const myFriends=myDoc.data()?.friends||[];
+        // Konuşması olan arkadaşların uid listesi
+        const convUids=convItems.map(c=>c.otherUid);
+        // Konuşması olmayan arkadaşlar
+        const noConvFriends=myFriends.filter(f=>!convUids.includes(f));
+
+        // Konuşması olan arkadaşların profillerini çek
+        const convPromises=convItems.map(item=>db.collection('users').doc(item.otherUid).get());
+        // Konuşması olmayan arkadaşların profillerini çek
+        const noConvPromises=noConvFriends.map(f=>db.collection('users').doc(f).get());
+
+        Promise.all([Promise.all(convPromises),Promise.all(noConvPromises)]).then(([convDocs,noConvDocs])=>{
+          let html='';
+          // Önce konuşmalar
+          convDocs.forEach((udoc,i)=>{
+            const u=udoc.exists?udoc.data():{name:'Kullanıcı',username:'',avatarThumb:''};
+            const item=convItems[i];
+            const d=item.data;
+            const isActive=activeChatUid===item.otherUid;
+            const timeStr=d.lastMsgAt?fmtChatTime(d.lastMsgAt.toDate?.()||new Date(d.lastMsgAt)):'';
+            const avatarHtml=u.avatarThumb?`<img src="${u.avatarThumb}">`:`<span>${(u.name||'?').slice(0,2).toUpperCase()}</span>`;
+            html+=`<div class="chat-conv-item${isActive?' active':''}" onclick="openChat('${item.otherUid}')">
+              <div class="chat-conv-avatar">${avatarHtml}</div>
+              <div class="chat-conv-info">
+                <div class="chat-conv-name">${escHtml(u.name||'')}</div>
+                <div class="chat-conv-preview">${item.unread>0?`<strong>${escHtml(d.lastMsg||'')}</strong>`:escHtml(d.lastMsg||'Merhaba de!')}</div>
+              </div>
+              <div class="chat-conv-meta">
+                <div class="chat-conv-time">${timeStr}</div>
+                ${item.unread>0?`<div class="chat-conv-badge">${item.unread}</div>`:''}
+              </div>
+            </div>`;
+          });
+          // Konuşması olmayan arkadaşlar (yeni sohbet başlatmak için)
+          if(noConvDocs.length){
+            if(convDocs.length) html+=`<div style="font-size:.52rem;letter-spacing:.15em;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;padding:12px 4px 6px;">Arkadaşlar</div>`;
+            noConvDocs.forEach(udoc=>{
+              if(!udoc.exists)return;
+              const u=udoc.data();
+              const avatarHtml=u.avatarThumb?`<img src="${u.avatarThumb}">`:`<span>${(u.name||'?').slice(0,2).toUpperCase()}</span>`;
+              html+=`<div class="chat-conv-item" onclick="openChat('${udoc.id}')">
+                <div class="chat-conv-avatar">${avatarHtml}</div>
+                <div class="chat-conv-info">
+                  <div class="chat-conv-name">${escHtml(u.name||'')}</div>
+                  <div class="chat-conv-preview" style="font-style:italic;">Merhaba de 👋</div>
+                </div>
+                <div class="chat-conv-meta">
+                  <div class="chat-conv-time" style="color:var(--accent2);font-size:.55rem;">Yeni</div>
+                </div>
+              </div>`;
+            });
+          }
+          if(!html){
+            html='<div class="chat-empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:36px;height:36px;opacity:.3;margin-bottom:12px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div>Henüz arkadaşın yok</div><div style="font-size:.65rem;margin-top:4px;opacity:.6;">Drawer\'dan arkadaş ekleyebilirsin</div></div>';
+          }
+          document.getElementById('chatConvList').innerHTML=html;
+          const tb=document.getElementById('chatUnreadTotal');
+          if(totalUnread>0){tb.style.display='';tb.textContent=totalUnread+' yeni';}
+          else tb.style.display='none';
+          updateChatNavBadge(totalUnread);
         });
-        document.getElementById('chatConvList').innerHTML=html;
-        const tb=document.getElementById('chatUnreadTotal');
-        if(totalUnread>0){tb.style.display='';tb.textContent=totalUnread+' yeni';}
-        else tb.style.display='none';
-        updateChatNavBadge(totalUnread);
-      });
+      }).catch(err=>{console.warn('conv list err',err);});
     },err=>console.warn('conv list err',err));
 }
 
 function updateChatNavBadge(count){
-  // Nav bar'daki sohbet butonuna badge ekle/kaldır
   const btn=document.querySelector('.nav-center-fab');
   if(!btn)return;
   let badge=btn.querySelector('.chat-nav-badge');
   if(count>0){
+    btn.classList.add('has-msg');
     if(!badge){badge=document.createElement('div');badge.className='chat-nav-badge';btn.appendChild(badge);}
     badge.textContent=count>9?'9+':count;
-    badge.style.cssText='position:absolute;top:-4px;right:-4px;background:var(--hard);color:#fff;font-size:.45rem;font-family:JetBrains Mono,monospace;border-radius:8px;padding:1px 4px;border:2px solid var(--bg);min-width:16px;text-align:center;';
-  } else if(badge){badge.remove();}
+    badge.style.cssText='position:absolute;top:-5px;right:-5px;background:var(--hard);color:#fff;font-size:.48rem;font-family:JetBrains Mono,monospace;border-radius:9px;padding:2px 5px;border:2px solid var(--bg);min-width:18px;text-align:center;font-weight:600;';
+  } else {
+    btn.classList.remove('has-msg');
+    if(badge)badge.remove();
+  }
 }
 
 function openChat(otherUid){
