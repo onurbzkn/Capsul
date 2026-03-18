@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
@@ -1593,7 +1593,7 @@ select.pf option{background:var(--bg2);color:var(--text);}
 </div>
 
 <!-- AUTH SCREEN -->
-<div id="authScreen" style="display:none;position:fixed;inset:0;z-index:3000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;">
+<div id="authScreen" style="display:none;position:fixed;inset:0;z-index:3000;background:var(--bg);flex-direction:column;align-items:center;justify-content:center;padding:24px;">
   <div style="width:100%;max-width:340px;">
     <div style="text-align:center;margin-bottom:32px;">
       <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--diary));display:flex;align-items:center;justify-content:center;margin:0 auto 12px;box-shadow:0 0 28px rgba(124,111,247,.4);">
@@ -1746,21 +1746,25 @@ const firebaseConfig = {
   messagingSenderId: "951927360233",
   appId: "1:951927360233:web:b3d8c62eae93c668a0be78"
 };
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
 
-let currentUser = null;
-let unsubscribeSnapshot = null;
+let auth=null, db=null;
+try{
+  firebase.initializeApp(firebaseConfig);
+  auth=firebase.auth();
+  db=firebase.firestore();
+}catch(e){console.warn('Firebase yüklenemedi:',e);}
+
+let currentUser=null;
+let unsubscribeSnapshot=null;
 
 // ── AUTH EKRANI ────────────────────────────────────────────────────────────
 function showAuthScreen(){
-  document.getElementById('authScreen').style.display='flex';
-  document.getElementById('app').style.display='none';
+  const el=document.getElementById('authScreen');
+  el.style.display='flex';
 }
 function hideAuthScreen(){
-  document.getElementById('authScreen').style.display='none';
-  document.getElementById('app').style.display='flex';
+  const el=document.getElementById('authScreen');
+  el.style.display='none';
 }
 
 function switchAuthTab(tab){
@@ -2158,7 +2162,7 @@ function updateFriendRequestBadge(requests){
 }
 
 // ── AUTH STATE ─────────────────────────────────────────────────────────────
-auth.onAuthStateChanged(user=>{
+if(auth){auth.onAuthStateChanged(user=>{
   currentUser=user;
   if(user){
     document.getElementById('signOutBtn').style.display='flex';
@@ -2168,19 +2172,17 @@ auth.onAuthStateChanged(user=>{
     });
   } else {
     document.getElementById('signOutBtn').style.display='none';
-    // State'i temizle — sayfa yenilemeden yeni hesap için hazır olsun
     if(unsubscribeSnapshot){unsubscribeSnapshot();unsubscribeSnapshot=null;}
     D={todos:[],completedTodos:[],trash:[],contentTrash:[],calPlans:{},notes:[],diary:[],
        kanban:{todo:[],doing:[],done:[]},reading:[],schedule:[],exams:[],notebook:[],
        profile:{name:'Kullanıcı',email:'',avatar:'',theme:D?.profile?.theme||'default'}};
     showAuthScreen();
-    // Auth ekranını sıfırla
     document.getElementById('authEmailInput').value='';
     document.getElementById('authPasswordInput').value='';
     document.getElementById('authError').style.display='none';
     switchAuthTab('login');
   }
-});
+});}
 
 function initApp(){
   hideAuthScreen();
@@ -2295,6 +2297,7 @@ let viewingEntry=null, completedOpen=false, _confirmCb=null;
 let pomoMode='work', pomoRunning=false, pomoSecs=25*60, pomoInterval=null, pomoSessions=0, pomoTaskId=null;
 const POMO_DUR={work:25*60,short:5*60,long:15*60};
 
+const ICO_SEARCH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
 const ICO_CHAT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
 const MODES={
   home:[
@@ -2318,7 +2321,6 @@ const MODES={
     {id:'notebook',lbl:'Notlar',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>'},
     {id:'pomodoro',lbl:'Pomodoro',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'},
   ],
-};
 };
 const PAGE_TITLES={home:'Ana Ekran',todo:'Görevler',notes:'Notlar',diary:'Günlük',search:'Arama',calendar:'Takvim',pomodoro:'Pomodoro',kanban:'Kanban',weekly:'Haftalık Özet',reading:'Okuma Listesi',pro:'Profesyonel',schedule:'Ders Programı',exams:'Sınav Takvimi',notebook:'Not Defteri',chat:'Sohbet'};
 
@@ -3262,7 +3264,7 @@ function listenMessages(cid,otherUser){
       snap.docs.forEach(doc=>{
         const m=doc.data();
         const isMine=m.senderId===currentUser.uid;
-        const d=m.sentAt?.toDate?()?m.sentAt.toDate():new Date(m.sentAt):new Date();
+        const d=m.sentAt?.toDate?m.sentAt.toDate():new Date(m.sentAt||Date.now());
         const dateStr=d.toLocaleDateString('tr-TR',{day:'numeric',month:'long'});
         if(dateStr!==lastDate){
           html+=`<div class="chat-date-divider">${dateStr}</div>`;
@@ -3946,8 +3948,7 @@ window.addEventListener('load',()=>{
   const isFirstVisit=!localStorage.getItem('capsula_toured')&&!localStorage.getItem('capsula_visited');
   localStorage.setItem('capsula_visited','1');
 
-  // Auth ekranı başta gizli, Firebase auth state belirleyecek
-  document.getElementById('authScreen').style.display='none';
+  // Auth state onAuthStateChanged hallediyor
 
   // Seed demo data
   if(!D.todos.length&&!D.notes.length&&!D.diary.length){
@@ -3975,11 +3976,26 @@ window.addEventListener('load',()=>{
   };
 
   runSplash(()=>{
-    // Auth state onAuthStateChanged hallediyor, burada sadece PIN kontrolü
-    const hasPIN=localStorage.getItem('capsula_pin');
+    if(!auth){
+      // Firebase yüklenemedi — offline mod, direkt uygulamaya gir
+      initApp();
+      return;
+    }
     if(currentUser){
+      const hasPIN=localStorage.getItem('capsula_pin');
       if(hasPIN)document.getElementById('pinScreen').style.display='flex';
       else if(isFirstVisit)setTimeout(showWelcomeCard,500);
+    } else {
+      let authResolved=false;
+      const unsub=auth.onAuthStateChanged(u=>{
+        if(authResolved)return;
+        authResolved=true;
+        unsub();
+        if(!u)showAuthScreen();
+      });
+      setTimeout(()=>{
+        if(!authResolved){authResolved=true;showAuthScreen();}
+      },4000);
     }
   });
 });
