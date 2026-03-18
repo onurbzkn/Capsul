@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
@@ -507,6 +507,50 @@ main{flex:1;overflow:hidden;position:relative;}
 .sdash-exam-name{font-size:.8rem;font-weight:400;color:var(--text);}
 .sdash-exam-date{font-size:.6rem;font-family:'JetBrains Mono',monospace;color:var(--text3);margin-top:1px;}
 .sdash-exam-diff{font-size:.6rem;font-family:'JetBrains Mono',monospace;white-space:nowrap;}
+/* ── CHAT ────────────────────────────────────────────────────────────────── */
+.chat-layout{display:flex;flex-direction:column;height:calc(100vh - var(--header-h) - var(--nav-h));gap:0;margin:-16px;padding:0;}
+.chat-list-panel{display:flex;flex-direction:column;height:100%;}
+.chat-list-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;flex-shrink:0;}
+.chat-list-title{font-size:.88rem;font-weight:500;color:var(--text);}
+.chat-unread-total{background:var(--accent);color:#fff;font-size:.55rem;font-family:'JetBrains Mono',monospace;border-radius:10px;padding:2px 8px;}
+.chat-conv-list{flex:1;overflow-y:auto;padding:0 10px 80px;}
+.chat-conv-item{display:flex;align-items:center;gap:11px;padding:10px;border-radius:14px;cursor:pointer;transition:background .18s;margin-bottom:4px;}
+.chat-conv-item:hover{background:var(--bg2);}
+.chat-conv-item.active{background:rgba(124,111,247,.12);border:1px solid rgba(124,111,247,.2);}
+.chat-conv-avatar{width:44px;height:44px;border-radius:50%;flex-shrink:0;overflow:hidden;background:linear-gradient(135deg,var(--accent),var(--diary));display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:600;color:#fff;}
+.chat-conv-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.chat-conv-info{flex:1;min-width:0;}
+.chat-conv-name{font-size:.82rem;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.chat-conv-preview{font-size:.68rem;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+.chat-conv-meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+.chat-conv-time{font-size:.55rem;font-family:'JetBrains Mono',monospace;color:var(--text3);}
+.chat-conv-badge{background:var(--accent);color:#fff;font-size:.52rem;font-family:'JetBrains Mono',monospace;border-radius:9px;padding:1px 6px;min-width:18px;text-align:center;}
+.chat-empty-state{text-align:center;padding:48px 20px;color:var(--text3);font-size:.72rem;font-weight:300;line-height:1.7;}
+.chat-active-panel{display:flex;flex-direction:column;height:100%;}
+.chat-active-header{display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(13,13,18,.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);flex-shrink:0;}
+.chat-back-btn{background:none;border:none;color:var(--text2);cursor:pointer;padding:4px 6px;border-radius:8px;display:flex;align-items:center;transition:background .18s;}
+.chat-back-btn:hover{background:var(--bg3);}
+.chat-active-name{font-size:.86rem;font-weight:500;color:var(--text);flex:1;}
+.chat-active-status{font-size:.58rem;font-family:'JetBrains Mono',monospace;color:var(--easy);}
+.chat-messages{flex:1;overflow-y:auto;padding:14px 14px 8px;display:flex;flex-direction:column;gap:4px;}
+.chat-msg-row{display:flex;align-items:flex-end;gap:7px;margin-bottom:2px;}
+.chat-msg-row.mine{flex-direction:row-reverse;}
+.chat-msg-avatar{width:28px;height:28px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,var(--accent),var(--diary));display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:600;color:#fff;flex-shrink:0;}
+.chat-msg-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.chat-bubble{max-width:72%;padding:9px 13px;border-radius:18px;font-size:.8rem;font-weight:300;line-height:1.55;word-break:break-word;}
+.chat-bubble.theirs{background:var(--bg2);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:4px;}
+.chat-bubble.mine{background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.85));color:#fff;border-bottom-right-radius:4px;}
+.chat-bubble-time{font-size:.5rem;opacity:.5;margin-top:3px;font-family:'JetBrains Mono',monospace;}
+.chat-bubble.mine .chat-bubble-time{text-align:right;}
+.chat-date-divider{text-align:center;font-size:.54rem;font-family:'JetBrains Mono',monospace;color:var(--text3);letter-spacing:.08em;margin:10px 0;display:flex;align-items:center;gap:8px;}
+.chat-date-divider::before,.chat-date-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.chat-input-bar{display:flex;align-items:flex-end;gap:8px;padding:10px 12px 12px;background:rgba(13,13,18,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);flex-shrink:0;}
+.chat-input{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:10px 14px;font-family:'Sora',sans-serif;font-size:.82rem;color:var(--text);outline:none;resize:none;max-height:100px;line-height:1.5;transition:border-color .2s;}
+.chat-input:focus{border-color:rgba(124,111,247,.4);}
+.chat-input::placeholder{color:var(--text3);}
+.chat-send-btn{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;color:#fff;box-shadow:0 4px 14px rgba(124,111,247,.3);}
+.chat-send-btn:hover{transform:scale(1.08);}
+/* ── DERS PROGRAMI ───────────────────────────────────────────────────────── */
 .schedule-days{display:flex;flex-direction:column;gap:10px;}
 .sched-day-block{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
 .sched-day-header{font-size:.55rem;font-family:'JetBrains Mono',monospace;letter-spacing:.18em;color:var(--text3);text-transform:uppercase;padding:7px 12px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02);}
@@ -893,6 +937,37 @@ select.pf option{background:var(--bg2);color:var(--text);}
       </div>
       <div id="calQuote"></div>
       <div id="calEvents"></div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="page" id="page-chat">
+      <div class="chat-layout">
+        <!-- Sol: Konuşma listesi -->
+        <div class="chat-list-panel" id="chatListPanel">
+          <div class="chat-list-header">
+            <div class="chat-list-title">Sohbet</div>
+            <div id="chatUnreadTotal" class="chat-unread-total" style="display:none;"></div>
+          </div>
+          <div id="chatConvList" class="chat-conv-list">
+            <div class="chat-empty-state">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:36px;height:36px;opacity:.3;margin-bottom:12px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <div>Henüz sohbet yok</div>
+              <div style="font-size:.65rem;margin-top:4px;opacity:.6;">Arkadaşlarına mesaj göndermek için<br>profil sayfalarını aç</div>
+            </div>
+          </div>
+        </div>
+        <!-- Sağ: Aktif sohbet -->
+        <div class="chat-active-panel" id="chatActivePanel" style="display:none;">
+          <div class="chat-active-header" id="chatActiveHeader"></div>
+          <div class="chat-messages" id="chatMessages"></div>
+          <div class="chat-input-bar">
+            <textarea class="chat-input" id="chatInput" placeholder="Mesaj yaz..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"></textarea>
+            <button class="chat-send-btn" onclick="sendMessage()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- POMODORO (Uni + shared) -->
@@ -2065,6 +2140,10 @@ function viewFriendProfile(uid){
             <div style="background:var(--bg3);border-radius:10px;padding:10px 6px;text-align:center;"><div style="font-size:1.1rem;font-family:'JetBrains Mono',monospace;font-weight:600;color:${accent};">${notes}</div><div style="font-size:.48rem;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-top:3px;">Not</div></div>
             <div style="background:var(--bg3);border-radius:10px;padding:10px 6px;text-align:center;"><div style="font-size:1.1rem;font-family:'JetBrains Mono',monospace;font-weight:600;color:${accent};">${books}</div><div style="font-size:.48rem;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-top:3px;">Kitap</div></div>
           </div>
+          <button onclick="startChatWith('${uid}')" style="width:100%;margin-top:4px;padding:11px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:12px;cursor:pointer;font-family:'Sora',sans-serif;font-size:.82rem;font-weight:500;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Mesaj Gönder
+          </button>
         </div>`;
       closeModal('friendsModal');
       openModal('friendProfileModal');
@@ -2109,6 +2188,8 @@ function initApp(){
   setMode(curMode);
   renderTodos();renderNotes();renderDiary();renderDashboard();renderCalendar();
   renderKanban();renderReading();renderSchedule();renderExams();renderNotebook();renderPro();
+  // Chat konuşma listesini arka planda dinle (badge için)
+  if(currentUser)loadConversations();
 }
 
 const QUOTES=[
@@ -2214,31 +2295,32 @@ let viewingEntry=null, completedOpen=false, _confirmCb=null;
 let pomoMode='work', pomoRunning=false, pomoSecs=25*60, pomoInterval=null, pomoSessions=0, pomoTaskId=null;
 const POMO_DUR={work:25*60,short:5*60,long:15*60};
 
-const ICO_SEARCH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
+const ICO_CHAT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
 const MODES={
   home:[
     {id:'home',lbl:'Ana',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>'},
     {id:'todo',lbl:'Görev',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>'},
-    {id:'diary',lbl:'Günlük',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',center:true},
+    {id:'chat',lbl:'Sohbet',ico:ICO_CHAT,center:true},
     {id:'notes',lbl:'Not',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'},
     {id:'search',lbl:'Ara',ico:ICO_SEARCH},
   ],
   pro:[
     {id:'pro',lbl:'Özet',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>'},
     {id:'kanban',lbl:'Kanban',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="10" rx="1"/><rect x="14" y="17" width="7" height="4" rx="1"/></svg>'},
-    {id:'todo',lbl:'Görev',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',center:true},
+    {id:'chat',lbl:'Sohbet',ico:ICO_CHAT,center:true},
     {id:'notes',lbl:'Not',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'},
     {id:'search',lbl:'Ara',ico:ICO_SEARCH},
   ],
   uni:[
     {id:'home',lbl:'Ana',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>'},
     {id:'schedule',lbl:'Program',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'},
-    {id:'exams',lbl:'Sınav',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',center:true},
+    {id:'chat',lbl:'Sohbet',ico:ICO_CHAT,center:true},
     {id:'notebook',lbl:'Notlar',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>'},
     {id:'pomodoro',lbl:'Pomodoro',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'},
   ],
 };
-const PAGE_TITLES={home:'Ana Ekran',todo:'Görevler',notes:'Notlar',diary:'Günlük',search:'Arama',calendar:'Takvim',pomodoro:'Pomodoro',kanban:'Kanban',weekly:'Haftalık Özet',reading:'Okuma Listesi',pro:'Profesyonel',schedule:'Ders Programı',exams:'Sınav Takvimi',notebook:'Not Defteri'};
+};
+const PAGE_TITLES={home:'Ana Ekran',todo:'Görevler',notes:'Notlar',diary:'Günlük',search:'Arama',calendar:'Takvim',pomodoro:'Pomodoro',kanban:'Kanban',weekly:'Haftalık Özet',reading:'Okuma Listesi',pro:'Profesyonel',schedule:'Ders Programı',exams:'Sınav Takvimi',notebook:'Not Defteri',chat:'Sohbet'};
 
 function setMode(mode){
   curMode=mode;
@@ -2281,6 +2363,7 @@ function switchPage(page){
   if(page==='schedule')renderSchedule();
   if(page==='exams')renderExams();
   if(page==='notebook')renderNotebook();
+  if(page==='chat'){renderChatPage();if(activeChatUid)openChat(activeChatUid);}
   if(page==='search'){document.getElementById('search-results').innerHTML='';setTimeout(()=>{const inp=document.getElementById('searchInput');if(inp){inp.value='';inp.focus();}},200);}
   if(page==='pro')renderPro();
 }
@@ -3043,6 +3126,200 @@ function renderReading(){
   let html='';
   ['reading','toread','done'].forEach(s=>{if(!groups[s].length)return;html+=`<div class="reading-group-title">${labels[s]}</div>`;groups[s].forEach(item=>html+=`<div class="reading-item" onclick="cycleReadingStatus(${item.id})"><div class="reading-dot ${item.status}"></div><div class="reading-info"><div class="reading-title">${escHtml(item.title)}</div>${item.author?`<div class="reading-author">${escHtml(item.author)}</div>`:''}</div><span class="reading-badge ${item.status}">${labels[item.status]}</span></div>`);});
   document.getElementById('readingList').innerHTML=html||'<div class="empty-state">Okuma listesi boş.<br>Üstten kitap ekle.</div>';
+}
+
+// ─────────────────────────── CHAT ─────────────────────────────────────────
+let activeChatUid=null;
+let activeChatUnsub=null;
+let convListUnsub=null;
+
+function convId(uid1,uid2){return[uid1,uid2].sort().join('_');}
+
+function renderChatPage(){
+  if(!currentUser){
+    document.getElementById('chatConvList').innerHTML='<div class="chat-empty-state">Giriş yapman gerekiyor</div>';
+    return;
+  }
+  loadConversations();
+}
+
+function loadConversations(){
+  if(convListUnsub)convListUnsub();
+  const uid=currentUser.uid;
+  convListUnsub=db.collection('conversations')
+    .where('members','array-contains',uid)
+    .orderBy('lastMsgAt','desc')
+    .onSnapshot(snap=>{
+      if(snap.empty){
+        document.getElementById('chatConvList').innerHTML='<div class="chat-empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:36px;height:36px;opacity:.3;margin-bottom:12px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div>Henüz sohbet yok</div><div style="font-size:.65rem;margin-top:4px;opacity:.6;">Arkadaşının profiline gir ve<br>\'Mesaj Gönder\' butonuna bas</div></div>';
+        return;
+      }
+      let totalUnread=0;
+      const items=snap.docs.map(doc=>{
+        const d=doc.data();
+        const otherUid=d.members.find(m=>m!==uid);
+        const unread=d.unreadCount?.[uid]||0;
+        totalUnread+=unread;
+        return{id:doc.id,otherUid,data:d,unread};
+      });
+      // Diğer kullanıcıların profillerini çek
+      const promises=items.map(item=>db.collection('users').doc(item.otherUid).get());
+      Promise.all(promises).then(docs=>{
+        let html='';
+        docs.forEach((udoc,i)=>{
+          const u=udoc.exists?udoc.data():{name:'Kullanıcı',username:'',avatarThumb:''};
+          const item=items[i];
+          const d=item.data;
+          const isActive=activeChatUid===item.otherUid;
+          const timeStr=d.lastMsgAt?fmtChatTime(d.lastMsgAt.toDate?.()||new Date(d.lastMsgAt)):'';
+          const avatarHtml=u.avatarThumb
+            ?`<img src="${u.avatarThumb}">`
+            :`<span>${(u.name||'?').slice(0,2).toUpperCase()}</span>`;
+          html+=`<div class="chat-conv-item${isActive?' active':''}" onclick="openChat('${item.otherUid}')">
+            <div class="chat-conv-avatar">${avatarHtml}</div>
+            <div class="chat-conv-info">
+              <div class="chat-conv-name">${escHtml(u.name||'')}</div>
+              <div class="chat-conv-preview">${escHtml(d.lastMsg||'')}</div>
+            </div>
+            <div class="chat-conv-meta">
+              <div class="chat-conv-time">${timeStr}</div>
+              ${item.unread>0?`<div class="chat-conv-badge">${item.unread}</div>`:''}
+            </div>
+          </div>`;
+        });
+        document.getElementById('chatConvList').innerHTML=html;
+        const tb=document.getElementById('chatUnreadTotal');
+        if(totalUnread>0){tb.style.display='';tb.textContent=totalUnread+' yeni';}
+        else tb.style.display='none';
+        updateChatNavBadge(totalUnread);
+      });
+    },err=>console.warn('conv list err',err));
+}
+
+function updateChatNavBadge(count){
+  // Nav bar'daki sohbet butonuna badge ekle/kaldır
+  const btn=document.querySelector('.nav-center-fab');
+  if(!btn)return;
+  let badge=btn.querySelector('.chat-nav-badge');
+  if(count>0){
+    if(!badge){badge=document.createElement('div');badge.className='chat-nav-badge';btn.appendChild(badge);}
+    badge.textContent=count>9?'9+':count;
+    badge.style.cssText='position:absolute;top:-4px;right:-4px;background:var(--hard);color:#fff;font-size:.45rem;font-family:JetBrains Mono,monospace;border-radius:8px;padding:1px 4px;border:2px solid var(--bg);min-width:16px;text-align:center;';
+  } else if(badge){badge.remove();}
+}
+
+function openChat(otherUid){
+  activeChatUid=otherUid;
+  // Aktif konuşmayı göster
+  document.getElementById('chatListPanel').style.display='none';
+  const panel=document.getElementById('chatActivePanel');
+  panel.style.display='flex';
+  // Karşı kullanıcının profilini çek
+  db.collection('users').doc(otherUid).get().then(doc=>{
+    const u=doc.exists?doc.data():{name:'Kullanıcı',avatarThumb:''};
+    const avatarHtml=u.avatarThumb
+      ?`<img src="${u.avatarThumb}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+      :`<span style="font-size:.65rem;font-weight:600;">${(u.name||'?').slice(0,2).toUpperCase()}</span>`;
+    document.getElementById('chatActiveHeader').innerHTML=`
+      <button class="chat-back-btn" onclick="closeChatActive()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:18px;height:18px;"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div style="width:36px;height:36px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,var(--accent),var(--diary));display:flex;align-items:center;justify-content:center;flex-shrink:0;">${avatarHtml}</div>
+      <div>
+        <div class="chat-active-name">${escHtml(u.name||'')}</div>
+        <div class="chat-active-status">● Çevrimiçi</div>
+      </div>
+    `;
+    // Okunmadı sayacını sıfırla
+    const cid=convId(currentUser.uid,otherUid);
+    db.collection('conversations').doc(cid).update({
+      [`unreadCount.${currentUser.uid}`]:0
+    }).catch(()=>{});
+    // Mesajları dinle
+    listenMessages(cid,u);
+  });
+  // Listeyi güncelle
+  loadConversations();
+}
+
+function closeChatActive(){
+  activeChatUid=null;
+  if(activeChatUnsub){activeChatUnsub();activeChatUnsub=null;}
+  document.getElementById('chatActivePanel').style.display='none';
+  document.getElementById('chatListPanel').style.display='flex';
+}
+
+function listenMessages(cid,otherUser){
+  if(activeChatUnsub){activeChatUnsub();activeChatUnsub=null;}
+  const msgs=document.getElementById('chatMessages');
+  msgs.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3);font-size:.68rem;">Yükleniyor...</div>';
+  activeChatUnsub=db.collection('conversations').doc(cid)
+    .collection('messages').orderBy('sentAt','asc')
+    .onSnapshot(snap=>{
+      if(snap.empty){msgs.innerHTML='<div style="text-align:center;padding:30px 20px;color:var(--text3);font-size:.72rem;">Henüz mesaj yok.<br>Merhaba de! 👋</div>';return;}
+      let html='';
+      let lastDate='';
+      snap.docs.forEach(doc=>{
+        const m=doc.data();
+        const isMine=m.senderId===currentUser.uid;
+        const d=m.sentAt?.toDate?()?m.sentAt.toDate():new Date(m.sentAt):new Date();
+        const dateStr=d.toLocaleDateString('tr-TR',{day:'numeric',month:'long'});
+        if(dateStr!==lastDate){
+          html+=`<div class="chat-date-divider">${dateStr}</div>`;
+          lastDate=dateStr;
+        }
+        const timeStr=d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+        const avatarHtml=!isMine?(otherUser.avatarThumb
+          ?`<div class="chat-msg-avatar"><img src="${otherUser.avatarThumb}"></div>`
+          :`<div class="chat-msg-avatar">${(otherUser.name||'?').slice(0,2).toUpperCase()}</div>`):'';
+        html+=`<div class="chat-msg-row${isMine?' mine':''}">
+          ${avatarHtml}
+          <div>
+            <div class="chat-bubble ${isMine?'mine':'theirs'}">${escHtml(m.text||'')}<div class="chat-bubble-time">${timeStr}</div></div>
+          </div>
+        </div>`;
+      });
+      msgs.innerHTML=html;
+      msgs.scrollTop=msgs.scrollHeight;
+    },err=>console.warn('msg err',err));
+}
+
+function sendMessage(){
+  const inp=document.getElementById('chatInput');
+  const text=inp.value.trim();
+  if(!text||!activeChatUid||!currentUser)return;
+  inp.value='';
+  inp.style.height='auto';
+  const cid=convId(currentUser.uid,activeChatUid);
+  const now=firebase.firestore.FieldValue.serverTimestamp();
+  const msgRef=db.collection('conversations').doc(cid).collection('messages').doc();
+  const batch=db.batch();
+  batch.set(msgRef,{text,senderId:currentUser.uid,sentAt:now});
+  batch.set(db.collection('conversations').doc(cid),{
+    members:[currentUser.uid,activeChatUid],
+    lastMsg:text,lastMsgAt:now,lastSenderId:currentUser.uid,
+    [`unreadCount.${activeChatUid}`]:firebase.firestore.FieldValue.increment(1),
+    [`unreadCount.${currentUser.uid}`]:0
+  },{merge:true});
+  batch.commit().catch(console.warn);
+}
+
+function startChatWith(otherUid){
+  // Arkadaş profilinden veya listesinden çağrılır
+  closeModal('friendProfileModal');
+  closeModal('friendsModal');
+  switchPage('chat');
+  setTimeout(()=>openChat(otherUid),300);
+}
+
+function fmtChatTime(d){
+  if(!d)return'';
+  const now=new Date();
+  const diff=now-d;
+  if(diff<60000)return'Şimdi';
+  if(diff<3600000)return Math.floor(diff/60000)+'dk';
+  if(diff<86400000)return d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+  return d.toLocaleDateString('tr-TR',{day:'numeric',month:'short'});
 }
 
 // ─────────────────────────── DERS PROGRAMI ────────────────────────────────
