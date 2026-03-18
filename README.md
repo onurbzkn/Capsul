@@ -378,10 +378,7 @@ main{flex:1;overflow:hidden;position:relative;}
 .reminder-badge.soon{color:var(--accent2);border-color:rgba(124,111,247,.3);}
 .reminder-text{font-size:.78rem;color:var(--text2);font-weight:300;flex:1;}
 .reminder-date{font-size:.6rem;font-family:'JetBrains Mono',monospace;color:var(--text3);margin-top:2px;}
-.notif-bell{position:fixed;bottom:calc(var(--nav-h) + 68px);right:16px;width:36px;height:36px;border-radius:50%;background:var(--bg2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:39;transition:all .2s;box-shadow:0 4px 14px rgba(0,0,0,.3);}
-.notif-bell:hover{transform:scale(1.08);}
-.notif-bell-badge{position:absolute;top:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:var(--hard);font-size:.5rem;font-family:'JetBrains Mono',monospace;color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);}
-.notif-bell.hidden{display:none;}
+/* notif-bell kaldırıldı - drawer'dan erişilir */
 
 /* ── DASHBOARD (Ana Ekran) ───────────────────────────────────────────────── */
 .dash-greeting h2{font-size:1.15rem;font-weight:300;color:var(--text);margin-bottom:3px;}
@@ -1027,11 +1024,7 @@ select.pf option{background:var(--bg2);color:var(--text);}
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
 </button>
 
-<!-- BİLDİRİM ÇANI -->
-<div class="notif-bell hidden" id="notifBell" onclick="openReminderModal()">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--text2)"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-  <div class="notif-bell-badge" id="notifBellBadge" style="display:none"></div>
-</div>
+<!-- BİLDİRİM ÇANI KALDIRILDI - drawer'dan erişilir -->
 
 
 <!-- DRAWER -->
@@ -1088,12 +1081,14 @@ select.pf option{background:var(--bg2);color:var(--text);}
         <div class="prof-avatar-edit">📷</div>
       </div>
       <input type="file" id="avatarUpload" accept="image/*" style="display:none" onchange="handleAvatarUpload(event)">
+      <div id="removeAvatarWrap" style="display:none;text-align:center;margin-top:-6px;margin-bottom:6px;">
+        <button onclick="removeAvatar()" style="background:none;border:none;font-size:.6rem;color:var(--text3);cursor:pointer;font-family:'JetBrains Mono',monospace;text-decoration:underline;text-underline-offset:3px;">Fotoğrafı kaldır</button>
+      </div>
       <div id="profHeaderName" class="prof-header-name">Kullanıcı</div>
       <div id="profHeaderBadge" class="prof-header-badge"></div>
     </div>
     <div class="prof-tabs">
       <button class="prof-tab active" onclick="switchProfTab('info',this)">Profil</button>
-      <button class="prof-tab" onclick="switchProfTab('style',this)">Görünüm</button>
       <button class="prof-tab" onclick="switchProfTab('stats',this)">İstatistik</button>
     </div>
     <div class="prof-body">
@@ -1909,6 +1904,15 @@ function openFriends(){
   openModal('friendsModal');
 }
 
+// Avatar HTML yardımcısı — Firestore'dan gelen avatarThumb varsa göster, yoksa baş harfler
+function userAvatarHtml(u,size=36){
+  const initials=(u.name||'?').slice(0,2).toUpperCase();
+  if(u.avatarThumb){
+    return`<div style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;flex-shrink:0;"><img src="${u.avatarThumb}" style="width:100%;height:100%;object-fit:cover;"></div>`;
+  }
+  return`<div style="width:${size}px;height:${size}px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--diary));display:flex;align-items:center;justify-content:center;font-size:${size*0.28}rem;font-weight:600;color:#fff;flex-shrink:0;">${initials}</div>`;
+}
+
 function searchUsers(query){
   const q=query.trim().toLowerCase();
   const res=document.getElementById('friendSearchResults');
@@ -1937,7 +1941,7 @@ function searchUsers(query){
           actionBtn=`<button onclick="sendFriendRequest('${d.id}','${u.username}',this)" style="background:rgba(124,111,247,.15);border:1px solid rgba(124,111,247,.3);border-radius:7px;padding:4px 10px;font-size:.62rem;color:var(--accent2);cursor:pointer;font-family:'Sora',sans-serif;white-space:nowrap;flex-shrink:0;">+ Ekle</button>`;
         }
         return`<div style="display:flex;align-items:center;gap:10px;padding:9px;background:var(--bg3);border-radius:10px;margin-bottom:6px;">
-          <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--diary));display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:600;color:#fff;flex-shrink:0;">${(u.name||'?').slice(0,2).toUpperCase()}</div>
+          ${userAvatarHtml(u,36)}
           <div style="flex:1;min-width:0;overflow:hidden;"><div style="font-size:.8rem;font-weight:400;color:var(--text);">@${u.username}</div><div style="font-size:.6rem;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${badge.ico} ${u.name||''}</div></div>
           ${actionBtn}
         </div>`;
@@ -1972,7 +1976,7 @@ function renderFriendsList(){
       html+=`<div style="font-size:.5rem;letter-spacing:.18em;color:var(--mid);font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-bottom:8px;">Bekleyen İstekler (${requests.length})</div>`;
       requests.forEach(r=>{
         html+=`<div style="display:flex;align-items:center;gap:10px;padding:9px;background:rgba(251,146,60,.06);border:1px solid rgba(251,146,60,.2);border-radius:10px;margin-bottom:6px;">
-          <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--mid),var(--diary));display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:600;color:#fff;flex-shrink:0;">${r.name?.slice(0,2).toUpperCase()||'??'}</div>
+          ${userAvatarHtml({name:r.name,avatarThumb:r.avatarThumb||''},34)}
           <div style="flex:1;"><div style="font-size:.78rem;color:var(--text);">@${r.username}</div><div style="font-size:.6rem;color:var(--text3);">${r.name}</div></div>
           <button onclick="acceptFriend('${r.uid}','${r.username}','${r.name}',this)" style="background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.3);border-radius:7px;padding:4px 9px;font-size:.6rem;color:var(--easy);cursor:pointer;font-family:'Sora',sans-serif;">Kabul</button>
           <button onclick="declineFriend('${r.uid}',this)" style="background:none;border:1px solid var(--border);border-radius:7px;padding:4px 9px;font-size:.6rem;color:var(--text3);cursor:pointer;">Reddet</button>
@@ -1991,7 +1995,7 @@ function renderFriendsList(){
           const u=d.data();
           const badge=BADGES?.find(b=>b.id===(u.badge||'student'))||{ico:'🎓',lbl:'Öğrenci'};
           fhtml+=`<div style="display:flex;align-items:center;gap:10px;padding:9px;background:var(--bg3);border-radius:10px;margin-bottom:6px;cursor:pointer;" onclick="viewFriendProfile('${d.id}')">
-            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--diary));display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:600;color:#fff;flex-shrink:0;">${u.name?.slice(0,2).toUpperCase()||'??'}</div>
+            ${userAvatarHtml(u,36)}
             <div style="flex:1;"><div style="font-size:.8rem;color:var(--text);">@${u.username||''}</div><div style="font-size:.6rem;color:var(--text3);">${badge.ico} ${u.name||''}</div></div>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:var(--text3);"><polyline points="9 18 15 12 9 6"/></svg>
           </div>`;
@@ -2042,7 +2046,12 @@ function viewFriendProfile(uid){
       document.getElementById('friendProfileContent').innerHTML=`
         <div style="background:linear-gradient(160deg,#1c1c28,#0d0d12);padding:28px 20px 20px;text-align:center;border-bottom:1px solid var(--border);">
           <button class="modal-close-btn" onclick="closeModal('friendProfileModal')" style="position:absolute;top:12px;right:12px;">✕</button>
-          <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,${accent},#f472b6);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:#fff;margin:0 auto 10px;box-shadow:0 0 24px ${accent}55;">${u.name?.slice(0,2).toUpperCase()||'??'}</div>
+          <div style="margin:0 auto 10px;width:64px;height:64px;box-shadow:0 0 24px ${accent}55;border-radius:50%;overflow:hidden;">
+            ${u.avatarThumb
+              ?`<img src="${u.avatarThumb}" style="width:100%;height:100%;object-fit:cover;">`
+              :`<div style="width:100%;height:100%;background:linear-gradient(135deg,${accent},#f472b6);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:#fff;">${(u.name||'?').slice(0,2).toUpperCase()}</div>`
+            }
+          </div>
           <div style="font-size:1rem;font-weight:500;color:var(--text);">${escHtml(u.name||'')}</div>
           <div style="font-size:.62rem;font-family:'JetBrains Mono',monospace;color:${accent};margin-top:3px;">@${u.username||''}</div>
           <div style="font-size:.68rem;color:var(--accent2);margin-top:4px;">${badge.ico} ${badge.lbl}</div>
@@ -2075,13 +2084,22 @@ auth.onAuthStateChanged(user=>{
   if(user){
     document.getElementById('signOutBtn').style.display='flex';
     loadUserData(user.uid);
-    // Arkadaş isteği badge güncelle
     db.collection('users').doc(user.uid).onSnapshot(doc=>{
       if(doc.exists)updateFriendRequestBadge(doc.data()?.friendRequests||[]);
     });
   } else {
     document.getElementById('signOutBtn').style.display='none';
+    // State'i temizle — sayfa yenilemeden yeni hesap için hazır olsun
+    if(unsubscribeSnapshot){unsubscribeSnapshot();unsubscribeSnapshot=null;}
+    D={todos:[],completedTodos:[],trash:[],contentTrash:[],calPlans:{},notes:[],diary:[],
+       kanban:{todo:[],doing:[],done:[]},reading:[],schedule:[],exams:[],notebook:[],
+       profile:{name:'Kullanıcı',email:'',avatar:'',theme:D?.profile?.theme||'default'}};
     showAuthScreen();
+    // Auth ekranını sıfırla
+    document.getElementById('authEmailInput').value='';
+    document.getElementById('authPasswordInput').value='';
+    document.getElementById('authError').style.display='none';
+    switchAuthTab('login');
   }
 });
 
@@ -2367,14 +2385,19 @@ function openProfile(){
   document.getElementById('profileBio').value=p.bio||'';
   document.getElementById('profileMotto').value=p.motto||'';
   document.getElementById('profileGoal').value=p.goal||'';
-  // Kullanıcı adını göster
   const uname=p.username||'—';
   const uf=document.getElementById('profUsernameField');if(uf)uf.textContent=uname;
   const ut=document.getElementById('profUsernameText');if(ut)ut.textContent=uname!=='—'?'@'+uname:'Kullanıcı adın henüz ayarlanmamış';
   const img=document.getElementById('profileAvatarImg');
-  if(p.avatar){img.src=p.avatar;img.style.display='block';document.getElementById('profileAvatarInitials').style.display='none';}
-  else{img.style.display='none';document.getElementById('profileAvatarInitials').style.display='';}
-  renderBadgeGrid();renderColorGrid();renderProfileStats();
+  if(p.avatar){
+    img.src=p.avatar;img.style.display='block';
+    document.getElementById('profileAvatarInitials').style.display='none';
+    const rw=document.getElementById('removeAvatarWrap');if(rw)rw.style.display='block';
+  } else {
+    img.style.display='none';document.getElementById('profileAvatarInitials').style.display='';
+    const rw=document.getElementById('removeAvatarWrap');if(rw)rw.style.display='none';
+  }
+  renderBadgeGrid();renderProfileStats();
   switchProfTab('info',document.querySelector('.prof-tab'));
   openModal('profileModal');
 }
@@ -2530,20 +2553,50 @@ function updateProfileUI(){
 
 function handleAvatarUpload(e){
   const file=e.target.files[0];if(!file)return;
-  // Önce boyutu kontrol et
-  if(file.size>2*1024*1024){showToast('Fotoğraf 2MB\'dan küçük olmalı');return;}
+  if(file.size>5*1024*1024){showToast("Fotoğraf 5MB'dan küçük olmalı");return;}
   const r=new FileReader();
   r.onload=ev=>{
-    D.profile.avatar=ev.target.result;
-    // Avatar SADECE localStorage'a kaydedilsin, Firestore'a gitmesin
-    localStorage.setItem('capsula_v4',JSON.stringify(D));
-    updateProfileUI();
-    const img=document.getElementById('profileAvatarImg');
-    img.src=ev.target.result;img.style.display='block';
-    document.getElementById('profileAvatarInitials').style.display='none';
-    showToast('Fotoğraf güncellendi ✓');
+    // Küçük thumbnail oluştur (80x80) — Firestore'a kaydedilecek
+    const img2=new Image();
+    img2.onload=()=>{
+      const canvas=document.createElement('canvas');
+      canvas.width=80;canvas.height=80;
+      const ctx=canvas.getContext('2d');
+      // Kare kırp
+      const size=Math.min(img2.width,img2.height);
+      const sx=(img2.width-size)/2,sy=(img2.height-size)/2;
+      ctx.drawImage(img2,sx,sy,size,size,0,0,80,80);
+      const thumb=canvas.toDataURL('image/jpeg',0.7);
+      D.profile.avatar=thumb;
+      localStorage.setItem('capsula_v4',JSON.stringify(D));
+      updateProfileUI();
+      const imgEl=document.getElementById('profileAvatarImg');
+      imgEl.src=thumb;imgEl.style.display='block';
+      document.getElementById('profileAvatarInitials').style.display='none';
+      const rw=document.getElementById('removeAvatarWrap');if(rw)rw.style.display='block';
+      // Firestore'daki users koleksiyonuna da kaydet (arkadaşlar görebilsin)
+      if(currentUser){
+        db.collection('users').doc(currentUser.uid).update({avatarThumb:thumb}).catch(console.warn);
+      }
+      showToast('Fotoğraf güncellendi ✓');
+    };
+    img2.src=ev.target.result;
   };
   r.readAsDataURL(file);
+}
+
+function removeAvatar(){
+  D.profile.avatar='';
+  localStorage.setItem('capsula_v4',JSON.stringify(D));
+  updateProfileUI();
+  const img=document.getElementById('profileAvatarImg');
+  img.src='';img.style.display='none';
+  document.getElementById('profileAvatarInitials').style.display='';
+  const rw=document.getElementById('removeAvatarWrap');if(rw)rw.style.display='none';
+  if(currentUser){
+    db.collection('users').doc(currentUser.uid).update({avatarThumb:''}).catch(console.warn);
+  }
+  showToast('Fotoğraf kaldırıldı');
 }
 
 function generateProfileCard(){
@@ -3518,7 +3571,6 @@ let reminderCheckInterval=null;
 
 function initReminders(){
   updateReminderBadge();
-  document.getElementById('notifBell').classList.remove('hidden');
   if(Notification.permission==='granted')startReminderInterval();
 }
 
@@ -3545,14 +3597,11 @@ function getReminders(){
 function updateReminderBadge(){
   const reminders=getReminders();
   const urgent=reminders.filter(r=>r.type==='overdue'||r.type==='today');
-  const badge=document.getElementById('notifBellBadge');
   const drawerBadge=document.getElementById('drawerReminderBadge');
-  const bell=document.getElementById('notifBell');
   if(urgent.length>0){
-    bell.classList.remove('hidden');badge.style.display='flex';badge.textContent=urgent.length>9?'9+':urgent.length;
     if(drawerBadge){drawerBadge.style.display='flex';drawerBadge.textContent=urgent.length>9?'9+':urgent.length;}
   } else {
-    badge.style.display='none';if(drawerBadge)drawerBadge.style.display='none';
+    if(drawerBadge)drawerBadge.style.display='none';
   }
 }
 
