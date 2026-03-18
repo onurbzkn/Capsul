@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
@@ -1099,10 +1099,20 @@ select.pf option{background:var(--bg2);color:var(--text);}
     <div class="prof-body">
       <!-- INFO -->
       <div id="profTab-info" class="prof-tab-content active">
+        <!-- Kullanıcı adı göstergesi -->
+        <div id="profUsernameDisplay" style="text-align:center;margin-bottom:14px;">
+          <div style="font-size:.72rem;font-family:'JetBrains Mono',monospace;color:var(--accent2);letter-spacing:.08em;" id="profUsernameText"></div>
+          <div style="font-size:.58rem;color:var(--text3);margin-top:2px;">Kullanıcı adın arkadaşların seni bulmak için kullanır</div>
+        </div>
+        <div class="plabel">Kullanıcı Adı</div>
+        <div style="display:flex;gap:8px;margin-bottom:9px;">
+          <div style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--text2);display:flex;align-items:center;gap:6px;"><span style="color:var(--text3);">@</span><span id="profUsernameField">—</span></div>
+          <button onclick="openChangeUsername()" style="background:rgba(124,111,247,.12);border:1px solid rgba(124,111,247,.25);border-radius:9px;padding:0 12px;font-size:.65rem;color:var(--accent2);cursor:pointer;font-family:'Sora',sans-serif;white-space:nowrap;transition:all .2s;">Değiştir</button>
+        </div>
         <div class="plabel">Ad Soyad</div>
         <input type="text" class="pf" id="profileName" placeholder="Adınız Soyadınız">
-        <div class="plabel">E-posta</div>
-        <input type="text" class="pf" id="profileEmail" placeholder="ornek@eposta.com">
+        <div class="plabel">E-posta <span style="font-size:.5rem;color:var(--text3);">(değiştirilemez)</span></div>
+        <input type="text" class="pf" id="profileEmail" placeholder="ornek@eposta.com" readonly style="opacity:.6;cursor:not-allowed;">
         <div class="plabel">Biyografi</div>
         <textarea class="pf" id="profileBio" placeholder="Kendini birkaç cümleyle anlat..." style="min-height:72px;resize:none;line-height:1.6;"></textarea>
         <div class="plabel">Motto</div>
@@ -1550,6 +1560,21 @@ select.pf option{background:var(--bg2);color:var(--text);}
   </div>
 </div>
 
+<!-- KULLANICI ADI DEĞİŞTİR MODAL -->
+<div class="modal-overlay" id="changeUsernameModal">
+  <div class="modal-box" style="padding:22px;">
+    <button class="modal-close-btn" onclick="closeModal('changeUsernameModal')">✕</button>
+    <div class="plabel" style="font-size:.85rem;margin-bottom:4px;">Kullanıcı Adını Değiştir</div>
+    <div style="font-size:.65rem;color:var(--text3);margin-bottom:14px;">Arkadaşların seni bu isimle arar. Sadece harf, rakam ve _ kullanabilirsin.</div>
+    <div style="display:flex;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:9px 12px;margin-bottom:9px;">
+      <span style="color:var(--text3);font-family:'JetBrains Mono',monospace;margin-right:4px;">@</span>
+      <input type="text" id="newUsernameInput" placeholder="yeni_kullanici_adi" style="flex:1;background:none;border:none;outline:none;font-family:'JetBrains Mono',monospace;font-size:.84rem;color:var(--text);" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')">
+    </div>
+    <div id="usernameChangeError" style="display:none;font-size:.68rem;color:var(--hard);margin-bottom:8px;"></div>
+    <button class="p-save" onclick="changeUsername()">Kaydet</button>
+  </div>
+</div>
+
 <!-- ARKADAŞ EKRANI -->
 <div class="modal-overlay" id="friendsModal">
   <div class="modal-box" style="padding:0;overflow:hidden;max-height:88vh;">
@@ -1718,16 +1743,24 @@ function authSubmit(){
 function authGoogle(){
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider).then(cred=>{
-    // Yeni kullanıcıysa Firestore'a ekle
     return db.collection('users').doc(cred.user.uid).get().then(doc=>{
       if(!doc.exists){
-        const username = cred.user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g,'');
-        return db.collection('users').doc(cred.user.uid).set({
-          name:cred.user.displayName||'Kullanıcı',
-          username,email:cred.user.email,badge:'student',
-          bio:'',motto:'',goal:'',accentColor:'purple',
-          createdAt:firebase.firestore.FieldValue.serverTimestamp(),
-          friends:[],friendRequests:[]
+        // Email'den kullanıcı adı oluştur, benzersiz yap
+        let baseUsername = cred.user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g,'');
+        if(baseUsername.length<3) baseUsername='user'+baseUsername;
+        // Benzersizlik kontrolü
+        return db.collection('usernames').doc(baseUsername).get().then(uDoc=>{
+          const finalUsername = uDoc.exists ? baseUsername+'_'+Math.floor(Math.random()*999) : baseUsername;
+          return Promise.all([
+            db.collection('users').doc(cred.user.uid).set({
+              name:cred.user.displayName||'Kullanıcı',
+              username:finalUsername,email:cred.user.email,badge:'student',
+              bio:'',motto:'',goal:'',accentColor:'purple',
+              createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+              friends:[],friendRequests:[]
+            }),
+            db.collection('usernames').doc(finalUsername).set({uid:cred.user.uid})
+          ]);
         });
       }
     });
@@ -1855,23 +1888,35 @@ function searchUsers(query){
   const res=document.getElementById('friendSearchResults');
   if(q.length<2){res.innerHTML='';return;}
   res.innerHTML='<div style="font-size:.68rem;color:var(--text3);text-align:center;padding:8px;">Aranıyor...</div>';
-  db.collection('users').where('username','>=',q).where('username','<=',q+'\uf8ff').limit(8).get().then(snap=>{
-    if(snap.empty){res.innerHTML='<div style="font-size:.68rem;color:var(--text3);text-align:center;padding:8px;">Kullanıcı bulunamadı</div>';return;}
-    const myUid=currentUser?.uid;
-    const myFriends=D.profile.friends||[];
-    res.innerHTML=snap.docs.filter(d=>d.id!==myUid).map(d=>{
-      const u=d.data();
-      const isFriend=myFriends.includes(d.id);
-      const badge=BADGES?.find(b=>b.id===(u.badge||'student'))||{ico:'🎓',lbl:'Öğrenci'};
-      return`<div style="display:flex;align-items:center;gap:10px;padding:9px;background:var(--bg3);border-radius:10px;margin-bottom:6px;">
-        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--diary));display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:600;color:#fff;flex-shrink:0;">${u.name?.slice(0,2).toUpperCase()||'??'}</div>
-        <div style="flex:1;min-width:0;"><div style="font-size:.8rem;font-weight:400;color:var(--text);">@${u.username}</div><div style="font-size:.6rem;color:var(--text3);">${badge.ico} ${u.name||''}</div></div>
-        ${isFriend
-          ?`<span style="font-size:.58rem;font-family:'JetBrains Mono',monospace;color:var(--easy);">Arkadaş ✓</span>`
-          :`<button onclick="sendFriendRequest('${d.id}','${u.username}',this)" style="background:rgba(124,111,247,.15);border:1px solid rgba(124,111,247,.3);border-radius:7px;padding:4px 10px;font-size:.62rem;color:var(--accent2);cursor:pointer;font-family:'Sora',sans-serif;white-space:nowrap;">+ Ekle</button>`
+  if(!currentUser){res.innerHTML='<div style="font-size:.68rem;color:var(--hard);text-align:center;padding:8px;">Giriş yapman gerekiyor</div>';return;}
+  // Önce kendi güncel verilerini çek
+  db.collection('users').doc(currentUser.uid).get().then(myDoc=>{
+    const myData=myDoc.data()||{};
+    const myFriends=myData.friends||[];
+    const myRequests=(myData.friendRequests||[]).map(r=>r.uid);
+    // Sonra arama yap
+    return db.collection('users').where('username','>=',q).where('username','<=',q+'\uf8ff').limit(8).get().then(snap=>{
+      if(snap.empty){res.innerHTML='<div style="font-size:.68rem;color:var(--text3);text-align:center;padding:8px;">Kullanıcı bulunamadı</div>';return;}
+      res.innerHTML=snap.docs.filter(d=>d.id!==currentUser.uid).map(d=>{
+        const u=d.data();
+        const isFriend=myFriends.includes(d.id);
+        const hasPendingRequest=myRequests.includes(d.id);
+        const badge=BADGES?.find(b=>b.id===(u.badge||'student'))||{ico:'🎓',lbl:'Öğrenci'};
+        let actionBtn='';
+        if(isFriend){
+          actionBtn=`<span style="font-size:.58rem;font-family:'JetBrains Mono',monospace;color:var(--easy);">Arkadaş ✓</span>`;
+        } else if(hasPendingRequest){
+          actionBtn=`<span style="font-size:.58rem;font-family:'JetBrains Mono',monospace;color:var(--text3);">İstek gönderildi</span>`;
+        } else {
+          actionBtn=`<button onclick="sendFriendRequest('${d.id}','${u.username}',this)" style="background:rgba(124,111,247,.15);border:1px solid rgba(124,111,247,.3);border-radius:7px;padding:4px 10px;font-size:.62rem;color:var(--accent2);cursor:pointer;font-family:'Sora',sans-serif;white-space:nowrap;flex-shrink:0;">+ Ekle</button>`;
         }
-      </div>`;
-    }).join('');
+        return`<div style="display:flex;align-items:center;gap:10px;padding:9px;background:var(--bg3);border-radius:10px;margin-bottom:6px;">
+          <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--diary));display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:600;color:#fff;flex-shrink:0;">${(u.name||'?').slice(0,2).toUpperCase()}</div>
+          <div style="flex:1;min-width:0;overflow:hidden;"><div style="font-size:.8rem;font-weight:400;color:var(--text);">@${u.username}</div><div style="font-size:.6rem;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${badge.ico} ${u.name||''}</div></div>
+          ${actionBtn}
+        </div>`;
+      }).join('');
+    });
   }).catch(()=>{res.innerHTML='<div style="font-size:.68rem;color:var(--hard);text-align:center;padding:8px;">Hata oluştu</div>';});
 }
 
@@ -2292,16 +2337,56 @@ const ACCENT_COLORS=[
 function openProfile(){
   const p=D.profile;
   document.getElementById('profileName').value=p.name||'';
-  document.getElementById('profileEmail').value=p.email||'';
+  document.getElementById('profileEmail').value=currentUser?.email||p.email||'';
   document.getElementById('profileBio').value=p.bio||'';
   document.getElementById('profileMotto').value=p.motto||'';
   document.getElementById('profileGoal').value=p.goal||'';
+  // Kullanıcı adını göster
+  const uname=p.username||'—';
+  const uf=document.getElementById('profUsernameField');if(uf)uf.textContent=uname;
+  const ut=document.getElementById('profUsernameText');if(ut)ut.textContent=uname!=='—'?'@'+uname:'Kullanıcı adın henüz ayarlanmamış';
   const img=document.getElementById('profileAvatarImg');
   if(p.avatar){img.src=p.avatar;img.style.display='block';document.getElementById('profileAvatarInitials').style.display='none';}
   else{img.style.display='none';document.getElementById('profileAvatarInitials').style.display='';}
   renderBadgeGrid();renderColorGrid();renderProfileStats();
   switchProfTab('info',document.querySelector('.prof-tab'));
   openModal('profileModal');
+}
+
+function openChangeUsername(){
+  document.getElementById('newUsernameInput').value='';
+  document.getElementById('usernameChangeError').style.display='none';
+  openModal('changeUsernameModal');
+}
+
+function changeUsername(){
+  const newName=document.getElementById('newUsernameInput').value.trim();
+  const errEl=document.getElementById('usernameChangeError');
+  errEl.style.display='none';
+  if(newName.length<3){errEl.textContent='En az 3 karakter olmalı';errEl.style.display='block';return;}
+  if(newName.length>20){errEl.textContent='En fazla 20 karakter olabilir';errEl.style.display='block';return;}
+  if(!currentUser){errEl.textContent='Giriş yapman gerekiyor';errEl.style.display='block';return;}
+  const oldName=D.profile.username;
+  // Kullanıcı adı müsait mi kontrol et
+  db.collection('usernames').doc(newName).get().then(doc=>{
+    if(doc.exists&&doc.data().uid!==currentUser.uid){
+      errEl.textContent='Bu kullanıcı adı alınmış';errEl.style.display='block';return;
+    }
+    const batch=db.batch();
+    // Yeni kullanıcı adını kaydet
+    batch.set(db.collection('usernames').doc(newName),{uid:currentUser.uid});
+    // Eskisini sil
+    if(oldName&&oldName!==newName)batch.delete(db.collection('usernames').doc(oldName));
+    // Profili güncelle
+    batch.update(db.collection('users').doc(currentUser.uid),{username:newName});
+    batch.commit().then(()=>{
+      D.profile.username=newName;
+      saveData();
+      closeModal('changeUsernameModal');
+      closeModal('profileModal');
+      setTimeout(()=>{openProfile();showToast('Kullanıcı adı güncellendi ✓');},300);
+    }).catch(e=>{errEl.textContent='Hata: '+e.message;errEl.style.display='block';});
+  }).catch(e=>{errEl.textContent='Bağlantı hatası';errEl.style.display='block';});
 }
 
 function switchProfTab(tab,btn){
@@ -2402,7 +2487,9 @@ function updateProfileUI(){
   const initials=p.name.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
   ['avatarInitials','drawerAvatarInitials','profileAvatarInitials'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=initials;});
   document.getElementById('drawerUserName').textContent=p.name;
-  document.getElementById('drawerUserEmail').textContent=p.email||'';
+  // Email Firebase'den göster
+  const emailDisplay=currentUser?.email||p.email||'';
+  document.getElementById('drawerUserEmail').textContent=emailDisplay?'@'+(p.username||emailDisplay.split('@')[0]):'';
   // Header profil adı ve badge
   const hname=document.getElementById('profHeaderName');if(hname)hname.textContent=p.name;
   const hbadge=document.getElementById('profHeaderBadge');
@@ -2438,12 +2525,13 @@ function generateProfileCard(){
   <div style="width:320px;background:linear-gradient(145deg,#0d0d12,#1c1c28);border-radius:20px;padding:28px;font-family:'Sora',sans-serif;border:1px solid rgba(255,255,255,0.1);position:relative;overflow:hidden;">
     <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,${accent}33,transparent 70%);pointer-events:none;"></div>
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
-      <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,${accent},${p.diary||'#f472b6'});display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 0 20px ${accent}55;overflow:hidden;">
+      <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,${accent},#f472b6);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 0 20px ${accent}55;overflow:hidden;">
         ${p.avatar?`<img src="${p.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`:`<span>${initials}</span>`}
       </div>
       <div>
         <div style="font-size:1rem;font-weight:500;color:#f0eeff;">${escHtml(p.name)}</div>
-        <div style="font-size:.62rem;font-family:'JetBrains Mono',monospace;color:${accent2};margin-top:3px;">${badge.ico} ${badge.lbl}</div>
+        ${p.username?`<div style="font-size:.62rem;font-family:'JetBrains Mono',monospace;color:${accent};margin-top:1px;">@${escHtml(p.username)}</div>`:''}
+        <div style="font-size:.6rem;font-family:'JetBrains Mono',monospace;color:${accent2};margin-top:2px;">${badge.ico} ${badge.lbl}</div>
       </div>
     </div>
     ${p.motto?`<div style="font-size:.75rem;color:rgba(240,238,255,.55);font-style:italic;border-left:2px solid ${accent};padding-left:10px;margin-bottom:16px;line-height:1.5;">"${escHtml(p.motto)}"</div>`:''}
