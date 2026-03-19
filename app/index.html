@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
@@ -22,6 +23,7 @@ body.theme-ocean{--bg:#030d14;--bg2:#071726;--bg3:#0d2236;--accent:#38bdf8;--acc
 body.theme-sand{--bg:#0f0d08;--bg2:#1a1710;--bg3:#242018;--accent:#fbbf24;--accent2:#fcd34d;--diary:#f472b6;--diary2:#f9a8d4;--note:#60a5fa;--note2:#93c5fd;}
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+*{-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;}
 ::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px;}
 #app{display:flex;flex-direction:column;height:100vh;}
@@ -182,7 +184,7 @@ main{flex:1;overflow:hidden;position:relative;isolation:auto;}
   position:relative;min-width:min(380px,calc(100vw - 32px));max-width:480px;overflow:visible;
 }
 .nav-glass::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 8%,rgba(255,255,255,.14) 30%,rgba(255,255,255,.18) 50%,rgba(255,255,255,.14) 70%,transparent 92%);border-radius:38px 38px 0 0;pointer-events:none;}
-.nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;padding:8px 10px;color:rgba(240,238,255,.28);font-family:'Sora',sans-serif;border-radius:24px;transition:color .2s,background .2s;flex:1;}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;padding:8px 10px;color:rgba(240,238,255,.28);font-family:'Sora',sans-serif;border-radius:24px;transition:color .2s,background .2s;flex:1;-webkit-tap-highlight-color:transparent;outline:none;}
 .nav-btn:hover{color:rgba(240,238,255,.55);background:rgba(255,255,255,.04);}
 .nav-btn.active{color:var(--accent2);}
 .nav-btn svg{width:20px;height:20px;transition:transform .2s;}
@@ -4767,7 +4769,7 @@ window.addEventListener('load',()=>{
     initApp();
   });
 });
- 
+
 
 </script>
 </body>
