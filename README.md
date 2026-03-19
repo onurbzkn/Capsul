@@ -167,7 +167,7 @@ main{flex:1;overflow:hidden;position:relative;}
   transition:opacity .22s,transform .22s;transform:translateY(6px);
   padding:16px 16px calc(var(--nav-h) + 20px);}
 .page.active{opacity:1;pointer-events:all;transform:translateY(0);}
-
+#page-chat{overflow:hidden;padding:0;display:flex;flex-direction:column;}
 /* ── LIQUID GLASS NAV ────────────────────────────────────────────────────── */
 .nav-wrap{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav-h) + env(safe-area-inset-bottom,0px));display:flex;align-items:flex-start;justify-content:center;padding:8px 16px 0;z-index:100;pointer-events:none;}
 .nav-glass{
@@ -536,7 +536,7 @@ main{flex:1;overflow:hidden;position:relative;}
 @keyframes fabPulse{0%,100%{box-shadow:0 8px 28px rgba(167,139,250,.5),0 0 0 3px rgba(255,255,255,.12);}50%{box-shadow:0 8px 28px rgba(248,113,113,.6),0 0 0 6px rgba(248,113,113,.15);}}
 .nav-center-fab.has-msg{animation:fabPulse 2.4s ease-in-out infinite;}
 /* ── CHAT ────────────────────────────────────────────────────────────────── */
-.chat-layout{display:flex;flex-direction:column;height:calc(100vh - var(--header-h) - var(--nav-h));gap:0;margin:-16px;padding:0;}
+.chat-layout{display:flex;flex-direction:column;height:100%;gap:0;margin:-16px;padding:0;overflow:hidden;}
 .chat-list-panel{display:flex;flex-direction:column;height:100%;}
 .chat-list-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;flex-shrink:0;}
 .chat-list-title{font-size:.88rem;font-weight:500;color:var(--text);}
@@ -554,18 +554,18 @@ main{flex:1;overflow:hidden;position:relative;}
 .chat-conv-time{font-size:.55rem;font-family:'JetBrains Mono',monospace;color:var(--text3);}
 .chat-conv-badge{background:var(--accent);color:#fff;font-size:.52rem;font-family:'JetBrains Mono',monospace;border-radius:9px;padding:1px 6px;min-width:18px;text-align:center;}
 .chat-empty-state{text-align:center;padding:48px 20px;color:var(--text3);font-size:.72rem;font-weight:300;line-height:1.7;}
-.chat-active-panel{display:flex;flex-direction:column;height:100%;}
+.chat-active-panel{display:flex;flex-direction:column;height:100%;min-height:0;}
 .chat-active-header{display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(13,13,18,.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);flex-shrink:0;}
 .chat-back-btn{background:none;border:none;color:var(--text2);cursor:pointer;padding:4px 6px;border-radius:8px;display:flex;align-items:center;transition:background .18s;}
 .chat-back-btn:hover{background:var(--bg3);}
 .chat-active-name{font-size:.86rem;font-weight:500;color:var(--text);flex:1;}
 .chat-active-status{font-size:.58rem;font-family:'JetBrains Mono',monospace;color:var(--easy);}
-.chat-messages{flex:1;overflow-y:auto;padding:14px 14px 8px;display:flex;flex-direction:column;gap:4px;}
-.chat-msg-row{display:flex;align-items:flex-end;gap:7px;margin-bottom:2px;}
+.chat-messages{flex:1;overflow-y:auto;padding:14px 14px 8px;display:flex;flex-direction:column;gap:4px;min-height:0;}
+.chat-msg-row{display:flex;align-items:flex-end;gap:7px;margin-bottom:2px;width:100%;}
 .chat-msg-row.mine{flex-direction:row-reverse;}
 .chat-msg-avatar{width:28px;height:28px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,var(--accent),var(--diary));display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:600;color:#fff;flex-shrink:0;}
 .chat-msg-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
-.chat-bubble{max-width:72%;padding:9px 13px;border-radius:18px;font-size:.8rem;font-weight:300;line-height:1.55;word-break:break-word;}
+.chat-bubble{max-width:75%;min-width:48px;padding:9px 13px;border-radius:18px;font-size:.84rem;font-weight:300;line-height:1.55;word-break:break-word;white-space:pre-wrap;}
 .chat-bubble.theirs{background:var(--bg2);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:4px;}
 .chat-bubble.mine{background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.85));color:#fff;border-bottom-right-radius:4px;}
 .chat-bubble-time{font-size:.5rem;opacity:.5;margin-top:3px;font-family:'JetBrains Mono',monospace;}
@@ -573,7 +573,7 @@ main{flex:1;overflow:hidden;position:relative;}
 .chat-date-divider{text-align:center;font-size:.54rem;font-family:'JetBrains Mono',monospace;color:var(--text3);letter-spacing:.08em;margin:10px 0;display:flex;align-items:center;gap:8px;}
 .chat-date-divider::before,.chat-date-divider::after{content:'';flex:1;height:1px;background:var(--border);}
 .chat-input-bar{display:flex;align-items:flex-end;gap:8px;padding:10px 12px 12px;background:rgba(13,13,18,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);flex-shrink:0;}
-.chat-input{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:10px 14px;font-family:'Sora',sans-serif;font-size:.82rem;color:var(--text);outline:none;resize:none;max-height:100px;line-height:1.5;transition:border-color .2s;}
+.chat-input{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:10px 14px;font-family:'Sora',sans-serif;font-size:.82rem;color:var(--text);outline:none;resize:none;max-height:120px;line-height:1.5;transition:border-color .2s;}
 .chat-input:focus{border-color:rgba(124,111,247,.4);}
 .chat-input::placeholder{color:var(--text3);}
 .chat-send-btn{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;color:#fff;box-shadow:0 4px 14px rgba(124,111,247,.3);}
@@ -1781,7 +1781,7 @@ select.pf option{background:var(--bg2);color:var(--text);}
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" crossorigin="anonymous"></script>
 <script>
 // ─────────────────────────── FIREBASE ─────────────────────────────────────
 const firebaseConfig = {
@@ -2333,8 +2333,14 @@ if(!D.schedule)D.schedule=[];
 if(!D.exams)D.exams=[];
 if(!D.notebook)D.notebook=[];
 if(!D.slides)D.slides=[];
-// PDF.js worker
-if(typeof pdfjsLib!=='undefined')pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+// PDF.js worker - mobile uyumlu
+if(typeof pdfjsLib!=='undefined'){
+  try{
+    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }catch(e){
+    pdfjsLib.GlobalWorkerOptions.workerSrc='';
+  }
+}
 if(!D.contentTrash)D.contentTrash=[];
 if(!D.trash)D.trash=[];
 function saveData(){localStorage.setItem('capsula_v4',JSON.stringify(D));}
@@ -3318,8 +3324,19 @@ function renderSlides(){
   }
   grid.innerHTML=slides.map(s=>`
     <div class="slide-card" onclick="openSlide('${s.id}')">
-      <div class="slide-thumb">
-        ${s.thumb?`<img src="${s.thumb}" style="width:100%;height:100%;object-fit:cover;">`:`<div class="slide-thumb-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:32px;height:32px;"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><span style="font-size:.6rem;font-family:'JetBrains Mono',monospace;">${s.pages} sayfa</span></div>`}
+      <div class="slide-thumb" style="height:130px;position:relative;">
+        ${s.thumb
+          ?`<img src="${s.thumb}" style="width:100%;height:100%;object-fit:cover;">`
+          :`<div class="slide-thumb-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:36px;height:36px;opacity:.4;"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>`
+        }
+        <!-- Sayfa sayısı overlay sağ altta -->
+        <div style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);color:#fff;font-size:.52rem;font-family:'JetBrains Mono',monospace;padding:2px 7px;border-radius:6px;">
+          ${s.pages&&s.pages>0?s.pages+'s':'?'}
+        </div>
+        <!-- Kategori overlay sol üstte -->
+        <div style="position:absolute;top:6px;left:6px;background:rgba(124,111,247,.7);backdrop-filter:blur(4px);color:#fff;font-size:.5rem;font-family:'JetBrains Mono',monospace;padding:2px 7px;border-radius:6px;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+          ${escHtml(s.category||'Genel')}
+        </div>
       </div>
       <div class="slide-actions">
         <div class="slide-action-btn" onclick="event.stopPropagation();changeSlideCat('${s.id}')" title="Kategori değiştir">
@@ -3335,8 +3352,7 @@ function renderSlides(){
       <div class="slide-info">
         <div class="slide-name">${escHtml(s.name)}</div>
         <div class="slide-meta">
-          <span>${s.pages&&s.pages>0?s.pages+' sayfa':'? sayfa'} · ${s.size?(s.size/1024/1024).toFixed(1)+'MB':''}</span>
-          <span class="slide-cat-tag">${escHtml(s.category||'Genel')}</span>
+          <span style="opacity:.7;">${s.size?(s.size/1024/1024).toFixed(1)+'MB':''}</span>
         </div>
       </div>
     </div>`).join('');
