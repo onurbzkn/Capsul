@@ -305,12 +305,24 @@ footer{
 .reveal.visible{opacity:1;transform:translateY(0);}
 
 /* ── MOBILE ── */
-@media(max-width:600px){
-  nav{padding:16px 20px;}
-  .nav-logo{font-size:1.2rem;}
+@media(max-width:640px){
+  nav{padding:14px 16px;}
+  .nav-logo{font-size:1.1rem;}
+  .nav-cta{padding:8px 14px;font-size:.76rem;}
+  .hero{padding:90px 16px 60px;}
+  .hero-badge{font-size:.6rem;padding:4px 12px;}
+  .hero-actions{flex-direction:column;align-items:stretch;}
+  .btn-primary,.btn-secondary{justify-content:center;width:100%;}
+  .preview-wrap{padding:0 16px 70px;}
+  .section{padding:60px 16px;}
   .sim-grid{grid-template-columns:1fr 1fr;}
   .sim-grid .sim-card:last-child{display:none;}
-  footer{flex-direction:column;text-align:center;padding:30px 20px;}
+  .stats-inner{gap:28px;grid-template-columns:repeat(2,1fr);}
+  .privacy-section{padding:60px 16px;}
+  .cta-section{padding:70px 16px;}
+  .features-grid{grid-template-columns:1fr;}
+  footer{flex-direction:column;text-align:center;padding:28px 16px;}
+  .footer-links{justify-content:center;}
 }
 </style>
 </head>
