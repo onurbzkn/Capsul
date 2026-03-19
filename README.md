@@ -2757,35 +2757,52 @@ function updatePomoDisplay(){
   }
 }
 function openPomoDurEdit(){
-  if(pomoRunning)return;
+  // Zaten açıksa kapat
+  const existing=document.getElementById('pomoDurModal');
+  if(existing){existing.remove();return;}
   const w=POMO_DUR_CUSTOM.work,sh=POMO_DUR_CUSTOM.short,lo=POMO_DUR_CUSTOM.long;
   const modal=document.createElement('div');
   modal.id='pomoDurModal';
-  modal.className='modal-overlay';modal.style.display='flex';
-  modal.innerHTML=`<div class="modal-box" style="padding:20px;">
-    <button class="modal-close-btn" onclick="this.closest('.modal-overlay').remove()">✕</button>
-    <div class="plabel" style="margin-bottom:14px;">Süre Ayarla (dakika)</div>
-    <div style="display:flex;flex-direction:column;gap:12px;">
-      <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:.75rem;color:var(--text2);width:80px;">Çalışma</span><input type="range" min="5" max="90" value="${w}" id="durWork" style="flex:1;" oninput="document.getElementById('durWorkVal').textContent=this.value"><span id="durWorkVal" style="font-size:.8rem;font-family:'JetBrains Mono',monospace;color:var(--accent2);width:28px;">${w}</span></div>
-      <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:.75rem;color:var(--text2);width:80px;">Kısa Mola</span><input type="range" min="1" max="30" value="${sh}" id="durShort" style="flex:1;" oninput="document.getElementById('durShortVal').textContent=this.value"><span id="durShortVal" style="font-size:.8rem;font-family:'JetBrains Mono',monospace;color:var(--easy);width:28px;">${sh}</span></div>
-      <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:.75rem;color:var(--text2);width:80px;">Uzun Mola</span><input type="range" min="5" max="45" value="${lo}" id="durLong" style="flex:1;" oninput="document.getElementById('durLongVal').textContent=this.value"><span id="durLongVal" style="font-size:.8rem;font-family:'JetBrains Mono',monospace;color:var(--note);width:28px;">${lo}</span></div>
+  modal.style.cssText='position:fixed;inset:0;z-index:3500;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:22px;width:100%;max-width:320px;position:relative;">
+    <button onclick="document.getElementById('pomoDurModal').remove()" style="position:absolute;top:10px;right:12px;background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--text3);">✕</button>
+    <div style="font-size:.86rem;font-weight:500;color:var(--text);margin-bottom:16px;">⏱ Süre Ayarla</div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:.74rem;color:var(--text2);">🍅 Çalışma</span><span id="pdr-work-val" style="font-size:.8rem;font-family:'JetBrains Mono',monospace;color:var(--accent2);">${w} dk</span></div>
+        <input type="range" min="5" max="90" value="${w}" id="pdr-work" style="width:100%;" oninput="document.getElementById('pdr-work-val').textContent=this.value+' dk'">
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:.74rem;color:var(--text2);">☕ Kısa Mola</span><span id="pdr-short-val" style="font-size:.8rem;font-family:'JetBrains Mono',monospace;color:var(--easy);">${sh} dk</span></div>
+        <input type="range" min="1" max="30" value="${sh}" id="pdr-short" style="width:100%;" oninput="document.getElementById('pdr-short-val').textContent=this.value+' dk'">
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:.74rem;color:var(--text2);">🌿 Uzun Mola</span><span id="pdr-long-val" style="font-size:.8rem;font-family:'JetBrains Mono',monospace;color:var(--note);">${lo} dk</span></div>
+        <input type="range" min="5" max="45" value="${lo}" id="pdr-long" style="width:100%;" oninput="document.getElementById('pdr-long-val').textContent=this.value+' dk'">
+      </div>
     </div>
-    <button onclick="savePomoDur()" style="width:100%;margin-top:14px;padding:10px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:10px;color:#fff;font-family:'Sora',sans-serif;font-size:.82rem;cursor:pointer;">Kaydet</button>
+    <button onclick="savePomoDur()" style="width:100%;margin-top:16px;padding:11px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:10px;color:#fff;font-family:'Sora',sans-serif;font-size:.84rem;cursor:pointer;">Kaydet</button>
   </div>`;
   document.body.appendChild(modal);
   modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
 }
 function savePomoDur(){
-  POMO_DUR_CUSTOM.work=parseInt(document.getElementById('durWork').value);
-  POMO_DUR_CUSTOM.short=parseInt(document.getElementById('durShort').value);
-  POMO_DUR_CUSTOM.long=parseInt(document.getElementById('durLong').value);
+  const wEl=document.getElementById('pdr-work');
+  const sEl=document.getElementById('pdr-short');
+  const lEl=document.getElementById('pdr-long');
+  if(!wEl||!sEl||!lEl){showToast('Hata: Slider bulunamadı');return;}
+  POMO_DUR_CUSTOM.work=parseInt(wEl.value);
+  POMO_DUR_CUSTOM.short=parseInt(sEl.value);
+  POMO_DUR_CUSTOM.long=parseInt(lEl.value);
   localStorage.setItem('capsula_pomo_dur',JSON.stringify(POMO_DUR_CUSTOM));
   const wl=document.getElementById('pomoWorkLbl');const sl=document.getElementById('pomoShortLbl');const ll=document.getElementById('pomoLongLbl');
-  if(wl)wl.textContent=POMO_DUR_CUSTOM.work;if(sl)sl.textContent=POMO_DUR_CUSTOM.short;if(ll)ll.textContent=POMO_DUR_CUSTOM.long;
-  // modal'ı kapat - id ile bul
+  if(wl)wl.textContent=POMO_DUR_CUSTOM.work;
+  if(sl)sl.textContent=POMO_DUR_CUSTOM.short;
+  if(ll)ll.textContent=POMO_DUR_CUSTOM.long;
   const durModal=document.getElementById('pomoDurModal');
   if(durModal)durModal.remove();
-  setPomoMode(pomoMode);showToast('Süreler güncellendi ✓');
+  setPomoMode(pomoMode);
+  showToast('Süreler güncellendi ✓');
 }
 function setPomoStyle(s){
   pomoStyle=s;localStorage.setItem('capsula_pomo_style',s);
