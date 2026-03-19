@@ -261,8 +261,8 @@ main{flex:1;overflow:hidden;position:relative;}
 .completed-list.open{max-height:2000px;}
 
 /* ── NOTES ───────────────────────────────────────────────────────────────── */
-.notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
-.note-card{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:14px;cursor:pointer;transition:all .22s;min-height:120px;display:flex;flex-direction:column;gap:7px;position:relative;overflow:hidden;}
+.notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;overflow:visible;padding:8px 4px;}
+.note-card{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:14px;cursor:pointer;transition:all .22s;min-height:120px;display:flex;flex-direction:column;gap:7px;position:relative;overflow:visible;}
 .note-card::after{content:'';position:absolute;inset:0;border-radius:13px;background:linear-gradient(135deg,rgba(96,165,250,.07),transparent);opacity:0;transition:opacity .22s;}
 .note-card:hover{border-color:rgba(96,165,250,.3);transform:translateY(-2px);box-shadow:0 6px 22px rgba(0,0,0,.3);}
 .note-card:hover::after{opacity:1;}
@@ -878,11 +878,7 @@ select.pf option{background:var(--bg2);color:var(--text);}
     <div style="flex:1;text-align:center;">
       <span id="pageTitle" style="font-size:.88rem;font-weight:500;color:var(--text);letter-spacing:.01em;">Capsula</span>
     </div>
-    <div class="header-right">
-      <div onclick="openProfile()" style="cursor:pointer;text-align:right;margin-right:4px;display:none;" id="headerUserInfo">
-        <div id="headerUserName" style="font-size:.72rem;font-weight:500;color:var(--text);line-height:1.2;white-space:nowrap;max-width:90px;overflow:hidden;text-overflow:ellipsis;"></div>
-        <div id="headerUserHandle" style="font-size:.56rem;font-family:'JetBrains Mono',monospace;color:var(--text3);white-space:nowrap;"></div>
-      </div>
+    <div class="header-right" style="gap:6px;">
       <button onclick="openNotifications()" style="position:relative;background:none;border:none;cursor:pointer;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--text3);transition:background .18s;" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='none'">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:18px;height:18px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         <span id="notifHeaderBadge" style="display:none;position:absolute;top:2px;right:2px;width:8px;height:8px;border-radius:50%;background:var(--hard);border:2px solid var(--bg);"></span>
@@ -891,6 +887,10 @@ select.pf option{background:var(--bg2);color:var(--text);}
         <img id="avatarImg" src="" style="display:none">
         <span class="avatar-initials" id="avatarInitials">KY</span>
       </button>
+      <div onclick="openProfile()" style="cursor:pointer;text-align:left;display:none;min-width:0;" id="headerUserInfo">
+        <div id="headerUserName" style="font-size:.72rem;font-weight:500;color:var(--text);line-height:1.2;white-space:nowrap;max-width:80px;overflow:hidden;text-overflow:ellipsis;"></div>
+        <div id="headerUserHandle" style="font-size:.54rem;font-family:'JetBrains Mono',monospace;color:var(--text3);white-space:nowrap;"></div>
+      </div>
     </div>
   </header>
 
@@ -1875,11 +1875,6 @@ function saveData(){localStorage.setItem('capsula_v4',JSON.stringify(D));}
 
 
 
-// saveProfile fonksiyonunu güncelle
-const _origSaveProfile = window.saveProfile;
-
-
-
 function initApp(){
   initPinToggle();autoTrash();updTrashBadge();updateProfileUI();initReminders();initLang();
   initSettingsToggles();
@@ -2539,24 +2534,29 @@ function confirmReset(type){
     reading:'Tüm okuma listesi ve ilerleme bilgileri silinecek. Onaylıyor musun?',
     schedule:'Tüm ders programı verileri silinecek. Onaylıyor musun?'
   };
+  // Varsa eski modalı kaldır
+  document.getElementById('resetConfirmModal')?.remove();
   const modal=document.createElement('div');
-  modal.style.cssText='position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:20px;';
-  modal.innerHTML=`<div style="background:var(--bg2);border:1px solid rgba(248,113,113,.3);border-radius:16px;padding:22px;width:100%;max-width:320px;text-align:center;">
+  modal.id='resetConfirmModal';
+  modal.style.cssText='position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.innerHTML=`<div style="background:var(--bg2);border:1px solid rgba(248,113,113,.35);border-radius:16px;padding:24px;width:100%;max-width:320px;text-align:center;">
     <div style="font-size:1.5rem;margin-bottom:10px;">⚠️</div>
-    <div style="font-size:.84rem;font-weight:500;color:var(--text);margin-bottom:10px;">Emin misin?</div>
-    <div style="font-size:.76rem;color:var(--text3);line-height:1.6;margin-bottom:18px;">${msgs[type]}</div>
+    <div style="font-size:.86rem;font-weight:600;color:var(--text);margin-bottom:10px;">Emin misin?</div>
+    <div style="font-size:.76rem;color:var(--text3);line-height:1.6;margin-bottom:20px;">${msgs[type]}</div>
     <div style="display:flex;gap:8px;">
-      <button onclick="this.closest('div[style]').remove()" style="flex:1;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;color:var(--text2);font-family:'Sora',sans-serif;font-size:.8rem;cursor:pointer;">İptal</button>
-      <button onclick="doReset('${type}');this.closest('div[style]').remove()" style="flex:1;padding:10px;background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.3);border-radius:9px;color:var(--hard);font-family:'Sora',sans-serif;font-size:.8rem;cursor:pointer;font-weight:500;">Onaylıyorum</button>
+      <button id="resetCancelBtn" style="flex:1;padding:11px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;color:var(--text2);font-family:'Sora',sans-serif;font-size:.82rem;cursor:pointer;">İptal</button>
+      <button id="resetConfirmBtn" style="flex:1;padding:11px;background:rgba(248,113,113,.15);border:2px solid rgba(248,113,113,.4);border-radius:9px;color:var(--hard);font-family:'Sora',sans-serif;font-size:.82rem;cursor:pointer;font-weight:600;">Onaylıyorum</button>
     </div>
   </div>`;
   document.body.appendChild(modal);
+  document.getElementById('resetCancelBtn').onclick=()=>modal.remove();
+  document.getElementById('resetConfirmBtn').onclick=()=>{doReset(type);modal.remove();};
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
 }
 function doReset(type){
-  if(type==='kanban'){D.kanban={todo:[],doing:[],done:[]};renderKanban();showToast('Kanban sıfırlandı');}
-  else if(type==='reading'){D.reading=[];renderReading();showToast('Okuma listesi sıfırlandı');}
-  else if(type==='schedule'){D.schedule=[];D.scheduleWeeks={};renderSchedule();showToast('Ders programı sıfırlandı');}
-  saveData();
+  if(type==='kanban'){D.kanban={todo:[],doing:[],done:[]};saveData();renderKanban();showToast('Kanban sıfırlandı');}
+  else if(type==='reading'){D.reading=[];saveData();renderReading();showToast('Okuma listesi sıfırlandı');}
+  else if(type==='schedule'){D.schedule=[];D.scheduleWeeks={};saveData();renderSchedule();showToast('Ders programı sıfırlandı');}
 }
 
 // ─────────────── NOT DÜZENLE ──────────────────────────────────────────────
@@ -2931,15 +2931,17 @@ function renderNotes(){
   grid.innerHTML=D.notes.map(n=>{
     const media=(n.media||[]).map(m=>`<span class="note-media-tag">${m.type}</span>`).join('');
     const tags=(n.tags||[]).map(t=>`<span class="note-tag-chip" style="color:${tagColor(t)};border-color:${tagColor(t)}44;">#${escHtml(t)}</span>`).join('');
-    return`<div class="note-card" style="position:relative;">
-      <div onclick="viewEntry('note',${n.id})" style="cursor:pointer;">
+    return`<div class="note-card" style="overflow:visible;">
+      <button onclick="openNoteEdit(${n.id})" style="position:absolute;top:-6px;right:-6px;z-index:10;width:26px;height:26px;background:var(--bg3);border:1px solid var(--border);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);transition:all .18s;box-shadow:0 2px 6px rgba(0,0,0,.3);" onmouseover="this.style.background='var(--accent)';this.style.color='#fff';this.style.borderColor='var(--accent)'" onmouseout="this.style.background='var(--bg3)';this.style.color='var(--text3)';this.style.borderColor='var(--border)'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:11px;height:11px;pointer-events:none;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+      <div onclick="viewEntry('note',${n.id})" style="cursor:pointer;flex:1;display:flex;flex-direction:column;gap:7px;">
         <div class="note-card-title">${escHtml(n.title||'Başlıksız')}</div>
         <div class="note-card-preview">${escHtml(n.content||'')}</div>
         ${tags?`<div style="display:flex;gap:3px;flex-wrap:wrap;">${tags}</div>`:''}
         <div style="display:flex;gap:3px;flex-wrap:wrap;">${media}</div>
         <div class="note-card-date">${fmtDate(n.createdAt)}</div>
       </div>
-      <button onclick="event.stopPropagation();openNoteEdit(${n.id})" style="position:absolute;top:6px;right:6px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text3);padding:3px 6px;font-size:.58rem;transition:all .15s;" onmouseover="this.style.color='var(--accent2)';this.style.borderColor='rgba(124,111,247,.4)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border)'">✏️</button>
     </div>`;
   }).join('');
 }
@@ -4253,7 +4255,7 @@ let reminderCheckInterval=null;
 
 function initReminders(){
   updateReminderBadge();
-  if(Notification.permission==='granted')startReminderInterval();
+  if('Notification' in window && Notification.permission==='granted')startReminderInterval();
 }
 
 function startReminderInterval(){
@@ -4288,7 +4290,7 @@ function updateReminderBadge(){
 }
 
 function checkAndFireNotifications(){
-  if(Notification.permission!=='granted')return;
+  if(!('Notification' in window)||Notification.permission!=='granted')return;
   const now=new Date();if(now.getHours()!==9)return;
   const todayKey=now.toISOString().split('T')[0];
   if(localStorage.getItem('capsula_notif_fired')===todayKey)return;
@@ -4298,7 +4300,7 @@ function checkAndFireNotifications(){
     let body='';
     if(todayTodos.length)body+=`Bugün: ${todayTodos.length} görev. `;
     if(overdue.length)body+=`Gecikmiş: ${overdue.length} görev.`;
-    new Notification('Capsula 📋',{body:body.trim()});
+    try{new Notification('Capsula 📋',{body:body.trim()});}catch(e){}
     localStorage.setItem('capsula_notif_fired',todayKey);
   }
 }
@@ -4566,27 +4568,16 @@ window.addEventListener('load',()=>{
   // Seed demo data
   if(!D.todos.length&&!D.notes.length&&!D.diary.length){
     const tmr=new Date();tmr.setDate(tmr.getDate()+1);
-    const nw=new Date();nw.setDate(nw.getDate()+7);
     D.todos=[
       {id:1,text:"Capsula'ya hoş geldin! Bu görevi tamamla ✓",priority:'easy',dueDate:null,createdAt:new Date().toISOString()},
-      {id:2,text:"Profesyonel mod'u dene — Kanban ve Haftalık Özet",priority:'mid',dueDate:tmr.toISOString().split('T')[0],createdAt:new Date().toISOString()},
-      {id:3,text:"Arkadaş ekle — Drawer'dan Arkadaşlar'a tıkla",priority:'hard',dueDate:nw.toISOString().split('T')[0],createdAt:new Date().toISOString()},
+      {id:2,text:"Profil fotoğrafını veya avatarını ayarla",priority:'easy',dueDate:null,createdAt:new Date().toISOString()},
+      {id:3,text:"Bir görev ekle ve takvimde gün üzerine sürükle",priority:'mid',dueDate:tmr.toISOString().split('T')[0],createdAt:new Date().toISOString()},
     ];
-    D.notes=[{id:101,title:'Capsula Rehberi',content:"Artık hesabın var! Verilerein buluta senkronize ediliyor.\n\nArkadaşlarını eklemek için sol üstteki ≡ → Arkadaşlar",media:[],tags:['rehber'],createdAt:new Date().toISOString()}];
-    D.diary=[{id:201,title:'Capsula açıldı',content:'Firebase ile bulut senkronizasyonu aktif! 🚀',mood:'💫',media:[],tags:[],createdAt:new Date().toISOString()}];
+    D.notes=[{id:101,title:'Capsula Rehberi',content:"Hoş geldin! 🎉\n\nNotlar, görevler, pomodoro, takvim ve daha fazlası burada.\n\nSol üstteki ≡ menüden tüm özelliklere ulaşabilirsin.",media:[],tags:['rehber'],createdAt:new Date().toISOString()}];
+    D.diary=[{id:201,title:'İlk gün',content:'Capsula yolculuğum başlıyor. Bugün neler öğrenecek, neler yapacağım?',mood:'💫',media:[],tags:[],createdAt:new Date().toISOString()}];
     saveData();
   }
 
-  // saveProfile'ı Firestore'a da kaydetmesi için güncelle
-  const origSave=window.saveProfile;
-  window.saveProfile=function(){
-    D.profile.name=document.getElementById('profileName').value.trim()||'Kullanıcı';
-    D.profile.email=document.getElementById('profileEmail').value.trim()||'';
-    D.profile.bio=document.getElementById('profileBio')?.value.trim()||'';
-    D.profile.motto=document.getElementById('profileMotto')?.value.trim()||'';
-    D.profile.goal=document.getElementById('profileGoal')?.value.trim()||'';
-    saveData();saveProfileToFirestore();updateProfileUI();closeModal('profileModal');showToast('Profil güncellendi ✦');
-  };
 
   runSplash(()=>{
     initApp();
