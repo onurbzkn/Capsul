@@ -1,0 +1,36 @@
+name: Build TWA APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install Bubblewrap
+        run: npm install -g @bubblewrap/cli
+      
+      - name: Init TWA
+        run: |
+          mkdir twa && cd twa
+          bubblewrap init --manifest https://capsulaapp.com/app/manifest.json
+      
+      - name: Build APK
+        run: |
+          cd twa
+          bubblewrap build
+      
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: capsula-apk
+          path: twa/app-release-unsigned.apk
