@@ -1876,8 +1876,7 @@ let currentUser=null;
 
 
 // ── VERİ KAYIT ─────────────────────────────────────────────────────────────
-function saveData(){localStorage.setItem('capsula_v4',JSON.stringify(D));}
-
+// saveData encryption bloğunda tanımlı (AES-256-GCM)
 
 
 function initApp(){
@@ -1970,22 +1969,86 @@ const QUOTES=[
 function getDayQuote(y,m,d){const seed=y*366+m*31+d;return QUOTES[((seed%QUOTES.length)+QUOTES.length)%QUOTES.length];}
 
 // ─────────────────────────── DATA ─────────────────────────────────────────
-let D=JSON.parse(localStorage.getItem('capsula_v4')||'null')||{
+// ─────────────────────────── ENCRYPTION (AES-256-GCM) ─────────────────────
+// Kullanıcı hiçbir şey fark etmez — tüm veriler şeffaf şifrelenir
+const CRYPTO_KEY_NAME='capsula_ck_v1';
+const DATA_KEY='capsula_v4';
+let _cryptoKey=null;
+
+async function getCryptoKey(){
+  if(_cryptoKey)return _cryptoKey;
+  // Mevcut anahtarı al veya yeni üret
+  const stored=localStorage.getItem(CRYPTO_KEY_NAME);
+  if(stored){
+    const raw=Uint8Array.from(atob(stored),c=>c.charCodeAt(0));
+    _cryptoKey=await crypto.subtle.importKey('raw',raw,{name:'AES-GCM'},false,['encrypt','decrypt']);
+  } else {
+    _cryptoKey=await crypto.subtle.generateKey({name:'AES-GCM',length:256},true,['encrypt','decrypt']);
+    const exported=await crypto.subtle.exportKey('raw',_cryptoKey);
+    localStorage.setItem(CRYPTO_KEY_NAME,btoa(String.fromCharCode(...new Uint8Array(exported))));
+  }
+  return _cryptoKey;
+}
+
+async function encryptData(obj){
+  try{
+    const key=await getCryptoKey();
+    const iv=crypto.getRandomValues(new Uint8Array(12));
+    const encoded=new TextEncoder().encode(JSON.stringify(obj));
+    const cipher=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,encoded);
+    const combined=new Uint8Array(iv.length+cipher.byteLength);
+    combined.set(iv);combined.set(new Uint8Array(cipher),iv.length);
+    return btoa(String.fromCharCode(...combined));
+  }catch(e){return JSON.stringify(obj);}
+}
+
+async function decryptData(str){
+  try{
+    const key=await getCryptoKey();
+    const bytes=Uint8Array.from(atob(str),c=>c.charCodeAt(0));
+    const iv=bytes.slice(0,12);
+    const cipher=bytes.slice(12);
+    const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv},key,cipher);
+    return JSON.parse(new TextDecoder().decode(plain));
+  }catch(e){
+    // Şifreli değilse düz JSON olarak oku (geçiş dönemi)
+    try{return JSON.parse(str);}catch{return null;}
+  }
+}
+
+async function saveDataEncrypted(){
+  const enc=await encryptData(D);
+  localStorage.setItem(DATA_KEY,enc);
+}
+
+async function loadDataEncrypted(){
+  const raw=localStorage.getItem(DATA_KEY);
+  if(!raw)return null;
+  // Base64 mi düz JSON mı?
+  try{
+    atob(raw); // base64 ise hata vermez
+    return await decryptData(raw);
+  }catch{
+    try{return JSON.parse(raw);}catch{return null;}
+  }
+}
+
+let D={
   todos:[],completedTodos:[],trash:[],contentTrash:[],
   calPlans:{},notes:[],diary:[],
   kanban:{todo:[],doing:[],done:[]},
   reading:[],schedule:[],exams:[],notebook:[],
   profile:{name:'Kullanıcı',email:'ornek@eposta.com',avatar:'',theme:'default'},
 };
-if(!D.calPlans)D.calPlans={};
-if(!D.kanban)D.kanban={todo:[],doing:[],done:[]};
-if(!D.reading)D.reading=[];
-if(!D.schedule)D.schedule=[];
-if(!D.exams)D.exams=[];
-if(!D.notebook)D.notebook=[];
-if(!D.contentTrash)D.contentTrash=[];
-if(!D.trash)D.trash=[];
-function saveData(){localStorage.setItem('capsula_v4',JSON.stringify(D));}
+
+// saveData artık async şifreli kayıt
+function saveData(){
+  saveDataEncrypted().catch(()=>{
+    // Fallback: şifresiz kayıt
+    localStorage.setItem(DATA_KEY,JSON.stringify(D));
+  });
+}
+
 
 // ─────────────────────────── MODE + NAV ───────────────────────────────────
 let curMode='home', curPage='notes', curPriority='easy', kanbanPriority='mid';
@@ -3783,6 +3846,25 @@ function getReadingAIEstimate(item){
   return`<div style="font-size:.6rem;color:var(--text3);margin-top:4px;font-style:italic;">🤖 Bu hızda (${rateStr}) ${finishStr}'de bitirirsin — ${daysLeft} gün kaldı</div>`;
 }
 
+function updateReadingPage(){
+  const active=D.reading.find(r=>r.status==='reading');
+  if(!active){showToast('Okunuyor durumunda kitap yok');return;}
+  const inp=document.getElementById('readingPageInput');
+  const val=parseInt(inp?.value);
+  if(isNaN(val)||val<0){showToast('Geçerli bir sayfa no gir');return;}
+  active.pagesRead=val;
+  if(active.pages&&val>=active.pages){
+    active.status='done';
+    active.completedAt=new Date().toISOString();
+    addNotification(`🎉 "${active.title}" kitabını bitirdin! Tebrikler!`,'reading');
+    showToast('Kitap tamamlandı! 🎉');
+  } else {
+    showToast(`Sayfa güncellendi: ${val}${active.pages?' / '+active.pages:''}`);
+  }
+  if(inp)inp.value='';
+  saveData();renderReading();
+}
+
 function updateReadingTodayCard(){
   const card=document.getElementById('readingTodayCard');
   if(!card)return;
@@ -4743,7 +4825,21 @@ function renderDiaryAIPrompt(){
   page.insertBefore(box,page.firstChild);
 }
 
-window.addEventListener('load',()=>{
+window.addEventListener('load',async ()=>{
+  // Önce şifreli veriyi yükle
+  const loaded=await loadDataEncrypted();
+  if(loaded){
+    D=loaded;
+    if(!D.calPlans)D.calPlans={};
+    if(!D.kanban)D.kanban={todo:[],doing:[],done:[]};
+    if(!D.reading)D.reading=[];
+    if(!D.schedule)D.schedule=[];
+    if(!D.scheduleWeeks)D.scheduleWeeks={};
+    if(!D.exams)D.exams=[];
+    if(!D.notebook)D.notebook=[];
+    if(!D.contentTrash)D.contentTrash=[];
+    if(!D.trash)D.trash=[];
+  }
   initTheme();
   // Auth state değişince initApp çağrılıyor, burada sadece splash ve seed data
   const isFirstVisit=!localStorage.getItem('capsula_toured')&&!localStorage.getItem('capsula_visited');
