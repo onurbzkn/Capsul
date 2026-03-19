@@ -930,24 +930,22 @@ select.pf option{background:var(--bg2);color:var(--text);}
         <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:14px;transition:border-color .2s;" onfocusin="this.style.borderColor='rgba(124,111,247,.4)'" onfocusout="this.style.borderColor='var(--border)'">
           <input type="text" id="quickNoteInput" placeholder="Aklına ne geldi? Yaz, kaydet..." style="width:100%;background:none;border:none;outline:none;font-family:'Sora',sans-serif;font-size:.92rem;color:var(--text);margin-bottom:10px;display:block;" onkeydown="if(event.key==='Enter')saveQuickNote()">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <div class="priority-pills" style="display:flex;gap:5px;" id="quickNotePriority">
-              <div class="pp easy sel" data-p="easy" onclick="selectQuickPrio('easy')">Kolay</div>
-              <div class="pp mid" data-p="mid" onclick="selectQuickPrio('mid')">Orta</div>
-              <div class="pp hard" data-p="hard" onclick="selectQuickPrio('hard')">Zor</div>
-            </div>
-            <div style="flex:1;"></div>
-            <label title="Fotoğraf" style="cursor:pointer;width:30px;height:30px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3);">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:15px;height:15px;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <label style="cursor:pointer;display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:9px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:.72rem;font-family:'Sora',sans-serif;transition:background .18s;" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='var(--bg3)'">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px;flex-shrink:0;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              Fotoğraf
               <input type="file" accept="image/*" style="display:none" onchange="quickNoteMedia(event,'image')">
             </label>
-            <label title="Video" style="cursor:pointer;width:30px;height:30px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3);">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:15px;height:15px;"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            <label style="cursor:pointer;display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:9px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:.72rem;font-family:'Sora',sans-serif;transition:background .18s;" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='var(--bg3)'">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px;flex-shrink:0;"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+              Video
               <input type="file" accept="video/*" style="display:none" onchange="quickNoteMedia(event,'video')">
             </label>
-            <label title="Ses" style="cursor:pointer;width:30px;height:30px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3);">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:15px;height:15px;"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+            <label style="cursor:pointer;display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:9px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:.72rem;font-family:'Sora',sans-serif;transition:background .18s;" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='var(--bg3)'">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px;flex-shrink:0;"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+              Ses
               <input type="file" accept="audio/*" style="display:none" onchange="quickNoteMedia(event,'audio')">
             </label>
+            <div style="flex:1;"></div>
             <button onclick="saveQuickNote()" style="background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:9px;padding:8px 16px;cursor:pointer;color:#fff;font-size:.78rem;font-family:'Sora',sans-serif;white-space:nowrap;">+ Not</button>
           </div>
           <div id="quickNoteMediaPreview" style="margin-top:8px;"></div>
@@ -1037,9 +1035,9 @@ select.pf option{background:var(--bg2);color:var(--text);}
           </div>
           <div class="pomo-time" id="pomoTime">25:00</div>
           <!-- Flip stili -->
-          <div id="pomoFlipWrap" style="display:none;flex-direction:column;align-items:center;gap:4px;">
+          <div id="pomoFlipWrap" style="display:none;flex-direction:row;align-items:center;gap:6px;">
             <div id="pomoFlipMin" style="background:var(--bg3);border-radius:8px;padding:6px 14px;font-family:'JetBrains Mono',monospace;font-size:2rem;color:var(--text);border:1px solid var(--border2);min-width:64px;text-align:center;">25</div>
-            <div style="font-size:1.2rem;color:var(--text3);">:</div>
+            <div style="font-size:1.6rem;color:var(--text3);font-weight:300;">:</div>
             <div id="pomoFlipSec" style="background:var(--bg3);border-radius:8px;padding:6px 14px;font-family:'JetBrains Mono',monospace;font-size:2rem;color:var(--accent);border:1px solid var(--border2);min-width:64px;text-align:center;">00</div>
           </div>
         </div>
@@ -1228,8 +1226,8 @@ select.pf option{background:var(--bg2);color:var(--text);}
         <textarea class="pf" id="profileBio" placeholder="Kendini birkaç cümleyle anlat..." style="min-height:72px;resize:none;line-height:1.6;"></textarea>
         <div class="plabel">Motto</div>
         <input type="text" class="pf" id="profileMotto" placeholder="Seni motive eden bir söz...">
-        <div class="plabel">Bu Dönem Hedefim</div>
-        <input type="text" class="pf" id="profileGoal" placeholder="Hedefini yaz...">
+        <div class="plabel" style="margin-bottom:8px;">Avatar Seç</div>
+        <div id="avatarPickerGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:4px;"></div>
         <div class="plabel" style="margin-bottom:8px;">Unvan</div>
         <div class="prof-badge-grid" id="profBadgeGrid"></div>
         <button class="p-save" onclick="saveProfile()">Kaydet</button>
@@ -2063,7 +2061,13 @@ function updateWordCount(){
   const chars=text.length;
   wc.textContent=`${words} kelime · ${chars} karakter`;
 }
-function openModal(id){document.getElementById(id).classList.add('open');}
+function openModal(id){
+  document.getElementById(id).classList.add('open');
+  if(id==='settingsModal'){
+    document.querySelectorAll('#settingsModal .acc-body').forEach(b=>{b.style.display='none';});
+    document.querySelectorAll('#settingsModal .acc-arrow').forEach(a=>{a.classList.remove('open');});
+  }
+}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
 const BADGES=[
@@ -2092,13 +2096,72 @@ const ACCENT_COLORS=[
   {name:'cyan',val:'#22d3ee',val2:'#67e8f9'},
 ];
 
+// 20 sistem avatarı - emoji tabanlı, renkli kartlar
+const SYSTEM_AVATARS=[
+  {id:'av1',emoji:'🦁',bg:'linear-gradient(135deg,#f59e0b,#d97706)'},
+  {id:'av2',emoji:'🐺',bg:'linear-gradient(135deg,#6366f1,#4f46e5)'},
+  {id:'av3',emoji:'🦊',bg:'linear-gradient(135deg,#f97316,#ea580c)'},
+  {id:'av4',emoji:'🐻',bg:'linear-gradient(135deg,#92400e,#78350f)'},
+  {id:'av5',emoji:'🐼',bg:'linear-gradient(135deg,#374151,#111827)'},
+  {id:'av6',emoji:'🦋',bg:'linear-gradient(135deg,#8b5cf6,#7c3aed)'},
+  {id:'av7',emoji:'🦅',bg:'linear-gradient(135deg,#0369a1,#075985)'},
+  {id:'av8',emoji:'🌿',bg:'linear-gradient(135deg,#16a34a,#15803d)'},
+  {id:'av9',emoji:'🔥',bg:'linear-gradient(135deg,#ef4444,#dc2626)'},
+  {id:'av10',emoji:'⚡',bg:'linear-gradient(135deg,#eab308,#ca8a04)'},
+  {id:'av11',emoji:'🌙',bg:'linear-gradient(135deg,#312e81,#1e1b4b)'},
+  {id:'av12',emoji:'☀️',bg:'linear-gradient(135deg,#f59e0b,#b45309)'},
+  {id:'av13',emoji:'🌊',bg:'linear-gradient(135deg,#0891b2,#0e7490)'},
+  {id:'av14',emoji:'🏔️',bg:'linear-gradient(135deg,#475569,#334155)'},
+  {id:'av15',emoji:'🌸',bg:'linear-gradient(135deg,#ec4899,#db2777)'},
+  {id:'av16',emoji:'💎',bg:'linear-gradient(135deg,#06b6d4,#0284c7)'},
+  {id:'av17',emoji:'🎯',bg:'linear-gradient(135deg,#7c3aed,#6d28d9)'},
+  {id:'av18',emoji:'🚀',bg:'linear-gradient(135deg,#1d4ed8,#1e40af)'},
+  {id:'av19',emoji:'🎭',bg:'linear-gradient(135deg,#9333ea,#7e22ce)'},
+  {id:'av20',emoji:'🌺',bg:'linear-gradient(135deg,#f43f5e,#e11d48)'},
+];
+
+function renderAvatarPicker(){
+  const grid=document.getElementById('avatarPickerGrid');
+  if(!grid)return;
+  const cur=D.profile.avatarId||'';
+  grid.innerHTML=SYSTEM_AVATARS.map(av=>`
+    <div onclick="selectSystemAvatar('${av.id}')"
+      style="width:100%;aspect-ratio:1;border-radius:12px;background:${av.bg};display:flex;align-items:center;justify-content:center;font-size:1.4rem;cursor:pointer;border:2px solid ${cur===av.id?'var(--accent)':'transparent'};transition:all .18s;position:relative;"
+      id="avopt-${av.id}">
+      ${av.emoji}
+      ${cur===av.id?'<div style="position:absolute;bottom:2px;right:2px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);"></div>':''}
+    </div>`).join('');
+}
+
+function selectSystemAvatar(id){
+  const av=SYSTEM_AVATARS.find(a=>a.id===id);
+  if(!av)return;
+  D.profile.avatarId=id;
+  D.profile.avatar=''; // özel fotoğraf varsa temizle
+  localStorage.setItem('capsula_v4',JSON.stringify(D));
+  // Avatar görselini güncelle - emoji+gradient
+  const initials=D.profile.name.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase()||'KY';
+  ['avatarInitials','drawerAvatarInitials','profileAvatarInitials'].forEach(el=>{
+    const e=document.getElementById(el);if(e)e.textContent=av.emoji;
+  });
+  // Gradient background uygula
+  const style=`background:${av.bg};`;
+  ['avatarImg','drawerAvatarImg','profileAvatarImg'].forEach(el=>{
+    const e=document.getElementById(el);if(e)e.style.display='none';
+  });
+  document.querySelectorAll('.prof-avatar-wrap,.drawer-avatar,.avatar-btn').forEach(el=>{
+    el.style.background=av.bg;
+  });
+  renderAvatarPicker();
+  showToast('Avatar seçildi '+av.emoji);
+}
+
 function openProfile(){
   const p=D.profile;
   document.getElementById('profileName').value=p.name||'';
   document.getElementById('profileEmail').value=p.email||'';
   document.getElementById('profileBio').value=p.bio||'';
   document.getElementById('profileMotto').value=p.motto||'';
-  document.getElementById('profileGoal').value=p.goal||'';
   const uname=p.username||'—';
   const uf=document.getElementById('profUsernameField');if(uf)uf.textContent=uname;
   const ut=document.getElementById('profUsernameText');if(ut)ut.textContent=uname!=='—'?'@'+uname:'Kullanıcı adın henüz ayarlanmamış';
@@ -2112,6 +2175,7 @@ function openProfile(){
     const rw=document.getElementById('removeAvatarWrap');if(rw)rw.style.display='none';
   }
   renderBadgeGrid();renderProfileStats();
+  renderAvatarPicker();
   switchProfTab('info',document.querySelector('.prof-tab'));
   openModal('profileModal');
 }
@@ -2216,20 +2280,31 @@ function saveProfile(){
 function updateProfileUI(){
   const p=D.profile;
   const initials=p.name.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
-  ['avatarInitials','drawerAvatarInitials','profileAvatarInitials'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=initials;});
   document.getElementById('drawerUserName').textContent=p.name;
-  // Email Firebase'den göster
   const emailDisplay=p.email||'';
   document.getElementById('drawerUserEmail').textContent=emailDisplay?'@'+(p.username||emailDisplay.split('@')[0]):'';
-  // Header profil adı ve badge
   const hname=document.getElementById('profHeaderName');if(hname)hname.textContent=p.name;
   const hbadge=document.getElementById('profHeaderBadge');
   if(hbadge){const b=BADGES.find(x=>x.id===(p.badge||'student'));if(b)hbadge.textContent=b.ico+' '+b.lbl;}
-  // Accent rengi uygula
   if(p.accentVal){document.documentElement.style.setProperty('--accent',p.accentVal);document.documentElement.style.setProperty('--accent2',p.accentVal2||p.accentVal);}
+  // Önce sistem avatarını kontrol et
+  if(p.avatarId&&!p.avatar){
+    const av=SYSTEM_AVATARS.find(a=>a.id===p.avatarId);
+    if(av){
+      ['avatarInitials','drawerAvatarInitials','profileAvatarInitials'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=av.emoji;});
+      ['avatarImg','drawerAvatarImg','profileAvatarImg'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+      // Gradient uygula tüm avatar elementlerine
+      document.querySelectorAll('.avatar-btn,.drawer-avatar,.prof-avatar-wrap').forEach(el=>{el.style.background=av.bg;});
+      return;
+    }
+  }
+  // Özel fotoğraf
+  ['avatarInitials','drawerAvatarInitials','profileAvatarInitials'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=initials;});
   if(p.avatar){
     ['avatarImg','drawerAvatarImg','profileAvatarImg'].forEach(id=>{const el=document.getElementById(id);if(el){el.src=p.avatar;el.style.display='block';}});
     ['avatarInitials','drawerAvatarInitials'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  } else {
+    ['avatarImg','drawerAvatarImg','profileAvatarImg'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
   }
 }
 
@@ -2297,7 +2372,7 @@ function generateProfileCard(){
       </div>
     </div>
     ${p.motto?`<div style="font-size:.75rem;color:rgba(240,238,255,.55);font-style:italic;border-left:2px solid ${accent};padding-left:10px;margin-bottom:16px;line-height:1.5;">"${escHtml(p.motto)}"</div>`:''}
-    ${p.goal?`<div style="background:rgba(255,255,255,.04);border-radius:10px;padding:10px 12px;margin-bottom:16px;"><div style="font-size:.48rem;letter-spacing:.18em;color:rgba(240,238,255,.3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-bottom:4px;">Bu Dönem Hedefim</div><div style="font-size:.76rem;color:rgba(240,238,255,.75);">${escHtml(p.goal)}</div></div>`:''}
+    
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;">
       <div style="text-align:center;background:rgba(255,255,255,.04);border-radius:10px;padding:10px 6px;">
         <div style="font-size:1.1rem;font-family:'JetBrains Mono',monospace;font-weight:600;color:${accent2};">${D.completedTodos.length}</div>
@@ -2685,6 +2760,7 @@ function openPomoDurEdit(){
   if(pomoRunning)return;
   const w=POMO_DUR_CUSTOM.work,sh=POMO_DUR_CUSTOM.short,lo=POMO_DUR_CUSTOM.long;
   const modal=document.createElement('div');
+  modal.id='pomoDurModal';
   modal.className='modal-overlay';modal.style.display='flex';
   modal.innerHTML=`<div class="modal-box" style="padding:20px;">
     <button class="modal-close-btn" onclick="this.closest('.modal-overlay').remove()">✕</button>
@@ -2706,7 +2782,9 @@ function savePomoDur(){
   localStorage.setItem('capsula_pomo_dur',JSON.stringify(POMO_DUR_CUSTOM));
   const wl=document.getElementById('pomoWorkLbl');const sl=document.getElementById('pomoShortLbl');const ll=document.getElementById('pomoLongLbl');
   if(wl)wl.textContent=POMO_DUR_CUSTOM.work;if(sl)sl.textContent=POMO_DUR_CUSTOM.short;if(ll)ll.textContent=POMO_DUR_CUSTOM.long;
-  document.querySelector('.modal-overlay:last-of-type')?.remove();
+  // modal'ı kapat - id ile bul
+  const durModal=document.getElementById('pomoDurModal');
+  if(durModal)durModal.remove();
   setPomoMode(pomoMode);showToast('Süreler güncellendi ✓');
 }
 function setPomoStyle(s){
