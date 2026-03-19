@@ -962,53 +962,7 @@ select.pf option{background:var(--bg2);color:var(--text);}
       <div id="calEvents"></div>
     </div>
 
-    <!-- SLIDES -->
-    <div class="page" id="page-slides">
-      <div class="slides-header">
-        <div class="slides-cats" id="slidesCats"></div>
-        <button class="slides-upload-btn" onclick="document.getElementById('slidesFileInput').click()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          PDF Yükle
-        </button>
-        <input type="file" id="slidesFileInput" accept=".pdf" multiple style="display:none" onchange="uploadSlides(event)">
-      </div>
-      <div class="slides-search-bar">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:15px;height:15px;flex-shrink:0;color:var(--text3);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="slidesSearchInput" placeholder="Slayt adı veya kategori ara..." oninput="renderSlides()" style="flex:1;background:none;border:none;outline:none;font-family:'Sora',sans-serif;font-size:.8rem;color:var(--text);">
-      </div>
-      <div id="slidesGrid" class="slides-grid"></div>
-    </div>
 
-    <!-- CHAT -->
-    <div class="page" id="page-chat">
-      <div class="chat-layout">
-        <!-- Sol: Konuşma listesi -->
-        <div class="chat-list-panel" id="chatListPanel">
-          <div class="chat-list-header">
-            <div class="chat-list-title">Sohbet</div>
-            <div id="chatUnreadTotal" class="chat-unread-total" style="display:none;"></div>
-          </div>
-          <div id="chatConvList" class="chat-conv-list">
-            <div class="chat-empty-state">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:36px;height:36px;opacity:.3;margin-bottom:12px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              <div>Henüz sohbet yok</div>
-              <div style="font-size:.65rem;margin-top:4px;opacity:.6;">Arkadaşlarına mesaj göndermek için<br>profil sayfalarını aç</div>
-            </div>
-          </div>
-        </div>
-        <!-- Sağ: Aktif sohbet -->
-        <div class="chat-active-panel" id="chatActivePanel" style="display:none;">
-          <div class="chat-active-header" id="chatActiveHeader"></div>
-          <div class="chat-messages" id="chatMessages"></div>
-          <div class="chat-input-bar">
-            <textarea class="chat-input" id="chatInput" placeholder="Mesaj yaz..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"></textarea>
-            <button class="chat-send-btn" onclick="sendMessage()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- POMODORO (Uni + shared) -->
     <div class="page" id="page-pomodoro">
@@ -1177,7 +1131,6 @@ select.pf option{background:var(--bg2);color:var(--text);}
     <button class="drawer-item" onclick="toggleDrawer();switchPage('reading')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Okuma Listesi</button>
     <button class="drawer-item" onclick="openFromDrawer('trash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg><span id="dl-trash">Çöp Kutusu</span><span class="trash-badge" id="trashBadge" style="display:none">0</span></button>
     <button class="drawer-item" onclick="openBackupModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span id="dl-backup">Yedekle & Geri Yükle</span></button>
-    <button class="drawer-item" onclick="openFriends()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span id="dl-friends">Arkadaşlar</span><span id="friendRequestBadge" style="display:none;margin-left:auto;min-width:18px;height:18px;font-size:.52rem;border-radius:9px;background:var(--accent);color:#fff;align-items:center;justify-content:center;padding:0 4px;font-family:'JetBrains Mono',monospace;"></span></button>
     <button class="drawer-item" id="drawerReminderBtn" onclick="openReminderModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span id="dl-reminders">Hatırlatıcılar</span><span id="drawerReminderBadge" style="display:none;margin-left:auto;min-width:18px;height:18px;font-size:.52rem;border-radius:9px;background:var(--hard);color:#fff;align-items:center;justify-content:center;padding:0 4px;font-family:JetBrains Mono,monospace;"></span></button>
     <div class="drawer-divider"></div>
     <div class="drawer-section-label" id="dl-about">Hakkında</div>
@@ -1214,16 +1167,7 @@ select.pf option{background:var(--bg2);color:var(--text);}
     <div class="prof-body">
       <!-- INFO -->
       <div id="profTab-info" class="prof-tab-content active">
-        <!-- Kullanıcı adı göstergesi -->
-        <div id="profUsernameDisplay" style="text-align:center;margin-bottom:14px;">
-          <div style="font-size:.72rem;font-family:'JetBrains Mono',monospace;color:var(--accent2);letter-spacing:.08em;" id="profUsernameText"></div>
-          <div style="font-size:.58rem;color:var(--text3);margin-top:2px;">Kullanıcı adın arkadaşların seni bulmak için kullanır</div>
-        </div>
-        <div class="plabel">Kullanıcı Adı</div>
-        <div style="display:flex;gap:8px;margin-bottom:9px;">
-          <div style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--text2);display:flex;align-items:center;gap:6px;"><span style="color:var(--text3);">@</span><span id="profUsernameField">—</span></div>
-          <button onclick="openChangeUsername()" style="background:rgba(124,111,247,.12);border:1px solid rgba(124,111,247,.25);border-radius:9px;padding:0 12px;font-size:.65rem;color:var(--accent2);cursor:pointer;font-family:'Sora',sans-serif;white-space:nowrap;transition:all .2s;">Değiştir</button>
-        </div>
+        
         <div class="plabel">Ad Soyad</div>
         <input type="text" class="pf" id="profileName" placeholder="Adınız Soyadınız">
         <div class="plabel">E-posta <span style="font-size:.5rem;color:var(--text3);">(değiştirilemez)</span></div>
@@ -1680,49 +1624,7 @@ select.pf option{background:var(--bg2);color:var(--text);}
   </div>
 </div>
 
-<!-- KULLANICI ADI DEĞİŞTİR MODAL -->
-<div class="modal-overlay" id="changeUsernameModal">
-  <div class="modal-box" style="padding:22px;">
-    <button class="modal-close-btn" onclick="closeModal('changeUsernameModal')">✕</button>
-    <div class="plabel" style="font-size:.85rem;margin-bottom:4px;">Kullanıcı Adını Değiştir</div>
-    <div style="font-size:.65rem;color:var(--text3);margin-bottom:14px;">Arkadaşların seni bu isimle arar. Sadece harf, rakam ve _ kullanabilirsin.</div>
-    <div style="display:flex;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:9px 12px;margin-bottom:9px;">
-      <span style="color:var(--text3);font-family:'JetBrains Mono',monospace;margin-right:4px;">@</span>
-      <input type="text" id="newUsernameInput" placeholder="yeni_kullanici_adi" style="flex:1;background:none;border:none;outline:none;font-family:'JetBrains Mono',monospace;font-size:.84rem;color:var(--text);" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')">
-    </div>
-    <div id="usernameChangeError" style="display:none;font-size:.68rem;color:var(--hard);margin-bottom:8px;"></div>
-    <button class="p-save" onclick="changeUsername()">Kaydet</button>
-  </div>
-</div>
 
-<!-- ARKADAŞ EKRANI -->
-<div class="modal-overlay" id="friendsModal">
-  <div class="modal-box" style="padding:0;overflow:hidden;max-height:88vh;">
-    <div style="padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
-      <button class="modal-close-btn" onclick="closeModal('friendsModal')" style="position:static;">✕</button>
-      <div style="font-size:.88rem;font-weight:500;color:var(--text);">Arkadaşlar</div>
-      <div id="friendsOnlineCount" style="margin-left:auto;font-size:.58rem;font-family:'JetBrains Mono',monospace;color:var(--easy);"></div>
-    </div>
-    <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
-      <div style="display:flex;gap:8px;">
-        <input type="text" id="friendSearchInput" placeholder="Kullanıcı adı ara..." style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:8px 12px;font-family:'Sora',sans-serif;font-size:.78rem;color:var(--text);outline:none;" oninput="searchUsers(this.value)">
-        <button onclick="searchUsers(document.getElementById('friendSearchInput').value)" style="background:var(--accent);border:none;border-radius:9px;padding:8px 14px;color:#fff;cursor:pointer;font-size:.75rem;font-family:'Sora',sans-serif;">Ara</button>
-      </div>
-      <div id="friendSearchResults" style="margin-top:10px;"></div>
-    </div>
-    <div style="padding:14px 16px;overflow-y:auto;max-height:50vh;">
-      <div style="font-size:.5rem;letter-spacing:.2em;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-bottom:10px;">Arkadaşlarım</div>
-      <div id="friendsList"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ARKADAŞ PROFİL MODAL -->
-<div class="modal-overlay" id="friendProfileModal">
-  <div class="modal-box" style="padding:0;overflow:hidden;">
-    <div id="friendProfileContent"></div>
-  </div>
-</div>
 
 <!-- SPLASH SCREEN -->
 <div id="splashScreen">
@@ -1976,236 +1878,13 @@ function saveData(){
 }
 
 function loadUserData(uid){
-  db.collection('userData').doc(uid).get().then(doc=>{
-    if(doc.exists){
-      const remote=doc.data();
-      const keys=['todos','completedTodos','trash','contentTrash','notes','diary','reading','schedule','exams','notebook'];
-      keys.forEach(k=>{if(remote[k])D[k]=remote[k];});
-      if(remote.calPlans)D.calPlans=remote.calPlans;
-      if(remote.kanban)D.kanban=remote.kanban;
-      localStorage.setItem('capsula_v4',JSON.stringify(D));
-    }
-    // Profil bilgisini yükle
-    db.collection('users').doc(uid).get().then(udoc=>{
-      if(udoc.exists){
-        const p=udoc.data();
-        D.profile.name=p.name||D.profile.name;
-        D.profile.bio=p.bio||'';
-        D.profile.motto=p.motto||'';
-        D.profile.goal=p.goal||'';
-        D.profile.badge=p.badge||'student';
-        D.profile.username=p.username||'';
-        // Email otomatik Firebase'den al
-        D.profile.email=currentUser.email||p.email||'';
-        saveData();
-        updateProfileUI();
-        updateFriendRequestBadge(p.friendRequests||[]);
-      }
-    });
-    startFirestoreSync(uid);
-    initApp();
-  }).catch(()=>initApp());
+  initApp();
 }
 
-function saveProfileToFirestore(){
-  if(!currentUser)return;
-  const p=D.profile;
-  db.collection('users').doc(currentUser.uid).update({
-    name:p.name,bio:p.bio||'',motto:p.motto||'',goal:p.goal||'',
-    badge:p.badge||'student',accentColor:p.accentColor||'purple',
-    accentVal:p.accentVal||'',accentVal2:p.accentVal2||''
-  }).catch(console.warn);
-}
 
+function saveProfileToFirestore(){}
 // saveProfile fonksiyonunu güncelle
 const _origSaveProfile = window.saveProfile;
-
-// ── ARKADAŞ SİSTEMİ ───────────────────────────────────────────────────────
-function openFriends(){
-  toggleDrawer();
-  renderFriendsList();
-  document.getElementById('friendSearchInput').value='';
-  document.getElementById('friendSearchResults').innerHTML='';
-  openModal('friendsModal');
-}
-
-// Avatar HTML yardımcısı — Firestore'dan gelen avatarThumb varsa göster, yoksa baş harfler
-function userAvatarHtml(u,size=36){
-  const initials=(u.name||'?').slice(0,2).toUpperCase();
-  if(u.avatarThumb){
-    return`<div style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;flex-shrink:0;"><img src="${u.avatarThumb}" style="width:100%;height:100%;object-fit:cover;"></div>`;
-  }
-  return`<div style="width:${size}px;height:${size}px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--diary));display:flex;align-items:center;justify-content:center;font-size:${size*0.28}rem;font-weight:600;color:#fff;flex-shrink:0;">${initials}</div>`;
-}
-
-function searchUsers(query){
-  const q=query.trim().toLowerCase();
-  const res=document.getElementById('friendSearchResults');
-  if(q.length<2){res.innerHTML='';return;}
-  res.innerHTML='<div style="font-size:.68rem;color:var(--text3);text-align:center;padding:8px;">Aranıyor...</div>';
-  if(!currentUser){res.innerHTML='<div style="font-size:.68rem;color:var(--hard);text-align:center;padding:8px;">Giriş yapman gerekiyor</div>';return;}
-  // Önce kendi güncel verilerini çek
-  db.collection('users').doc(currentUser.uid).get().then(myDoc=>{
-    const myData=myDoc.data()||{};
-    const myFriends=myData.friends||[];
-    const myRequests=(myData.friendRequests||[]).map(r=>r.uid);
-    // Sonra arama yap
-    return db.collection('users').where('username','>=',q).where('username','<=',q+'\uf8ff').limit(8).get().then(snap=>{
-      if(snap.empty){res.innerHTML='<div style="font-size:.68rem;color:var(--text3);text-align:center;padding:8px;">Kullanıcı bulunamadı</div>';return;}
-      res.innerHTML=snap.docs.filter(d=>d.id!==currentUser.uid).map(d=>{
-        const u=d.data();
-        const isFriend=myFriends.includes(d.id);
-        const hasPendingRequest=myRequests.includes(d.id);
-        const badge=BADGES?.find(b=>b.id===(u.badge||'student'))||{ico:'🎓',lbl:'Öğrenci'};
-        let actionBtn='';
-        if(isFriend){
-          actionBtn=`<span style="font-size:.58rem;font-family:'JetBrains Mono',monospace;color:var(--easy);">Arkadaş ✓</span>`;
-        } else if(hasPendingRequest){
-          actionBtn=`<span style="font-size:.58rem;font-family:'JetBrains Mono',monospace;color:var(--text3);">İstek gönderildi</span>`;
-        } else {
-          actionBtn=`<button onclick="sendFriendRequest('${d.id}','${u.username}',this)" style="background:rgba(124,111,247,.15);border:1px solid rgba(124,111,247,.3);border-radius:7px;padding:4px 10px;font-size:.62rem;color:var(--accent2);cursor:pointer;font-family:'Sora',sans-serif;white-space:nowrap;flex-shrink:0;">+ Ekle</button>`;
-        }
-        return`<div style="display:flex;align-items:center;gap:10px;padding:9px;background:var(--bg3);border-radius:10px;margin-bottom:6px;">
-          ${userAvatarHtml(u,36)}
-          <div style="flex:1;min-width:0;overflow:hidden;"><div style="font-size:.8rem;font-weight:400;color:var(--text);">@${u.username}</div><div style="font-size:.6rem;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${badge.ico} ${u.name||''}</div></div>
-          ${actionBtn}
-        </div>`;
-      }).join('');
-    });
-  }).catch(()=>{res.innerHTML='<div style="font-size:.68rem;color:var(--hard);text-align:center;padding:8px;">Hata oluştu</div>';});
-}
-
-function sendFriendRequest(toUid,toUsername,btn){
-  if(!currentUser)return;
-  btn.textContent='Gönderildi ✓';btn.disabled=true;btn.style.color='var(--easy)';
-  db.collection('users').doc(toUid).update({
-    friendRequests: firebase.firestore.FieldValue.arrayUnion({
-      uid:currentUser.uid,
-      name:D.profile.name,
-      username:D.profile.username||currentUser.email?.split('@')[0]||'',
-      sentAt:new Date().toISOString()
-    })
-  }).catch(()=>{btn.textContent='+ Ekle';btn.disabled=false;});
-}
-
-function renderFriendsList(){
-  if(!currentUser){document.getElementById('friendsList').innerHTML='<div style="color:var(--text3);font-size:.72rem;text-align:center;padding:20px;">Giriş yapman gerekiyor</div>';return;}
-  db.collection('users').doc(currentUser.uid).get().then(doc=>{
-    if(!doc.exists)return;
-    const data=doc.data();
-    const requests=data.friendRequests||[];
-    const friends=data.friends||[];
-    let html='';
-    // Bekleyen istekler
-    if(requests.length){
-      html+=`<div style="font-size:.5rem;letter-spacing:.18em;color:var(--mid);font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-bottom:8px;">Bekleyen İstekler (${requests.length})</div>`;
-      requests.forEach(r=>{
-        html+=`<div style="display:flex;align-items:center;gap:10px;padding:9px;background:rgba(251,146,60,.06);border:1px solid rgba(251,146,60,.2);border-radius:10px;margin-bottom:6px;">
-          ${userAvatarHtml({name:r.name,avatarThumb:r.avatarThumb||''},34)}
-          <div style="flex:1;"><div style="font-size:.78rem;color:var(--text);">@${r.username}</div><div style="font-size:.6rem;color:var(--text3);">${r.name}</div></div>
-          <button onclick="acceptFriend('${r.uid}','${r.username}','${r.name}',this)" style="background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.3);border-radius:7px;padding:4px 9px;font-size:.6rem;color:var(--easy);cursor:pointer;font-family:'Sora',sans-serif;">Kabul</button>
-          <button onclick="declineFriend('${r.uid}',this)" style="background:none;border:1px solid var(--border);border-radius:7px;padding:4px 9px;font-size:.6rem;color:var(--text3);cursor:pointer;">Reddet</button>
-        </div>`;
-      });
-    }
-    // Arkadaşlar
-    if(friends.length){
-      html+=`<div style="font-size:.5rem;letter-spacing:.18em;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin:${requests.length?'14px':'0'} 0 8px;">Arkadaşlarım (${friends.length})</div>`;
-      // Her arkadaşın profilini çek
-      const promises=friends.map(uid=>db.collection('users').doc(uid).get());
-      Promise.all(promises).then(docs=>{
-        let fhtml='';
-        docs.forEach(d=>{
-          if(!d.exists)return;
-          const u=d.data();
-          const badge=BADGES?.find(b=>b.id===(u.badge||'student'))||{ico:'🎓',lbl:'Öğrenci'};
-          fhtml+=`<div style="display:flex;align-items:center;gap:10px;padding:9px;background:var(--bg3);border-radius:10px;margin-bottom:6px;cursor:pointer;" onclick="viewFriendProfile('${d.id}')">
-            ${userAvatarHtml(u,36)}
-            <div style="flex:1;"><div style="font-size:.8rem;color:var(--text);">@${u.username||''}</div><div style="font-size:.6rem;color:var(--text3);">${badge.ico} ${u.name||''}</div></div>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;color:var(--text3);"><polyline points="9 18 15 12 9 6"/></svg>
-          </div>`;
-        });
-        document.getElementById('friendsList').innerHTML=html+fhtml;
-      });
-    } else {
-      document.getElementById('friendsList').innerHTML=html+(html?'':'<div style="color:var(--text3);font-size:.72rem;font-style:italic;text-align:center;padding:16px;">Henüz arkadaş yok.<br>Yukarıdan ara ve ekle!</div>');
-    }
-  });
-}
-
-function acceptFriend(uid,username,name,btn){
-  btn.textContent='...';btn.disabled=true;
-  const myUid=currentUser.uid;
-  Promise.all([
-    db.collection('users').doc(myUid).update({
-      friends:firebase.firestore.FieldValue.arrayUnion(uid),
-      friendRequests:firebase.firestore.FieldValue.arrayRemove({uid,username,name})
-    }),
-    db.collection('users').doc(uid).update({
-      friends:firebase.firestore.FieldValue.arrayUnion(myUid)
-    })
-  ]).then(()=>{showToast(name+' arkadaş olarak eklendi ✓');renderFriendsList();updateFriendRequestBadge([]);})
-  .catch(()=>{btn.textContent='Kabul';btn.disabled=false;});
-}
-
-function declineFriend(uid,btn){
-  btn.textContent='...';btn.disabled=true;
-  db.collection('users').doc(currentUser.uid).get().then(doc=>{
-    const reqs=(doc.data()?.friendRequests||[]).filter(r=>r.uid!==uid);
-    return db.collection('users').doc(currentUser.uid).update({friendRequests:reqs});
-  }).then(()=>renderFriendsList()).catch(()=>{btn.textContent='Reddet';btn.disabled=false;});
-}
-
-function viewFriendProfile(uid){
-  db.collection('users').doc(uid).get().then(doc=>{
-    if(!doc.exists)return;
-    const u=doc.data();
-    const badge=BADGES?.find(b=>b.id===(u.badge||'student'))||{ico:'🎓',lbl:'Öğrenci'};
-    const accent=u.accentVal||'#7c6ff7';
-    // Kullanıcı verisini çek
-    db.collection('userData').doc(uid).get().then(dDoc=>{
-      const data=dDoc.exists?dDoc.data():{};
-      const completed=(data.completedTodos||[]).length;
-      const notes=(data.notes||[]).length+(data.diary||[]).length;
-      const books=(data.reading||[]).filter(r=>r.status==='done').length;
-      document.getElementById('friendProfileContent').innerHTML=`
-        <div style="background:linear-gradient(160deg,#1c1c28,#0d0d12);padding:28px 20px 20px;text-align:center;border-bottom:1px solid var(--border);">
-          <button class="modal-close-btn" onclick="closeModal('friendProfileModal')" style="position:absolute;top:12px;right:12px;">✕</button>
-          <div style="margin:0 auto 10px;width:64px;height:64px;box-shadow:0 0 24px ${accent}55;border-radius:50%;overflow:hidden;">
-            ${u.avatarThumb
-              ?`<img src="${u.avatarThumb}" style="width:100%;height:100%;object-fit:cover;">`
-              :`<div style="width:100%;height:100%;background:linear-gradient(135deg,${accent},#f472b6);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:#fff;">${(u.name||'?').slice(0,2).toUpperCase()}</div>`
-            }
-          </div>
-          <div style="font-size:1rem;font-weight:500;color:var(--text);">${escHtml(u.name||'')}</div>
-          <div style="font-size:.62rem;font-family:'JetBrains Mono',monospace;color:${accent};margin-top:3px;">@${u.username||''}</div>
-          <div style="font-size:.68rem;color:var(--accent2);margin-top:4px;">${badge.ico} ${badge.lbl}</div>
-        </div>
-        <div style="padding:16px 18px;">
-          ${u.motto?`<div style="font-size:.74rem;color:var(--text2);font-style:italic;border-left:2px solid ${accent};padding-left:10px;margin-bottom:14px;line-height:1.5;">"${escHtml(u.motto)}"</div>`:''}
-          ${u.bio?`<div style="font-size:.74rem;color:var(--text2);line-height:1.6;margin-bottom:14px;">${escHtml(u.bio)}</div>`:''}
-          ${u.goal?`<div style="background:var(--bg3);border-radius:10px;padding:10px 12px;margin-bottom:14px;"><div style="font-size:.48rem;letter-spacing:.15em;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-bottom:4px;">Bu Dönem Hedef</div><div style="font-size:.76rem;color:var(--text2);">${escHtml(u.goal)}</div></div>`:''}
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
-            <div style="background:var(--bg3);border-radius:10px;padding:10px 6px;text-align:center;"><div style="font-size:1.1rem;font-family:'JetBrains Mono',monospace;font-weight:600;color:${accent};">${completed}</div><div style="font-size:.48rem;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-top:3px;">Tamamlanan</div></div>
-            <div style="background:var(--bg3);border-radius:10px;padding:10px 6px;text-align:center;"><div style="font-size:1.1rem;font-family:'JetBrains Mono',monospace;font-weight:600;color:${accent};">${notes}</div><div style="font-size:.48rem;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-top:3px;">Not</div></div>
-            <div style="background:var(--bg3);border-radius:10px;padding:10px 6px;text-align:center;"><div style="font-size:1.1rem;font-family:'JetBrains Mono',monospace;font-weight:600;color:${accent};">${books}</div><div style="font-size:.48rem;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-top:3px;">Kitap</div></div>
-          </div>
-          <button onclick="startChatWith('${uid}')" style="width:100%;margin-top:4px;padding:11px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:12px;cursor:pointer;font-family:'Sora',sans-serif;font-size:.82rem;font-weight:500;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            Mesaj Gönder
-          </button>
-        </div>`;
-      closeModal('friendsModal');
-      openModal('friendProfileModal');
-    });
-  });
-}
-
-function updateFriendRequestBadge(requests){
-  const b=document.getElementById('friendRequestBadge');
-  if(requests.length>0){b.style.display='flex';b.textContent=requests.length;}
-  else b.style.display='none';
-}
 
 // ── AUTH STATE ─────────────────────────────────────────────────────────────
 if(auth){auth.onAuthStateChanged(user=>{
@@ -2213,10 +1892,7 @@ if(auth){auth.onAuthStateChanged(user=>{
   if(user){
     document.getElementById('signOutBtn').style.display='flex';
     loadUserData(user.uid);
-    db.collection('users').doc(user.uid).onSnapshot(doc=>{
-      if(doc.exists)updateFriendRequestBadge(doc.data()?.friendRequests||[]);
-    });
-  } else {
+      } else {
     document.getElementById('signOutBtn').style.display='none';
     if(unsubscribeSnapshot){unsubscribeSnapshot();unsubscribeSnapshot=null;}
     D={todos:[],completedTodos:[],trash:[],contentTrash:[],calPlans:{},notes:[],diary:[],
@@ -2237,9 +1913,7 @@ function initApp(){
   renderTodos();renderNotes();renderDiary();renderDashboard();renderCalendar();
   renderKanban();renderReading();renderSchedule();renderExams();renderNotebook();renderPro();
   // Chat konuşma listesini arka planda dinle (badge için)
-  if(currentUser)loadConversations();
-  if(currentUser)loadUserSlides();
-}
+    }
 
 const QUOTES=[
   {text:"Başarı, her gün tekrarlanan küçük çabaların toplamıdır.",author:"Robert Collier",tag:"Motivasyon"},
@@ -2332,21 +2006,12 @@ if(!D.reading)D.reading=[];
 if(!D.schedule)D.schedule=[];
 if(!D.exams)D.exams=[];
 if(!D.notebook)D.notebook=[];
-if(!D.slides)D.slides=[];
-// PDF.js worker - mobile uyumlu
-if(typeof pdfjsLib!=='undefined'){
-  try{
-    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-  }catch(e){
-    pdfjsLib.GlobalWorkerOptions.workerSrc='';
-  }
-}
 if(!D.contentTrash)D.contentTrash=[];
 if(!D.trash)D.trash=[];
 function saveData(){localStorage.setItem('capsula_v4',JSON.stringify(D));}
 
 // ─────────────────────────── MODE + NAV ───────────────────────────────────
-let curMode='home', curPage='slides', curPriority='easy', kanbanPriority='mid';
+let curMode='home', curPage='notes', curPriority='easy', kanbanPriority='mid';
 let editorType='note', editorMediaFiles=[], editorTags=[], selMoodVal='😊';
 let calYear=new Date().getFullYear(), calMonth=new Date().getMonth(), selCalDay=new Date().getDate();
 let viewingEntry=null, completedOpen=false, _confirmCb=null;
@@ -2354,28 +2019,27 @@ let pomoMode='work', pomoRunning=false, pomoSecs=25*60, pomoInterval=null, pomoS
 const POMO_DUR={work:25*60,short:5*60,long:15*60};
 
 const ICO_SEARCH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
-const ICO_CHAT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
 const MODES={
   home:[
-    {id:'slides',lbl:'Slayt',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>'},
-    {id:'todo',lbl:'Görev',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>'},
-    {id:'chat',lbl:'Sohbet',ico:ICO_CHAT,center:true},
     {id:'notes',lbl:'Not',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'},
-    {id:'search',lbl:'Ara',ico:ICO_SEARCH},
+    {id:'todo',lbl:'Görev',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>'},
+    {id:'pomodoro',lbl:'Odak',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',center:true},
+    {id:'schedule',lbl:'Program',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'},
+    {id:'calendar',lbl:'Takvim',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'},
   ],
   pro:[
-    {id:'slides',lbl:'Slayt',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>'},
-    {id:'todo',lbl:'Görev',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>'},
-    {id:'chat',lbl:'Sohbet',ico:ICO_CHAT,center:true},
     {id:'notes',lbl:'Not',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'},
-    {id:'search',lbl:'Ara',ico:ICO_SEARCH},
+    {id:'todo',lbl:'Görev',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>'},
+    {id:'pomodoro',lbl:'Odak',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',center:true},
+    {id:'schedule',lbl:'Program',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'},
+    {id:'calendar',lbl:'Takvim',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'},
   ],
   uni:[
-    {id:'slides',lbl:'Slayt',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>'},
-    {id:'todo',lbl:'Görev',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>'},
-    {id:'chat',lbl:'Sohbet',ico:ICO_CHAT,center:true},
     {id:'notes',lbl:'Not',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'},
-    {id:'search',lbl:'Ara',ico:ICO_SEARCH},
+    {id:'todo',lbl:'Görev',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>'},
+    {id:'pomodoro',lbl:'Odak',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',center:true},
+    {id:'schedule',lbl:'Program',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'},
+    {id:'calendar',lbl:'Takvim',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'},
   ],
 };
 const PAGE_TITLES={home:'Ana Ekran',slides:'Slaytlar',todo:'Görevler',notes:'Notlar',diary:'Günlük',search:'Arama',calendar:'Takvim',pomodoro:'Pomodoro',kanban:'Kanban',weekly:'Haftalık Özet',reading:'Okuma Listesi',pro:'Profesyonel',schedule:'Ders Programı',exams:'Sınav Takvimi',notebook:'Not Defteri',chat:'Sohbet'};
@@ -2421,9 +2085,7 @@ function switchPage(page){
   if(page==='schedule')renderSchedule();
   if(page==='exams')renderExams();
   if(page==='notebook')renderNotebook();
-  if(page==='chat'){renderChatPage();if(activeChatUid)openChat(activeChatUid);}
-  if(page==='slides')renderSlides();
-  if(page==='search'){document.getElementById('search-results').innerHTML='';setTimeout(()=>{const inp=document.getElementById('searchInput');if(inp){inp.value='';inp.focus();}},200);}
+      if(page==='search'){document.getElementById('search-results').innerHTML='';setTimeout(()=>{const inp=document.getElementById('searchInput');if(inp){inp.value='';inp.focus();}},200);}
   if(page==='pro')renderPro();
 }
 
@@ -2544,41 +2206,9 @@ function openProfile(){
   openModal('profileModal');
 }
 
-function openChangeUsername(){
-  document.getElementById('newUsernameInput').value='';
-  document.getElementById('usernameChangeError').style.display='none';
-  openModal('changeUsernameModal');
-}
 
-function changeUsername(){
-  const newName=document.getElementById('newUsernameInput').value.trim();
-  const errEl=document.getElementById('usernameChangeError');
-  errEl.style.display='none';
-  if(newName.length<3){errEl.textContent='En az 3 karakter olmalı';errEl.style.display='block';return;}
-  if(newName.length>20){errEl.textContent='En fazla 20 karakter olabilir';errEl.style.display='block';return;}
-  if(!currentUser){errEl.textContent='Giriş yapman gerekiyor';errEl.style.display='block';return;}
-  const oldName=D.profile.username;
-  // Kullanıcı adı müsait mi kontrol et
-  db.collection('usernames').doc(newName).get().then(doc=>{
-    if(doc.exists&&doc.data().uid!==currentUser.uid){
-      errEl.textContent='Bu kullanıcı adı alınmış';errEl.style.display='block';return;
-    }
-    const batch=db.batch();
-    // Yeni kullanıcı adını kaydet
-    batch.set(db.collection('usernames').doc(newName),{uid:currentUser.uid});
-    // Eskisini sil
-    if(oldName&&oldName!==newName)batch.delete(db.collection('usernames').doc(oldName));
-    // Profili güncelle
-    batch.update(db.collection('users').doc(currentUser.uid),{username:newName});
-    batch.commit().then(()=>{
-      D.profile.username=newName;
-      saveData();
-      closeModal('changeUsernameModal');
-      closeModal('profileModal');
-      setTimeout(()=>{openProfile();showToast('Kullanıcı adı güncellendi ✓');},300);
-    }).catch(e=>{errEl.textContent='Hata: '+e.message;errEl.style.display='block';});
-  }).catch(e=>{errEl.textContent='Bağlantı hatası';errEl.style.display='block';});
-}
+
+
 
 function switchProfTab(tab,btn){
   document.querySelectorAll('.prof-tab').forEach(b=>b.classList.remove('active'));
@@ -2849,24 +2479,7 @@ function toggleCompleted(){completedOpen=!completedOpen;renderTodos();}
 
 // ─────────────────────────── NOTES ────────────────────────────────────────
 function tagColor(tag){const colors=['#60a5fa','#a78bfa','#f472b6','#4ade80','#fb923c','#f87171','#fbbf24','#34d399'];let h=0;for(let c of tag)h=(h*31+c.charCodeAt(0))%colors.length;return colors[h];}
-function saveQuickNote(){
-  const inp=document.getElementById('quickNoteInput');
-  const text=inp?.value.trim();
-  if(!text)return;
-  const note={
-    id:Date.now(),
-    title:text.slice(0,40)+(text.length>40?'...':''),
-    content:text,
-    media:[],tags:['hızlı'],
-    pinned:true,
-    createdAt:new Date().toISOString()
-  };
-  D.notes.unshift(note);
-  saveData();
-  renderNotes();
-  inp.value='';
-  showToast('Not eklendi ✓');
-}
+
 
 function renderNotes(){
   const grid=document.getElementById('notes-grid');const empty=document.getElementById('notes-empty');
@@ -3206,592 +2819,7 @@ function renderReading(){
   document.getElementById('readingList').innerHTML=html||'<div class="empty-state">Okuma listesi boş.<br>Üstten kitap ekle.</div>';
 }
 
-function loadUserSlides(){
-  if(!currentUser||!db)return;
-  showToast('Slaytlar kontrol ediliyor...');
-  db.collection('userSlides').doc(currentUser.uid).collection('slides')
-    .orderBy('addedAt','desc').get().then(snap=>{
-      if(snap.empty){showToast('Bulutta slayt yok');return;}
-      if(!D.slides)D.slides=[];
-      const localIds=new Set(D.slides.map(s=>String(s.id)));
-      const allRemote=snap.docs.map(d=>d.data());
-      const newOnes=allRemote.filter(s=>!localIds.has(String(s.id)));
-      if(!newOnes.length){showToast('Slaytlar güncel ✓');renderSlides();return;}
-      showToast(newOnes.length+' yeni slayt indiriliyor...');
-      let loaded=0;
-      const sequential=(arr,fn)=>arr.reduce((p,item)=>p.then(()=>fn(item)),Promise.resolve());
-      sequential(newOnes,s=>{
-        return db.collection('userSlides').doc(currentUser.uid)
-          .collection('slides').doc(String(s.id))
-          .collection('chunks').orderBy('idx').get()
-          .then(cSnap=>{
-            if(cSnap.empty){D.slides.unshift({...s,base64:''});return;}
-            const b64='data:application/pdf;base64,'+cSnap.docs.map(d=>d.data().data).join('');
-            D.slides.unshift({...s,base64:b64});
-            loaded++;
-          }).catch(()=>{D.slides.unshift({...s,base64:''});});
-      }).then(()=>{
-        D.slides.sort((a,b)=>new Date(b.addedAt)-new Date(a.addedAt));
-        localStorage.setItem('capsula_v4',JSON.stringify(D));
-        renderSlides();
-        showToast(loaded+' slayt indirildi ✓');
-      });
-    }).catch(err=>showToast('Hata: '+(err.code||err.message)));
-}
 
-// ─────────────────────────── SLIDES ────────────────────────────────────────
-// D.slides = [{id, name, category, pages, size, addedAt, thumb, base64}]
-let slidesCurCat='Tümü';
-
-function uploadSlides(e){
-  const files=[...e.target.files];
-  if(!files.length)return;
-  const pdfs=files.filter(f=>f.name.toLowerCase().endsWith('.pdf'));
-  if(!pdfs.length){showToast('Sadece PDF destekleniyor');return;}
-  const processOne=(file)=>new Promise(resolve=>{
-    if(file.size>20*1024*1024){showToast(file.name+' çok büyük (max 20MB)');resolve();return;}
-    showToast(file.name+' işleniyor...');
-    const reader=new FileReader();
-    reader.onload=ev=>{
-      const base64=ev.target.result;
-      const rawB64=base64.split(',')[1];
-      const arr=new Uint8Array(rawB64.split('').map(c=>c.charCodeAt(0)));
-      const makeSlide=(thumb,pages)=>{
-        const slideId='slide-'+Date.now()+'-'+Math.random().toString(36).slice(2);
-        const slide={id:slideId,name:file.name.replace(/\.pdf$/i,''),category:'Genel',pages,size:file.size,addedAt:new Date().toISOString(),thumb,base64};
-        if(!D.slides)D.slides=[];
-        D.slides.unshift(slide);
-        localStorage.setItem('capsula_v4',JSON.stringify(D));
-        renderSlides();
-        if(currentUser&&db){
-          const ref=db.collection('userSlides').doc(currentUser.uid).collection('slides').doc(slideId);
-          ref.set({id:slideId,name:slide.name,category:slide.category,pages,size:file.size,addedAt:slide.addedAt,thumb})
-            .then(()=>{
-              const CHUNK=450*1024;
-              const chunks=[];
-              for(let i=0;i<rawB64.length;i+=CHUNK)chunks.push(rawB64.slice(i,i+CHUNK));
-              return chunks.reduce((p,chunk,idx)=>p.then(()=>
-                ref.collection('chunks').doc(String(idx).padStart(4,'0')).set({data:chunk,idx})
-              ),Promise.resolve());
-            }).then(()=>{showToast(slide.name+' buluta kaydedildi ✓');resolve();})
-            .catch(err=>{showToast('Yerel kaydedildi (bulut hatası: '+(err.code||'?')+')');resolve();});
-        } else resolve();
-      };
-      if(typeof pdfjsLib!=='undefined'){
-        pdfjsLib.getDocument({data:arr}).promise.then(pdf=>{
-          const totalPages=pdf.numPages;
-          pdf.getPage(1).then(page=>{
-            // Daha yüksek scale ile net thumbnail
-            const vp0=page.getViewport({scale:1});
-            const targetW=320;
-            const scale=targetW/vp0.width;
-            const vp=page.getViewport({scale});
-            const cv=document.createElement('canvas');
-            cv.width=vp.width;cv.height=vp.height;
-            page.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise
-              .then(()=>makeSlide(cv.toDataURL('image/jpeg',0.88),totalPages))
-              .catch(()=>makeSlide('',totalPages));
-          }).catch(()=>makeSlide('',totalPages));
-        }).catch(()=>makeSlide('',0));
-      } else makeSlide('',0);
-    };
-    reader.onerror=()=>{showToast('Dosya okunamadı');resolve();};
-    reader.readAsDataURL(file);
-  });
-  pdfs.reduce((p,f)=>p.then(()=>processOne(f)),Promise.resolve());
-  e.target.value='';
-}
-
-function renderSlides(){
-  if(!D.slides)D.slides=[];
-  const q=(document.getElementById('slidesSearchInput')?.value||'').toLowerCase();
-  // Kategoriler
-  const cats=['Tümü',...new Set(D.slides.map(s=>s.category||'Genel'))];
-  const catEl=document.getElementById('slidesCats');
-  if(catEl){
-    catEl.innerHTML=cats.map(c=>`<button class="slide-cat-btn${c===slidesCurCat?' active':''}" onclick="slidesCurCat='${c}';renderSlides()">${c}</button>`
-    +(c==='Tümü'?`<button class="slide-cat-btn" onclick="addSlideCat()" style="border-style:dashed;">+ Kategori</button>`:'')).join('');
-  }
-  // Filtrele
-  let slides=D.slides;
-  if(slidesCurCat!=='Tümü')slides=slides.filter(s=>(s.category||'Genel')===slidesCurCat);
-  if(q)slides=slides.filter(s=>s.name.toLowerCase().includes(q)||(s.category||'').toLowerCase().includes(q));
-  const grid=document.getElementById('slidesGrid');
-  if(!grid)return;
-  if(!slides.length){
-    grid.innerHTML=`<div class="slide-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:40px;height:40px;opacity:.3;margin-bottom:12px;"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><div>Henüz slayt yok</div><div style="font-size:.62rem;margin-top:4px;opacity:.6;">PDF Yükle butonuna basarak ekleyebilirsin</div></div>`;
-    return;
-  }
-  grid.innerHTML=slides.map(s=>`
-    <div class="slide-card" onclick="openSlide('${s.id}')">
-      <div class="slide-thumb" style="height:130px;position:relative;">
-        ${s.thumb
-          ?`<img src="${s.thumb}" style="width:100%;height:100%;object-fit:cover;">`
-          :`<div class="slide-thumb-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:36px;height:36px;opacity:.4;"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>`
-        }
-        <!-- Sayfa sayısı overlay sağ altta -->
-        <div style="position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);color:#fff;font-size:.52rem;font-family:'JetBrains Mono',monospace;padding:2px 7px;border-radius:6px;">
-          ${s.pages&&s.pages>0?s.pages+'s':'?'}
-        </div>
-        <!-- Kategori overlay sol üstte -->
-        <div style="position:absolute;top:6px;left:6px;background:rgba(124,111,247,.7);backdrop-filter:blur(4px);color:#fff;font-size:.5rem;font-family:'JetBrains Mono',monospace;padding:2px 7px;border-radius:6px;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-          ${escHtml(s.category||'Genel')}
-        </div>
-      </div>
-      <div class="slide-actions">
-        <div class="slide-action-btn" onclick="event.stopPropagation();changeSlideCat('${s.id}')" title="Kategori değiştir">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-        </div>
-        <div class="slide-action-btn" onclick="event.stopPropagation();shareSlide('${s.id}')" title="Paylaş">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-        </div>
-        <div class="slide-action-btn" onclick="event.stopPropagation();deleteSlide('${s.id}')" title="Sil" style="color:var(--hard);">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
-        </div>
-      </div>
-      <div class="slide-info">
-        <div class="slide-name">${escHtml(s.name)}</div>
-        <div class="slide-meta">
-          <span style="opacity:.7;">${s.size?(s.size/1024/1024).toFixed(1)+'MB':''}</span>
-        </div>
-      </div>
-    </div>`).join('');
-}
-
-function openSlide(id){
-  const s=D.slides.find(x=>String(x.id)===String(id));
-  if(!s||!s.base64)return;
-
-  // PDF.js ile tam ekran modal
-  const modal=document.createElement('div');
-  modal.id='pdfViewerModal';
-  modal.style.cssText='position:fixed;inset:0;z-index:4000;background:#111;display:flex;flex-direction:column;';
-  modal.innerHTML=`
-    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(13,13,18,.97);border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0;">
-      <button onclick="document.getElementById('pdfViewerModal').remove()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;cursor:pointer;padding:6px 12px;border-radius:8px;font-size:.75rem;font-family:'Sora',sans-serif;display:flex;align-items:center;gap:6px;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;"><polyline points="15 18 9 12 15 6"/></svg> Geri
-      </button>
-      <div style="flex:1;font-size:.82rem;font-weight:500;color:#f0eeff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(s.name)}</div>
-      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-        <button onclick="pdfPrevPage()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;cursor:pointer;width:32px;height:32px;border-radius:8px;font-size:1rem;display:flex;align-items:center;justify-content:center;">‹</button>
-        <span id="pdfPageInfo" style="font-size:.68rem;font-family:'JetBrains Mono',monospace;color:rgba(255,255,255,.5);white-space:nowrap;">1 / ?</span>
-        <button onclick="pdfNextPage()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;cursor:pointer;width:32px;height:32px;border-radius:8px;font-size:1rem;display:flex;align-items:center;justify-content:center;">›</button>
-      </div>
-    </div>
-    <div style="flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:16px;background:#1a1a1a;">
-      <canvas id="pdfCanvas" style="max-width:100%;box-shadow:0 8px 32px rgba(0,0,0,.6);border-radius:4px;"></canvas>
-    </div>
-    <div id="pdfLoading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(17,17,17,.9);z-index:10;">
-      <div style="text-align:center;color:rgba(255,255,255,.6);">
-        <div style="font-size:.8rem;font-family:'Sora',sans-serif;margin-bottom:8px;">PDF yükleniyor...</div>
-        <div style="width:48px;height:2px;background:rgba(124,111,247,.3);border-radius:2px;margin:0 auto;overflow:hidden;"><div style="width:40%;height:100%;background:var(--accent);animation:loadBar .8s ease-in-out infinite alternate;border-radius:2px;"></div></div>
-      </div>
-    </div>`;
-  document.body.appendChild(modal);
-
-  // PDF.js ile yükle
-  const data=atob(s.base64.split(',')[1]);
-  const arr=new Uint8Array(data.length);
-  for(let i=0;i<data.length;i++)arr[i]=data.charCodeAt(i);
-
-  window._pdfDoc=null;
-  window._pdfPage=1;
-
-  pdfjsLib.getDocument({data:arr}).promise.then(pdf=>{
-    window._pdfDoc=pdf;
-    window._pdfPage=1;
-    document.getElementById('pdfLoading').style.display='none';
-    renderPdfPage();
-    // Sayfa sayısı 0 ise güncelle
-    if(s.pages===0||!s.pages){
-      s.pages=pdf.numPages;
-      localStorage.setItem('capsula_v4',JSON.stringify(D));
-      // Firestore'u da güncelle
-      if(currentUser&&db){
-        db.collection('userSlides').doc(currentUser.uid).collection('slides').doc(String(s.id))
-          .update({pages:pdf.numPages}).catch(()=>{});
-      }
-    }
-  }).catch(err=>{
-    document.getElementById('pdfLoading').innerHTML='<div style="color:#f87171;font-size:.8rem;padding:20px;">PDF açılamadı: '+err.message+'</div>';
-  });
-}
-
-function renderPdfPage(){
-  if(!window._pdfDoc)return;
-  const canvas=document.getElementById('pdfCanvas');
-  if(!canvas)return;
-  const pageInfo=document.getElementById('pdfPageInfo');
-  if(pageInfo)pageInfo.textContent=window._pdfPage+' / '+window._pdfDoc.numPages;
-  window._pdfDoc.getPage(window._pdfPage).then(page=>{
-    const vw=canvas.parentElement.clientWidth-32;
-    const vp0=page.getViewport({scale:1});
-    const scale=Math.min(vw/vp0.width,3);
-    const vp=page.getViewport({scale});
-    canvas.width=vp.width;
-    canvas.height=vp.height;
-    page.render({canvasContext:canvas.getContext('2d'),viewport:vp});
-  });
-}
-
-function pdfNextPage(){
-  if(!window._pdfDoc)return;
-  if(window._pdfPage<window._pdfDoc.numPages){window._pdfPage++;renderPdfPage();}
-}
-
-function pdfPrevPage(){
-  if(!window._pdfDoc)return;
-  if(window._pdfPage>1){window._pdfPage--;renderPdfPage();}
-}
-
-function dataURLtoBlob(dataURL){
-  const arr=dataURL.split(',');
-  const mime=arr[0].match(/:(.*?);/)[1];
-  const bstr=atob(arr[1]);
-  let n=bstr.length;
-  const u8=new Uint8Array(n);
-  while(n--)u8[n]=bstr.charCodeAt(n);
-  return new Blob([u8],{type:mime});
-}
-
-function addSlideCat(){
-  const name=prompt('Yeni kategori adı:');
-  if(!name?.trim())return;
-  slidesCurCat=name.trim();
-  renderSlides();
-}
-
-function changeSlideCat(id){
-  const s=D.slides.find(x=>x.id==id);if(!s)return;
-  const cats=[...new Set(D.slides.map(x=>x.category||'Genel')),'+ Yeni kategori'];
-  const cur=s.category||'Genel';
-  const chosen=prompt(`Kategori seç (şu an: ${cur})\n${cats.join(', ')}\n\nYeni kategori adı yaz:`);
-  if(!chosen?.trim())return;
-  s.category=chosen.trim();
-  localStorage.setItem('capsula_v4',JSON.stringify(D));
-  renderSlides();
-}
-
-function deleteSlide(id){
-  showConfirm('Bu slaytı silmek istediğine emin misin?',()=>{
-    D.slides=D.slides.filter(x=>x.id!=id);
-    localStorage.setItem('capsula_v4',JSON.stringify(D));
-    renderSlides();
-    showToast('Slayt silindi');
-  });
-}
-
-function shareSlide(id){
-  const s=D.slides.find(x=>x.id==id);if(!s)return;
-  if(!currentUser){showToast('Paylaşmak için giriş yap');return;}
-  // Arkadaş listesini çek ve seçtir
-  if(!D.profile.friends?.length){showToast('Henüz arkadaşın yok');return;}
-  db.collection('users').doc(currentUser.uid).get().then(doc=>{
-    const friends=doc.data()?.friends||[];
-    if(!friends.length){showToast('Henüz arkadaşın yok');return;}
-    const promises=friends.map(uid=>db.collection('users').doc(uid).get());
-    Promise.all(promises).then(docs=>{
-      const modal=document.createElement('div');
-      modal.className='modal-overlay';modal.style.display='flex';
-      modal.innerHTML=`<div class="modal-box" style="padding:20px;">
-        <button class="modal-close-btn" onclick="this.closest('.modal-overlay').remove()">✕</button>
-        <div class="plabel" style="margin-bottom:12px;">Slaytı Paylaş — ${escHtml(s.name)}</div>
-        ${docs.map(d=>{const u=d.data();return`<div onclick="sendSlideToFriend('${id}','${d.id}');this.closest('.modal-overlay').remove();" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;cursor:pointer;background:var(--bg3);margin-bottom:6px;">
-          ${userAvatarHtml(u,36)}
-          <div><div style="font-size:.8rem;color:var(--text);">${escHtml(u.name||'')}</div><div style="font-size:.62rem;color:var(--text3);">@${u.username||''}</div></div>
-        </div>`;}).join('')}
-      </div>`;
-      document.body.appendChild(modal);
-    });
-  });
-}
-
-function sendSlideToFriend(slideId,toUid){
-  const s=D.slides.find(x=>x.id==slideId);if(!s)return;
-  const cid=convId(currentUser.uid,toUid);
-  const msg=`📄 **${s.name}** adlı slaytı paylaştı`;
-  const batch=db.batch();
-  const msgRef=db.collection('conversations').doc(cid).collection('messages').doc();
-  batch.set(msgRef,{
-    text:msg,senderId:currentUser.uid,
-    sentAt:firebase.firestore.FieldValue.serverTimestamp(),
-    type:'slide',slideThumb:s.thumb||'',slideName:s.name
-  });
-  batch.set(db.collection('conversations').doc(cid),{
-    members:[currentUser.uid,toUid],
-    lastMsg:`📄 ${s.name}`,
-    lastMsgAt:firebase.firestore.FieldValue.serverTimestamp(),
-    lastSenderId:currentUser.uid,
-    [`unreadCount.${toUid}`]:firebase.firestore.FieldValue.increment(1),
-    [`unreadCount.${currentUser.uid}`]:0
-  },{merge:true});
-  batch.commit().then(()=>showToast('Slayt gönderildi ✓')).catch(console.warn);
-}
-
-// ─────────────────────────── CHAT ─────────────────────────────────────────
-let activeChatUid=null;
-let activeChatUnsub=null;
-let convListUnsub=null;
-
-function convId(uid1,uid2){return[uid1,uid2].sort().join('_');}
-
-function renderChatPage(){
-  if(!currentUser){
-    document.getElementById('chatConvList').innerHTML='<div class="chat-empty-state">Giriş yapman gerekiyor</div>';
-    return;
-  }
-  loadConversations();
-}
-
-function loadConversations(){
-  if(convListUnsub)convListUnsub();
-  if(!currentUser||!db)return;
-  const uid=currentUser.uid;
-
-  // Index gerektirmeyen basit sorgu — sadece members filtrele, sıralama client'ta
-  convListUnsub=db.collection('conversations')
-    .where('members','array-contains',uid)
-    .onSnapshot(snap=>{
-      let totalUnread=0;
-      const convItems=snap.docs
-        .map(doc=>{
-          const d=doc.data();
-          const otherUid=d.members?.find(m=>m!==uid);
-          if(!otherUid)return null;
-          const unread=d.unreadCount?.[uid]||0;
-          totalUnread+=unread;
-          return{id:doc.id,otherUid,data:d,unread};
-        })
-        .filter(Boolean)
-        .sort((a,b)=>{
-          const ta=a.data.lastMsgAt?.toDate?.()||new Date(0);
-          const tb=b.data.lastMsgAt?.toDate?.()||new Date(0);
-          return tb-ta;
-        });
-
-      // Arkadaş listesini çek
-      db.collection('users').doc(uid).get().then(myDoc=>{
-        const myFriends=myDoc.data()?.friends||[];
-        const convUids=convItems.map(c=>c.otherUid);
-        const noConvFriends=myFriends.filter(f=>!convUids.includes(f));
-
-        const allUids=[...convUids,...noConvFriends];
-        if(!allUids.length){
-          document.getElementById('chatConvList').innerHTML='<div class="chat-empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:36px;height:36px;opacity:.3;margin-bottom:12px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div>Henüz arkadaşın yok</div><div style="font-size:.65rem;margin-top:4px;opacity:.6;">Drawer\'dan arkadaş ekleyebilirsin</div></div>';
-          updateChatNavBadge(0);
-          return;
-        }
-
-        // Tüm kullanıcı profillerini çek
-        Promise.all(allUids.map(u=>db.collection('users').doc(u).get())).then(userDocs=>{
-          const userMap={};
-          userDocs.forEach(d=>{if(d.exists)userMap[d.id]=d.data();});
-
-          let html='';
-          // Konuşmalar
-          if(convItems.length){
-            convItems.forEach(item=>{
-              const u=userMap[item.otherUid]||{name:'Kullanıcı',username:'',avatarThumb:''};
-              const d=item.data;
-              const isActive=activeChatUid===item.otherUid;
-              const timeStr=d.lastMsgAt?fmtChatTime(d.lastMsgAt.toDate?.()||new Date(d.lastMsgAt)):'';
-              const avatarHtml=u.avatarThumb?`<img src="${u.avatarThumb}">`:`<span>${(u.name||'?').slice(0,2).toUpperCase()}</span>`;
-              html+=`<div class="chat-conv-item${isActive?' active':''}" onclick="openChat('${item.otherUid}')">
-                <div class="chat-conv-avatar">${avatarHtml}</div>
-                <div class="chat-conv-info">
-                  <div class="chat-conv-name">${escHtml(u.name||'')}</div>
-                  <div class="chat-conv-preview">${item.unread>0?`<b>${escHtml(d.lastMsg||'')}</b>`:escHtml(d.lastMsg||'')}</div>
-                </div>
-                <div class="chat-conv-meta">
-                  <div class="chat-conv-time">${timeStr}</div>
-                  ${item.unread>0?`<div class="chat-conv-badge">${item.unread}</div>`:''}
-                </div>
-              </div>`;
-            });
-          }
-          // Konuşması olmayan arkadaşlar
-          if(noConvFriends.length){
-            if(convItems.length)html+=`<div style="font-size:.52rem;letter-spacing:.15em;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;padding:12px 6px 6px;">Arkadaşlar</div>`;
-            noConvFriends.forEach(fuid=>{
-              const u=userMap[fuid];
-              if(!u)return;
-              const avatarHtml=u.avatarThumb?`<img src="${u.avatarThumb}">`:`<span>${(u.name||'?').slice(0,2).toUpperCase()}</span>`;
-              html+=`<div class="chat-conv-item" onclick="openChat('${fuid}')">
-                <div class="chat-conv-avatar">${avatarHtml}</div>
-                <div class="chat-conv-info">
-                  <div class="chat-conv-name">${escHtml(u.name||'')}</div>
-                  <div class="chat-conv-preview" style="font-style:italic;opacity:.7;">Merhaba de 👋</div>
-                </div>
-                <div class="chat-conv-meta">
-                  <div style="font-size:.55rem;color:var(--accent2);">Yeni</div>
-                </div>
-              </div>`;
-            });
-          }
-          if(!html)html='<div class="chat-empty-state">Henüz kimse yok</div>';
-          const el=document.getElementById('chatConvList');
-          if(el)el.innerHTML=html;
-          const tb=document.getElementById('chatUnreadTotal');
-          if(tb){if(totalUnread>0){tb.style.display='';tb.textContent=totalUnread+' yeni';}else tb.style.display='none';}
-          updateChatNavBadge(totalUnread);
-        });
-      }).catch(err=>console.warn('friends fetch err',err));
-    },err=>{
-      console.warn('conv list err',err);
-      // Index hatası olabilir — sadece arkadaşları göster
-      db.collection('users').doc(uid).get().then(myDoc=>{
-        const myFriends=myDoc.data()?.friends||[];
-        if(!myFriends.length){
-          const el=document.getElementById('chatConvList');
-          if(el)el.innerHTML='<div class="chat-empty-state">Henüz arkadaşın yok</div>';
-          return;
-        }
-        Promise.all(myFriends.map(f=>db.collection('users').doc(f).get())).then(docs=>{
-          let html='';
-          docs.forEach(d=>{
-            if(!d.exists)return;
-            const u=d.data();
-            const avatarHtml=u.avatarThumb?`<img src="${u.avatarThumb}">`:`<span>${(u.name||'?').slice(0,2).toUpperCase()}</span>`;
-            html+=`<div class="chat-conv-item" onclick="openChat('${d.id}')">
-              <div class="chat-conv-avatar">${avatarHtml}</div>
-              <div class="chat-conv-info"><div class="chat-conv-name">${escHtml(u.name||'')}</div><div class="chat-conv-preview" style="font-style:italic;opacity:.7;">Merhaba de 👋</div></div>
-            </div>`;
-          });
-          const el=document.getElementById('chatConvList');
-          if(el)el.innerHTML=html||'<div class="chat-empty-state">Henüz kimse yok</div>';
-        });
-      });
-    });
-}
-
-function updateChatNavBadge(count){
-  const btn=document.querySelector('.nav-center-fab');
-  if(!btn)return;
-  let badge=btn.querySelector('.chat-nav-badge');
-  if(count>0){
-    btn.classList.add('has-msg');
-    if(!badge){badge=document.createElement('div');badge.className='chat-nav-badge';btn.appendChild(badge);}
-    badge.textContent=count>9?'9+':count;
-    badge.style.cssText='position:absolute;top:-5px;right:-5px;background:var(--hard);color:#fff;font-size:.48rem;font-family:JetBrains Mono,monospace;border-radius:9px;padding:2px 5px;border:2px solid var(--bg);min-width:18px;text-align:center;font-weight:600;';
-  } else {
-    btn.classList.remove('has-msg');
-    if(badge)badge.remove();
-  }
-}
-
-function openChat(otherUid){
-  activeChatUid=otherUid;
-  // Aktif konuşmayı göster
-  document.getElementById('chatListPanel').style.display='none';
-  const panel=document.getElementById('chatActivePanel');
-  panel.style.display='flex';
-  // Karşı kullanıcının profilini çek
-  db.collection('users').doc(otherUid).get().then(doc=>{
-    const u=doc.exists?doc.data():{name:'Kullanıcı',avatarThumb:''};
-    const avatarHtml=u.avatarThumb
-      ?`<img src="${u.avatarThumb}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
-      :`<span style="font-size:.65rem;font-weight:600;">${(u.name||'?').slice(0,2).toUpperCase()}</span>`;
-    document.getElementById('chatActiveHeader').innerHTML=`
-      <button class="chat-back-btn" onclick="closeChatActive()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:18px;height:18px;"><polyline points="15 18 9 12 15 6"/></svg>
-      </button>
-      <div style="width:36px;height:36px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,var(--accent),var(--diary));display:flex;align-items:center;justify-content:center;flex-shrink:0;">${avatarHtml}</div>
-      <div>
-        <div class="chat-active-name">${escHtml(u.name||'')}</div>
-        <div class="chat-active-status">● Çevrimiçi</div>
-      </div>
-    `;
-    // Okunmadı sayacını sıfırla
-    const cid=convId(currentUser.uid,otherUid);
-    db.collection('conversations').doc(cid).update({
-      [`unreadCount.${currentUser.uid}`]:0
-    }).catch(()=>{});
-    // Mesajları dinle
-    listenMessages(cid,u);
-  });
-  // Listeyi güncelle
-  loadConversations();
-}
-
-function closeChatActive(){
-  activeChatUid=null;
-  if(activeChatUnsub){activeChatUnsub();activeChatUnsub=null;}
-  document.getElementById('chatActivePanel').style.display='none';
-  document.getElementById('chatListPanel').style.display='flex';
-}
-
-function listenMessages(cid,otherUser){
-  if(activeChatUnsub){activeChatUnsub();activeChatUnsub=null;}
-  const msgs=document.getElementById('chatMessages');
-  msgs.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3);font-size:.68rem;">Yükleniyor...</div>';
-  activeChatUnsub=db.collection('conversations').doc(cid)
-    .collection('messages').orderBy('sentAt','asc')
-    .onSnapshot(snap=>{
-      if(snap.empty){msgs.innerHTML='<div style="text-align:center;padding:30px 20px;color:var(--text3);font-size:.72rem;">Henüz mesaj yok.<br>Merhaba de! 👋</div>';return;}
-      let html='';
-      let lastDate='';
-      snap.docs.forEach(doc=>{
-        const m=doc.data();
-        const isMine=m.senderId===currentUser.uid;
-        const d=m.sentAt?.toDate?m.sentAt.toDate():new Date(m.sentAt||Date.now());
-        const dateStr=d.toLocaleDateString('tr-TR',{day:'numeric',month:'long'});
-        if(dateStr!==lastDate){
-          html+=`<div class="chat-date-divider">${dateStr}</div>`;
-          lastDate=dateStr;
-        }
-        const timeStr=d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
-        const avatarHtml=!isMine?(otherUser.avatarThumb
-          ?`<div class="chat-msg-avatar"><img src="${otherUser.avatarThumb}"></div>`
-          :`<div class="chat-msg-avatar">${(otherUser.name||'?').slice(0,2).toUpperCase()}</div>`):'';
-        html+=`<div class="chat-msg-row${isMine?' mine':''}">
-          ${avatarHtml}
-          <div>
-            <div class="chat-bubble ${isMine?'mine':'theirs'}">${escHtml(m.text||'')}<div class="chat-bubble-time">${timeStr}</div></div>
-          </div>
-        </div>`;
-      });
-      msgs.innerHTML=html;
-      msgs.scrollTop=msgs.scrollHeight;
-    },err=>console.warn('msg err',err));
-}
-
-function sendMessage(){
-  const inp=document.getElementById('chatInput');
-  const text=inp.value.trim();
-  if(!text||!activeChatUid||!currentUser)return;
-  inp.value='';
-  inp.style.height='auto';
-  const cid=convId(currentUser.uid,activeChatUid);
-  const now=firebase.firestore.FieldValue.serverTimestamp();
-  const msgRef=db.collection('conversations').doc(cid).collection('messages').doc();
-  const batch=db.batch();
-  batch.set(msgRef,{text,senderId:currentUser.uid,sentAt:now});
-  batch.set(db.collection('conversations').doc(cid),{
-    members:[currentUser.uid,activeChatUid],
-    lastMsg:text,lastMsgAt:now,lastSenderId:currentUser.uid,
-    [`unreadCount.${activeChatUid}`]:firebase.firestore.FieldValue.increment(1),
-    [`unreadCount.${currentUser.uid}`]:0
-  },{merge:true});
-  batch.commit().catch(console.warn);
-}
-
-function startChatWith(otherUid){
-  // Arkadaş profilinden veya listesinden çağrılır
-  closeModal('friendProfileModal');
-  closeModal('friendsModal');
-  switchPage('chat');
-  setTimeout(()=>openChat(otherUid),300);
-}
-
-function fmtChatTime(d){
-  if(!d)return'';
-  const now=new Date();
-  const diff=now-d;
-  if(diff<60000)return'Şimdi';
-  if(diff<3600000)return Math.floor(diff/60000)+'dk';
-  if(diff<86400000)return d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
-  return d.toLocaleDateString('tr-TR',{day:'numeric',month:'short'});
-}
 
 // ─────────────────────────── DERS PROGRAMI ────────────────────────────────
 let schedColor='#7c6ff7';
