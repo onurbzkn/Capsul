@@ -855,18 +855,8 @@ select.pf option{background:var(--bg2);color:var(--text);}
         <div class="ham-line"></div><div class="ham-line"></div><div class="ham-line"></div>
       </button>
     </div>
-    <div class="mode-switcher-row">
-      <div class="mode-pill">
-        <button class="mode-btn m-pro" id="modePro" onclick="setMode('pro')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Pro
-        </button>
-        <button class="mode-btn m-home active" id="modeHome" onclick="setMode('home');setTimeout(()=>switchPage('slides'),50)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Ana
-        </button>
-        <button class="mode-btn m-uni" id="modeUni" onclick="setMode('uni')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>Öğrenci
-        </button>
-      </div>
+    <div style="flex:1;text-align:center;">
+      <span id="pageTitle" style="font-size:.88rem;font-weight:500;color:var(--text);letter-spacing:.01em;">Capsula</span>
     </div>
     <div class="header-right">
       <button class="avatar-btn" id="avatarBtn" onclick="openProfile()">
@@ -911,6 +901,11 @@ select.pf option{background:var(--bg2);color:var(--text);}
 
     <!-- NOTES -->
     <div class="page" id="page-notes">
+      <!-- Hızlı Not -->
+      <div id="quickNoteBar" style="display:flex;gap:8px;margin-bottom:12px;">
+        <input type="text" id="quickNoteInput" placeholder="Hızlı not al..." style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:9px 13px;font-family:'Sora',sans-serif;font-size:.82rem;color:var(--text);outline:none;transition:border-color .2s;" onfocus="this.style.borderColor='rgba(124,111,247,.4)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')saveQuickNote()">
+        <button onclick="saveQuickNote()" style="background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:10px;padding:9px 14px;cursor:pointer;color:#fff;font-size:.78rem;font-family:'Sora',sans-serif;white-space:nowrap;transition:opacity .2s;">+ Ekle</button>
+      </div>
       <div class="notes-grid" id="notes-grid"></div>
       <div class="empty-state" id="notes-empty" style="display:none">Henüz not yok.<br>Sağ alttaki + ile başla.</div>
     </div>
@@ -1175,6 +1170,11 @@ select.pf option{background:var(--bg2);color:var(--text);}
     <button class="drawer-item" onclick="openFromDrawer('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span id="dl-profile">Profilim</span></button>
     <button class="drawer-item" onclick="openFromDrawer('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg><span id="dl-settings">Ayarlar</span></button>
     <button class="drawer-item" onclick="openCalendarFromDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span id="dl-calendar">Takvim</span></button>
+    <button class="drawer-item" onclick="toggleDrawer();switchPage('diary')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Günlük</button>
+    <button class="drawer-item" onclick="toggleDrawer();switchPage('kanban')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="10" rx="1"/><rect x="14" y="17" width="7" height="4" rx="1"/></svg>Kanban</button>
+    <button class="drawer-item" onclick="toggleDrawer();switchPage('pomodoro')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pomodoro</button>
+    <button class="drawer-item" onclick="toggleDrawer();switchPage('schedule')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Ders Programı</button>
+    <button class="drawer-item" onclick="toggleDrawer();switchPage('reading')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Okuma Listesi</button>
     <button class="drawer-item" onclick="openFromDrawer('trash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg><span id="dl-trash">Çöp Kutusu</span><span class="trash-badge" id="trashBadge" style="display:none">0</span></button>
     <button class="drawer-item" onclick="openBackupModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span id="dl-backup">Yedekle & Geri Yükle</span></button>
     <button class="drawer-item" onclick="openFriends()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span id="dl-friends">Arkadaşlar</span><span id="friendRequestBadge" style="display:none;margin-left:auto;min-width:18px;height:18px;font-size:.52rem;border-radius:9px;background:var(--accent);color:#fff;align-items:center;justify-content:center;padding:0 4px;font-family:'JetBrains Mono',monospace;"></span></button>
@@ -2340,7 +2340,7 @@ if(!D.trash)D.trash=[];
 function saveData(){localStorage.setItem('capsula_v4',JSON.stringify(D));}
 
 // ─────────────────────────── MODE + NAV ───────────────────────────────────
-let curMode='home', curPage='home', curPriority='easy', kanbanPriority='mid';
+let curMode='home', curPage='slides', curPriority='easy', kanbanPriority='mid';
 let editorType='note', editorMediaFiles=[], editorTags=[], selMoodVal='😊';
 let calYear=new Date().getFullYear(), calMonth=new Date().getMonth(), selCalDay=new Date().getDate();
 let viewingEntry=null, completedOpen=false, _confirmCb=null;
@@ -2358,27 +2358,24 @@ const MODES={
     {id:'search',lbl:'Ara',ico:ICO_SEARCH},
   ],
   pro:[
-    {id:'pro',lbl:'Özet',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>'},
-    {id:'kanban',lbl:'Kanban',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="10" rx="1"/><rect x="14" y="17" width="7" height="4" rx="1"/></svg>'},
+    {id:'slides',lbl:'Slayt',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>'},
+    {id:'todo',lbl:'Görev',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>'},
     {id:'chat',lbl:'Sohbet',ico:ICO_CHAT,center:true},
     {id:'notes',lbl:'Not',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'},
     {id:'search',lbl:'Ara',ico:ICO_SEARCH},
   ],
   uni:[
-    {id:'home',lbl:'Ana',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>'},
-    {id:'schedule',lbl:'Program',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'},
+    {id:'slides',lbl:'Slayt',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>'},
+    {id:'todo',lbl:'Görev',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>'},
     {id:'chat',lbl:'Sohbet',ico:ICO_CHAT,center:true},
-    {id:'notebook',lbl:'Notlar',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>'},
-    {id:'pomodoro',lbl:'Pomodoro',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'},
+    {id:'notes',lbl:'Not',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'},
+    {id:'search',lbl:'Ara',ico:ICO_SEARCH},
   ],
 };
 const PAGE_TITLES={home:'Ana Ekran',slides:'Slaytlar',todo:'Görevler',notes:'Notlar',diary:'Günlük',search:'Arama',calendar:'Takvim',pomodoro:'Pomodoro',kanban:'Kanban',weekly:'Haftalık Özet',reading:'Okuma Listesi',pro:'Profesyonel',schedule:'Ders Programı',exams:'Sınav Takvimi',notebook:'Not Defteri',chat:'Sohbet'};
 
 function setMode(mode){
   curMode=mode;
-  document.getElementById('modePro').className='mode-btn m-pro'+(mode==='pro'?' active':'');
-  document.getElementById('modeHome').className='mode-btn m-home'+(mode==='home'?' active':'');
-  document.getElementById('modeUni').className='mode-btn m-uni'+(mode==='uni'?' active':'');
   buildNav();
   switchPage(MODES[mode][0].id);
 }
@@ -2401,6 +2398,9 @@ function switchPage(page){
   const el=document.getElementById('page-'+page);if(el)el.classList.add('active');
   curPage=page;
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.pid===page));
+  // Sayfa başlığını güncelle
+  const titleEl=document.getElementById('pageTitle');
+  if(titleEl)titleEl.textContent=PAGE_TITLES[page]||'Capsula';
   document.getElementById('fabNotes').style.display=page==='notes'?'flex':'none';
   document.getElementById('fabDiary').style.display=page==='diary'?'flex':'none';
   if(page==='home')renderDashboard();
@@ -2843,6 +2843,25 @@ function toggleCompleted(){completedOpen=!completedOpen;renderTodos();}
 
 // ─────────────────────────── NOTES ────────────────────────────────────────
 function tagColor(tag){const colors=['#60a5fa','#a78bfa','#f472b6','#4ade80','#fb923c','#f87171','#fbbf24','#34d399'];let h=0;for(let c of tag)h=(h*31+c.charCodeAt(0))%colors.length;return colors[h];}
+function saveQuickNote(){
+  const inp=document.getElementById('quickNoteInput');
+  const text=inp?.value.trim();
+  if(!text)return;
+  const note={
+    id:Date.now(),
+    title:text.slice(0,40)+(text.length>40?'...':''),
+    content:text,
+    media:[],tags:['hızlı'],
+    pinned:true,
+    createdAt:new Date().toISOString()
+  };
+  D.notes.unshift(note);
+  saveData();
+  renderNotes();
+  inp.value='';
+  showToast('Not eklendi ✓');
+}
+
 function renderNotes(){
   const grid=document.getElementById('notes-grid');const empty=document.getElementById('notes-empty');
   if(!D.notes.length){grid.innerHTML='';empty.style.display='block';return;}
@@ -4162,8 +4181,6 @@ function setLang(lang){
     'dl-cleardata':L.cleardata,'dl-signout':L.signout,
   };
   Object.entries(ids).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.textContent=txt;});
-  // Mod butonları
-  document.getElementById('modeHome').querySelector('svg')?.nextSibling;
   // Todo input
   const ti=document.getElementById('todoInput');if(ti)ti.placeholder=L.addTodo;
   // Arama
