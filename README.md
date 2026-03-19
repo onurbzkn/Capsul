@@ -1085,6 +1085,11 @@ select.pf option{background:var(--bg2);color:var(--text);}
       <div id="weeklyContent"></div>
     </div>
 
+    <!-- İSTATİSTİK & AI -->
+    <div class="page" id="page-stats">
+      <div id="statsContent"></div>
+    </div>
+
     <!-- READING (Uni) -->
     <div class="page" id="page-reading">
       <!-- Bugün oku kutusu -->
@@ -1113,6 +1118,22 @@ select.pf option{background:var(--bg2);color:var(--text);}
 
     <!-- DERS PROGRAMI (Uni) -->
     <div class="page" id="page-schedule">
+      <div id="schedWeekHeader" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;">
+        <div>
+          <div style="font-size:.52rem;letter-spacing:.15em;font-family:'JetBrains Mono',monospace;color:var(--text3);text-transform:uppercase;">Hafta</div>
+          <div id="schedWeekNum" style="font-size:1.4rem;font-weight:600;color:var(--accent2);font-family:'JetBrains Mono',monospace;line-height:1.1;">—</div>
+          <div id="schedWeekRange" style="font-size:.6rem;color:var(--text3);margin-top:1px;"></div>
+        </div>
+        <div style="text-align:right;">
+          <div id="schedModeLabel" style="font-size:.6rem;color:var(--text3);margin-bottom:4px;"></div>
+          <div style="font-size:.58rem;color:var(--text3);opacity:.7;">Ayarlar'dan değiştirebilirsiniz</div>
+        </div>
+      </div>
+      <div id="schedWeekNav" style="display:none;display:flex;gap:6px;margin-bottom:10px;">
+        <button onclick="changeSchedWeek(-1)" style="flex:1;padding:7px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:.72rem;color:var(--text2);cursor:pointer;">← Önceki Hafta</button>
+        <button onclick="changeSchedWeek(0)" style="padding:7px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:.72rem;color:var(--text3);cursor:pointer;">Bugün</button>
+        <button onclick="changeSchedWeek(1)" style="flex:1;padding:7px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:.72rem;color:var(--text2);cursor:pointer;">Sonraki Hafta →</button>
+      </div>
       <div class="action-row">
         <button class="action-btn a-uni" onclick="openScheduleAdd()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Ders Ekle
@@ -1197,6 +1218,7 @@ select.pf option{background:var(--bg2);color:var(--text);}
   <div class="drawer-menu">
     <button class="drawer-item" onclick="openFromDrawer('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profilim</button>
     <button class="drawer-item" onclick="openCalendarFromDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Takvim</button>
+    <button class="drawer-item" onclick="toggleDrawer();switchPage('stats')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>İstatistikler ✦ AI</button>
     <button class="drawer-item" onclick="toggleDrawer();switchPage('kanban')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="10" rx="1"/><rect x="14" y="17" width="7" height="4" rx="1"/></svg>Kanban</button>
     <button class="drawer-item" onclick="toggleDrawer();switchPage('reading')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Okuma Listesi</button>
     <button class="drawer-item" onclick="toggleDrawer();switchPage('pomodoro')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pomodoro</button>
@@ -1377,6 +1399,19 @@ select.pf option{background:var(--bg2);color:var(--text);}
       <div class="acc-body" id="acc-kanban" style="display:none;">
         <div class="settings-row"><span class="settings-row-label" style="font-size:.76rem;">Tamamlananları otomatik sil</span><div class="toggle" id="kanbanAutoDelete" onclick="toggleKanbanAutoDelete()"></div></div>
         <div style="font-size:.62rem;color:var(--text3);margin-top:4px;line-height:1.5;">Tamamlanan kartlar 30 gün sonra çöpe taşınır. Kapatmak için bu ayarı kullanın.</div>
+      </div>
+    </div>
+    <!-- Ders Programı Ayarları -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc('acc-schedule')">
+        <span>📅 Ders Programı</span><svg class="acc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;transition:transform .2s;"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="acc-body" id="acc-schedule" style="display:none;">
+        <div class="settings-row"><span class="settings-row-label" style="font-size:.76rem;">Her hafta değişsin</span><div class="toggle" id="schedWeeklyToggle" onclick="toggleSchedWeekly()"></div></div>
+        <div style="font-size:.62rem;color:var(--text3);margin-top:6px;line-height:1.6;">
+          <b>Açık:</b> Üniversite gibi her hafta farklı ders programı (hafta numarasına göre ayrı kaydedilir).<br>
+          <b>Kapalı:</b> Lise/ilkokul gibi her hafta aynı sabit program.
+        </div>
       </div>
     </div>
     <!-- Okuma Listesi Ayarları -->
@@ -1973,7 +2008,7 @@ const MODES={
     {id:'search',lbl:'Ara',ico:ICO_SEARCH},
   ],
 };
-const PAGE_TITLES={home:'Ana Ekran',slides:'Slaytlar',todo:'Görevler',notes:'Notlar',diary:'Günlük',search:'Arama',calendar:'Takvim',pomodoro:'Pomodoro',kanban:'Kanban',weekly:'Haftalık Özet',reading:'Okuma Listesi',pro:'Profesyonel',schedule:'Ders Programı',exams:'Sınav Takvimi',notebook:'Not Defteri',chat:'Sohbet'};
+const PAGE_TITLES={home:'Ana Ekran',stats:'İstatistikler',slides:'Slaytlar',todo:'Görevler',notes:'Notlar',diary:'Günlük',search:'Arama',calendar:'Takvim',pomodoro:'Pomodoro',kanban:'Kanban',weekly:'Haftalık Özet',reading:'Okuma Listesi',pro:'Profesyonel',schedule:'Ders Programı',exams:'Sınav Takvimi',notebook:'Not Defteri',chat:'Sohbet'};
 
 function setMode(mode){
   curMode=mode;
@@ -2016,7 +2051,8 @@ function switchPage(page){
   if(page==='schedule')renderSchedule();
   if(page==='exams')renderExams();
   if(page==='notebook')renderNotebook();
-      if(page==='search'){document.getElementById('search-results').innerHTML='';setTimeout(()=>{const inp=document.getElementById('searchInput');if(inp){inp.value='';inp.focus();}},200);}
+  if(page==='stats')renderStats();
+  if(page==='search'){document.getElementById('search-results').innerHTML='';setTimeout(()=>{const inp=document.getElementById('searchInput');if(inp){inp.value='';inp.focus();}},200);}
   if(page==='pro')renderPro();
 }
 
@@ -2501,7 +2537,7 @@ function todoItemHtml(t,labels,dl,dc){
   const repeatIco=t.repeat?`<span style="font-size:.58rem;color:var(--accent2);margin-left:3px;">${t.repeat==='daily'?'🔁 Günlük':t.repeat==='weekly'?'🔁 Haftalık':'🔁 Aylık'}</span>`:'';
   return`<div class="todo-item ${t.priority}" id="todo-${t.id}" draggable="true" ondragstart="dragTodo(event,${t.id})">
     <div class="todo-check" onclick="completeTodo(${t.id})"></div>
-    <div class="todo-body">
+    <div class="todo-body" onclick="openTodoEdit(${t.id})" style="cursor:pointer;flex:1;">
       <div class="todo-text">${escHtml(t.text)}</div>
       <div class="todo-meta">
         <span class="todo-badge">${labels[t.priority]}</span>
@@ -2509,8 +2545,206 @@ function todoItemHtml(t,labels,dl,dc){
         ${timeStr}${repeatIco}
       </div>
     </div>
-    <div class="todo-dot"></div>
+    <button onclick="event.stopPropagation();openTodoEdit(${t.id})" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;border-radius:6px;transition:color .15s;" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text3)'" title="Düzenle">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    </button>
+    <button onclick="event.stopPropagation();deleteTodoPermanent(${t.id})" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;border-radius:6px;transition:color .15s;" onmouseover="this.style.color='var(--hard)'" onmouseout="this.style.color='var(--text3)'" title="Sil">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+    </button>
   </div>`;
+}
+
+function openTodoEdit(id){
+  const t=D.todos.find(x=>x.id===id);if(!t)return;
+  const modal=document.createElement('div');
+  modal.id='todoEditModal';
+  modal.style.cssText='position:fixed;inset:0;z-index:3500;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const dueDT=t.dueDate?(t.dueTime?`${t.dueDate}T${t.dueTime}`:t.dueDate):'';
+  modal.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:22px;width:100%;max-width:360px;position:relative;">
+    <button onclick="document.getElementById('todoEditModal').remove()" style="position:absolute;top:10px;right:12px;background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--text3);">✕</button>
+    <div style="font-size:.86rem;font-weight:500;color:var(--text);margin-bottom:14px;">✏️ Görevi Düzenle</div>
+    <input type="text" id="teText" value="${escHtml(t.text)}" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'Sora',sans-serif;font-size:.86rem;color:var(--text);outline:none;margin-bottom:10px;box-sizing:border-box;">
+    <div style="font-size:.66rem;color:var(--text3);margin-bottom:6px;">Öncelik</div>
+    <div style="display:flex;gap:6px;margin-bottom:10px;">
+      ${['easy','mid','hard'].map(p=>`<button onclick="tePrio='${p}';document.querySelectorAll('.te-prio').forEach(b=>b.style.opacity='.4');this.style.opacity='1';" class="te-prio" style="flex:1;padding:6px;border:1px solid var(--border);border-radius:7px;background:var(--bg3);font-family:'Sora',sans-serif;font-size:.7rem;cursor:pointer;color:${p==='easy'?'var(--easy)':p==='mid'?'var(--mid)':'var(--hard)'};opacity:${t.priority===p?'1':'.4'};transition:opacity .15s;">${p==='easy'?'Kolay':p==='mid'?'Orta':'Zor'}</button>`).join('')}
+    </div>
+    <div style="font-size:.66rem;color:var(--text3);margin-bottom:6px;">Tarih ve Saat</div>
+    <input type="datetime-local" id="teDatetime" value="${dueDT}" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:'Sora',sans-serif;font-size:.78rem;color:var(--text);outline:none;margin-bottom:10px;box-sizing:border-box;">
+    <div style="font-size:.66rem;color:var(--text3);margin-bottom:6px;">Tekrar</div>
+    <select id="teRepeat" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:'Sora',sans-serif;font-size:.78rem;color:var(--text);outline:none;margin-bottom:14px;box-sizing:border-box;">
+      <option value="" ${!t.repeat?'selected':''}>Tekrar yok</option>
+      <option value="daily" ${t.repeat==='daily'?'selected':''}>Her gün 🔁</option>
+      <option value="weekly" ${t.repeat==='weekly'?'selected':''}>Her hafta</option>
+      <option value="monthly" ${t.repeat==='monthly'?'selected':''}>Her ay</option>
+    </select>
+    <div style="display:flex;gap:8px;">
+      <button onclick="saveTodoEdit(${id})" style="flex:1;padding:11px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:10px;color:#fff;font-family:'Sora',sans-serif;font-size:.84rem;cursor:pointer;">Kaydet</button>
+      <button onclick="deleteTodoPermanent(${id});document.getElementById('todoEditModal')?.remove();" style="padding:11px 14px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);border-radius:10px;color:var(--hard);font-family:'Sora',sans-serif;font-size:.84rem;cursor:pointer;">Sil</button>
+    </div>
+  </div>`;
+  window.tePrio=t.priority||'easy';
+  document.body.appendChild(modal);
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+  setTimeout(()=>document.getElementById('teText')?.focus(),100);
+}
+
+function saveTodoEdit(id){
+  const t=D.todos.find(x=>x.id===id);if(!t)return;
+  const text=document.getElementById('teText')?.value.trim();if(!text)return;
+  const dt=document.getElementById('teDatetime')?.value||'';
+  let dueDate=null,dueTime=null;
+  if(dt){const[d,ti]=dt.split('T');dueDate=d;dueTime=ti?ti.slice(0,5):null;}
+  t.text=text;t.priority=window.tePrio||t.priority;
+  t.dueDate=dueDate;t.dueTime=dueTime;
+  t.repeat=document.getElementById('teRepeat')?.value||null;
+  saveData();renderTodos();document.getElementById('todoEditModal')?.remove();showToast('Güncellendi ✓');
+}
+
+function deleteTodoPermanent(id){
+  D.todos=D.todos.filter(t=>t.id!==id);
+  saveData();renderTodos();showToast('Görev silindi');
+}
+
+// ─────────────────────────── İSTATİSTİKLER ────────────────────────────────
+async function renderStats(){
+  const el=document.getElementById('statsContent');
+  if(!el)return;
+  el.innerHTML=`<div style="text-align:center;padding:30px;color:var(--text3);font-size:.76rem;">🤖 AI analiz ediliyor...</div>`;
+
+  // Veri hazırla
+  const now=new Date();
+  const todayKey=now.toISOString().split('T')[0];
+  const ws=new Date(now);ws.setDate(now.getDate()-((now.getDay()+6)%7));ws.setHours(0,0,0,0);
+
+  const totalTodos=D.todos.length+D.completedTodos.length;
+  const completedThisWeek=D.completedTodos.filter(t=>new Date(t.completedAt)>=ws).length;
+  const completedTotal=D.completedTodos.length;
+  const streak=calcStreak();
+  const notesCount=D.notes.length;
+  const diaryCount=D.diary.length;
+
+  // Okuma istatistikleri
+  const booksTotal=D.reading.length;
+  const booksDone=D.reading.filter(r=>r.status==='done').length;
+  const booksReading=D.reading.filter(r=>r.status==='reading');
+  const totalPagesRead=D.reading.reduce((s,r)=>s+(r.pagesRead||0),0);
+
+  // Öncelik dağılımı
+  const prioCount={easy:0,mid:0,hard:0};
+  D.completedTodos.forEach(t=>prioCount[t.priority||'mid']++);
+
+  // Son 30 günün tamamlama trendi
+  const last30=[];
+  for(let i=29;i>=0;i--){
+    const d=new Date(now);d.setDate(now.getDate()-i);
+    const dk=d.toISOString().split('T')[0];
+    last30.push(D.completedTodos.filter(t=>t.completedAt?.startsWith(dk)).length);
+  }
+  const avgPerDay=(last30.reduce((s,v)=>s+v,0)/30).toFixed(1);
+  const maxDay=Math.max(...last30,1);
+
+  // AI prompt için özet
+  const aiSummary=`
+Kullanıcı verileri:
+- ${completedTotal} görev tamamlandı, ${D.todos.length} aktif görev var
+- Bu hafta ${completedThisWeek} görev tamamlandı, günlük ort. ${avgPerDay}
+- ${streak} günlük aktif seri
+- ${notesCount} not, ${diaryCount} günlük girişi
+- ${booksTotal} kitap/makale listede, ${booksDone} tamamlandı, ${totalPagesRead} sayfa okundu
+- Zorluk dağılımı: Kolay ${prioCount.easy}, Orta ${prioCount.mid}, Zor ${prioCount.hard}
+${booksReading.map(b=>`- "${b.title}": ${b.pagesRead||0}/${b.pages||'?'} sayfa`).join('\n')}
+  `.trim();
+
+  // AI yorumu çek
+  let aiText='';
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:600,
+        messages:[{role:'user',content:`Sen bir kişisel verimlilik koçusun. Kullanıcının Capsula uygulaması verilerini analiz et ve samimi, motive edici, kişiselleştirilmiş Türkçe yorumlar yaz. 
+
+${aiSummary}
+
+3-4 kısa paragraf yaz:
+1. Genel performans değerlendirmesi (iltifat et ama gerçekçi ol)
+2. Okuma hızı analizi ve tahmin (varsa)
+3. En güçlü yön ve iyileştirilecek alan
+4. Bu hafta için kişiselleştirilmiş öneri
+
+Samimi, sıcak ve destekleyici bir dil kullan. Emoji kullan ama abartma.`}]
+      })
+    });
+    const data=await resp.json();
+    aiText=data.content?.[0]?.text||'';
+  }catch(e){
+    aiText='AI bağlantısı kurulamadı. Veriler yerel olarak analiz edildi.';
+  }
+
+  // HTML oluştur
+  el.innerHTML=`
+    <!-- Özet kartlar -->
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px;">
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;">
+        <div style="font-size:1.6rem;font-weight:700;color:var(--accent2);font-family:'JetBrains Mono',monospace;">${completedTotal}</div>
+        <div style="font-size:.58rem;color:var(--text3);margin-top:2px;">Toplam Görev ✓</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;">
+        <div style="font-size:1.6rem;font-weight:700;color:${streak>=7?'var(--hard)':'var(--easy)'};font-family:'JetBrains Mono',monospace;">${streak}🔥</div>
+        <div style="font-size:.58rem;color:var(--text3);margin-top:2px;">Günlük Seri</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;">
+        <div style="font-size:1.6rem;font-weight:700;color:var(--note);font-family:'JetBrains Mono',monospace;">${booksDone}</div>
+        <div style="font-size:.58rem;color:var(--text3);margin-top:2px;">Kitap Tamamlandı</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;">
+        <div style="font-size:1.6rem;font-weight:700;color:var(--diary);font-family:'JetBrains Mono',monospace;">${avgPerDay}</div>
+        <div style="font-size:.58rem;color:var(--text3);margin-top:2px;">Görev/Gün (ort.)</div>
+      </div>
+    </div>
+
+    <!-- 30 günlük aktivite ısı haritası -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px;">
+      <div style="font-size:.6rem;letter-spacing:.15em;font-family:'JetBrains Mono',monospace;color:var(--text3);text-transform:uppercase;margin-bottom:10px;">Son 30 Gün Aktivitesi</div>
+      <div style="display:flex;align-items:flex-end;gap:2px;height:40px;">
+        ${last30.map((v,i)=>{
+          const h=Math.max(3,Math.round((v/maxDay)*38));
+          const alpha=v===0?0.1:0.2+((v/maxDay)*0.8);
+          const isToday=i===29;
+          return`<div style="flex:1;height:${h}px;background:${isToday?'var(--accent)':`rgba(124,111,247,${alpha})`};border-radius:2px;transition:height .3s;" title="${v} görev"></div>`;
+        }).join('')}
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px;">
+        <span style="font-size:.48rem;font-family:'JetBrains Mono',monospace;color:var(--text3);">30 gün önce</span>
+        <span style="font-size:.48rem;font-family:'JetBrains Mono',monospace;color:var(--accent2);">Bugün</span>
+      </div>
+    </div>
+
+    <!-- Okuma istatistikleri -->
+    ${booksTotal>0?`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px;">
+      <div style="font-size:.6rem;letter-spacing:.15em;font-family:'JetBrains Mono',monospace;color:var(--text3);text-transform:uppercase;margin-bottom:10px;">📚 Okuma Özeti</div>
+      <div style="display:flex;gap:10px;margin-bottom:10px;">
+        <div style="flex:1;text-align:center;"><div style="font-size:1.2rem;font-weight:600;color:var(--easy);font-family:'JetBrains Mono',monospace;">${booksDone}</div><div style="font-size:.54rem;color:var(--text3);">Bitti</div></div>
+        <div style="flex:1;text-align:center;"><div style="font-size:1.2rem;font-weight:600;color:var(--accent2);font-family:'JetBrains Mono',monospace;">${booksReading.length}</div><div style="font-size:.54rem;color:var(--text3);">Okunuyor</div></div>
+        <div style="flex:1;text-align:center;"><div style="font-size:1.2rem;font-weight:600;color:var(--note);font-family:'JetBrains Mono',monospace;">${totalPagesRead}</div><div style="font-size:.54rem;color:var(--text3);">Sayfa</div></div>
+      </div>
+      ${booksReading.map(b=>{const pct=b.pages?Math.round((b.pagesRead||0)/b.pages*100):0;return`<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="font-size:.68rem;color:var(--text2);">${escHtml(b.title)}</span><span style="font-size:.6rem;font-family:'JetBrains Mono',monospace;color:var(--accent2);">${pct}%</span></div><div style="background:var(--bg3);border-radius:4px;height:5px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;"></div></div>${getReadingAIEstimate(b)}</div>`;}).join('')}
+    </div>`:''}
+
+    <!-- AI Yorum -->
+    <div style="background:linear-gradient(135deg,rgba(124,111,247,.1),rgba(168,157,254,.05));border:1px solid rgba(124,111,247,.25);border-radius:12px;padding:16px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+        <span style="font-size:.88rem;">✦</span>
+        <div style="font-size:.58rem;letter-spacing:.15em;font-family:'JetBrains Mono',monospace;color:var(--accent2);text-transform:uppercase;">AI Koç Yorumu</div>
+      </div>
+      <div style="font-size:.8rem;color:var(--text2);line-height:1.7;font-weight:300;white-space:pre-wrap;">${escHtml(aiText)}</div>
+    </div>
+
+    <button onclick="renderStats()" style="width:100%;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-family:'Sora',sans-serif;font-size:.76rem;cursor:pointer;transition:background .18s;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='var(--bg2)'">
+      🔄 Yenile / Yeni AI Analizi
+    </button>
+  `;
 }
 
 function dragTodo(e,id){e.dataTransfer.setData('todoId',String(id));e.dataTransfer.effectAllowed='move';}
@@ -3276,28 +3510,89 @@ function saveScheduleItem(){
   if(!name)return;
   const days=[...document.querySelectorAll('#scheduleDayPicker input:checked')].map(i=>parseInt(i.value));
   if(!days.length){showToast('En az bir gün seç');return;}
-  D.schedule.push({id:Date.now(),name,room:document.getElementById('scheduleRoomInput').value.trim(),start:document.getElementById('scheduleStartInput').value,end:document.getElementById('scheduleEndInput').value,days,color:schedColor,createdAt:new Date().toISOString()});
+  const item={id:Date.now(),name,room:document.getElementById('scheduleRoomInput').value.trim(),start:document.getElementById('scheduleStartInput').value,end:document.getElementById('scheduleEndInput').value,days,color:schedColor,createdAt:new Date().toISOString()};
+  const schedWeekly=localStorage.getItem('capsula_sched_weekly')==='on';
+  if(schedWeekly){
+    const wk=getViewWeekKey();
+    if(!D.scheduleWeeks)D.scheduleWeeks={};
+    if(!D.scheduleWeeks[wk])D.scheduleWeeks[wk]=[];
+    D.scheduleWeeks[wk].push(item);
+  } else {
+    D.schedule.push(item);
+  }
   saveData();closeModal('scheduleAddModal');renderSchedule();showToast('Ders eklendi');
 }
-function deleteScheduleItem(id){D.schedule=D.schedule.filter(s=>s.id!==id);saveData();renderSchedule();}
+function deleteScheduleItem(id){
+  const schedWeekly=localStorage.getItem('capsula_sched_weekly')==='on';
+  if(schedWeekly){
+    const wk=getViewWeekKey();
+    if(!D.scheduleWeeks)D.scheduleWeeks={};
+    if(D.scheduleWeeks[wk])D.scheduleWeeks[wk]=D.scheduleWeeks[wk].filter(s=>s.id!==id);
+  } else {
+    D.schedule=D.schedule.filter(s=>s.id!==id);
+  }
+  saveData();renderSchedule();
+}
+function getCurrentWeekKey(){
+  const now=new Date();const yr=now.getFullYear();
+  const start=new Date(yr,0,1);
+  const wk=Math.ceil(((now-start)/86400000+start.getDay()+1)/7);
+  return `${yr}-W${String(wk).padStart(2,'0')}`;
+}
+function getCurrentWeekKeyFor(date){
+  const yr=date.getFullYear();const start=new Date(yr,0,1);
+  const wk=Math.ceil(((date-start)/86400000+start.getDay()+1)/7);
+  return`${yr}-W${String(wk).padStart(2,'0')}`;
+}
+function getWeekRange(weekKey){
+  const [yr,wPart]=weekKey.split('-W');const y=parseInt(yr),w=parseInt(wPart);
+  const jan1=new Date(y,0,1);const dayOfWeek=jan1.getDay()||7;
+  const monday=new Date(jan1);monday.setDate(jan1.getDate()+(1-dayOfWeek)+7*(w-1));
+  const sunday=new Date(monday);sunday.setDate(monday.getDate()+6);
+  const fmt=d=>d.toLocaleDateString('tr-TR',{day:'numeric',month:'short'});
+  return`${fmt(monday)} – ${fmt(sunday)}`;
+}
+let schedWeekOffset=0;
+function changeSchedWeek(offset){if(offset===0)schedWeekOffset=0;else schedWeekOffset+=offset;renderSchedule();}
+function getViewWeekKey(){
+  if(schedWeekOffset===0)return getCurrentWeekKey();
+  const now=new Date();now.setDate(now.getDate()+schedWeekOffset*7);
+  return getCurrentWeekKeyFor(now);
+}
 function renderSchedule(){
   const dayNames=['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
   const orderedDays=[1,2,3,4,5,6,0];
+  const schedWeekly=localStorage.getItem('capsula_sched_weekly')==='on';
+  const curWk=getCurrentWeekKey();const viewWk=getViewWeekKey();
+  const wNum=viewWk.split('-W')[1];const wRange=getWeekRange(viewWk);
+  const wnEl=document.getElementById('schedWeekNum');const wrEl=document.getElementById('schedWeekRange');
+  const mlEl=document.getElementById('schedModeLabel');const navEl=document.getElementById('schedWeekNav');
+  if(wnEl)wnEl.textContent=`Hafta ${wNum}`;if(wrEl)wrEl.textContent=wRange;
+  if(mlEl)mlEl.textContent=schedWeekly?'📅 Her hafta farklı':'📌 Sabit program';
+  if(navEl)navEl.style.display=schedWeekly?'flex':'none';
+  let lessons=[];
+  if(schedWeekly){if(!D.scheduleWeeks)D.scheduleWeeks={};lessons=D.scheduleWeeks[viewWk]||[];}
+  else{lessons=D.schedule||[];}
   let html='';
+  if(schedWeekly&&viewWk!==curWk){
+    html+=`<div style="text-align:center;padding:8px;font-size:.66rem;color:var(--text3);font-style:italic;margin-bottom:8px;">${schedWeekOffset<0?'Geçmiş hafta':'Gelecek hafta'} · ${wRange}</div>`;
+  }
+  const todayDay=new Date().getDay();
   orderedDays.forEach(dayIdx=>{
-    const lessons=D.schedule.filter(s=>s.days.includes(dayIdx)).sort((a,b)=>a.start.localeCompare(b.start));
-    const hasClass=lessons.length>0;
-    html+=`<div class="sched-day-block"><div class="sched-day-header${hasClass?' has-class':''}">${dayNames[dayIdx]}</div>`;
-    if(lessons.length){
-      lessons.forEach(l=>{
-        html+=`<div class="sched-lesson"><div class="sched-color-bar" style="background:${l.color}"></div><div style="flex:1"><div class="sched-lesson-name">${escHtml(l.name)}</div>${l.room?`<div class="sched-lesson-room">${escHtml(l.room)}</div>`:''}</div><div class="sched-lesson-time">${l.start||''}${l.start&&l.end?' – ':''}${l.end||''}</div><button class="sched-delete-btn" onclick="deleteScheduleItem(${l.id})">✕</button></div>`;
-      });
-    } else {
-      html+=`<div style="padding:8px 12px;font-size:.68rem;color:var(--text3);font-style:italic;">Ders yok</div>`;
-    }
+    const dayLessons=lessons.filter(s=>s.days.includes(dayIdx)).sort((a,b)=>a.start.localeCompare(b.start));
+    const hasClass=dayLessons.length>0;const isToday=dayIdx===todayDay;
+    html+=`<div class="sched-day-block"><div class="sched-day-header${hasClass?' has-class':''}" style="${isToday?'color:var(--accent2);':''}">${dayNames[dayIdx]}${isToday?' <span style="font-size:.48rem;background:var(--accent);color:#fff;border-radius:4px;padding:1px 5px;vertical-align:middle;">Bugün</span>':''}</div>`;
+    if(dayLessons.length){dayLessons.forEach(l=>{html+=`<div class="sched-lesson"><div class="sched-color-bar" style="background:${l.color}"></div><div style="flex:1"><div class="sched-lesson-name">${escHtml(l.name)}</div>${l.room?`<div class="sched-lesson-room">${escHtml(l.room)}</div>`:''}</div><div class="sched-lesson-time">${l.start||''}${l.start&&l.end?' – ':''}${l.end||''}</div><button class="sched-delete-btn" onclick="deleteScheduleItem(${l.id})">✕</button></div>`});}
+    else{html+=`<div style="padding:8px 12px;font-size:.68rem;color:var(--text3);font-style:italic;">Ders yok</div>`;}
     html+='</div>';
   });
   document.getElementById('scheduleDays').innerHTML=html||'<div class="empty-state">Ders programı boş.<br>Üstten ders ekle.</div>';
+}
+function toggleSchedWeekly(){
+  const cur=localStorage.getItem('capsula_sched_weekly')==='on';
+  localStorage.setItem('capsula_sched_weekly',cur?'off':'on');
+  const tog=document.getElementById('schedWeeklyToggle');if(tog)tog.classList.toggle('on',!cur);
+  schedWeekOffset=0;renderSchedule();showToast(cur?'Sabit program modu':'Haftalık program modu');
 }
 
 // ─────────────────────────── SINAV TAKVİMİ ────────────────────────────────
@@ -3912,8 +4207,10 @@ function toggleReadingAutoArchive(){
 function initSettingsToggles(){
   const kd=document.getElementById('kanbanAutoDelete');
   const ra=document.getElementById('readingAutoArchive');
+  const sw=document.getElementById('schedWeeklyToggle');
   if(kd)kd.classList.toggle('on',localStorage.getItem('capsula_kanban_autodelete')!=='off');
   if(ra)ra.classList.toggle('on',localStorage.getItem('capsula_reading_autoarchive')!=='off');
+  if(sw)sw.classList.toggle('on',localStorage.getItem('capsula_sched_weekly')==='on');
   const ps=document.getElementById('ps-'+pomoStyle);
   if(ps)ps.classList.add('active');
 }
@@ -4043,6 +4340,16 @@ function checkSmartNotifications(){
       if(done>0||books>0){
         addNotification(`🎉 Bu hafta ${done} görev tamamladın${books>0?` ve ${books} kitap bitirdin`:''} — harika gidiyor!`,'weekly');
         localStorage.setItem(weekKey,'1');
+      }
+      // Ders programı hatırlatması - Pazar
+      const schedWeekly=localStorage.getItem('capsula_sched_weekly')==='on';
+      const nextWk=getCurrentWeekKeyFor(new Date(now.getTime()+7*24*60*60*1000));
+      const schedKey=`notif_sched_${nextWk}`;
+      if(schedWeekly&&!localStorage.getItem(schedKey)){
+        if(!D.scheduleWeeks||!D.scheduleWeeks[nextWk]||!D.scheduleWeeks[nextWk].length){
+          addNotification(`📅 Yeni hafta başlıyor (Hafta ${nextWk.split('-W')[1]})! Ders programını girmeyi unutma.`,'schedule');
+          localStorage.setItem(schedKey,'1');
+        }
       }
     }
   }
