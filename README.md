@@ -3202,121 +3202,92 @@ function renderReading(){
 
 function loadUserSlides(){
   if(!currentUser||!db)return;
+  showToast('Slaytlar kontrol ediliyor...');
   db.collection('userSlides').doc(currentUser.uid).collection('slides')
     .orderBy('addedAt','desc').get().then(snap=>{
-      if(snap.empty)return;
-      const remoteSlides=snap.docs.map(d=>d.data());
-      // Yerel slides ile birleştir — id'ye göre
+      if(snap.empty){showToast('Bulutta slayt yok');return;}
       if(!D.slides)D.slides=[];
       const localIds=new Set(D.slides.map(s=>String(s.id)));
-      const newOnes=remoteSlides.filter(s=>!localIds.has(String(s.id)));
-      if(!newOnes.length)return;
-      // Yeni slaytların PDF verisini chunks'tan çek
-      const promises=newOnes.map(s=>
-        db.collection('userSlides').doc(currentUser.uid).collection('slides').doc(s.id)
-          .collection('chunks').orderBy('idx').get().then(cSnap=>{
-            if(cSnap.empty)return{...s,base64:''};
-            const b64Parts=cSnap.docs.map(d=>d.data().data).join('');
-            return{...s,base64:'data:application/pdf;base64,'+b64Parts};
-          }).catch(()=>({...s,base64:''}))
-      );
-      Promise.all(promises).then(loaded=>{
-        loaded.forEach(sl=>{if(sl)D.slides.push(sl);});
+      const allRemote=snap.docs.map(d=>d.data());
+      const newOnes=allRemote.filter(s=>!localIds.has(String(s.id)));
+      if(!newOnes.length){showToast('Slaytlar güncel ✓');renderSlides();return;}
+      showToast(newOnes.length+' yeni slayt indiriliyor...');
+      let loaded=0;
+      const sequential=(arr,fn)=>arr.reduce((p,item)=>p.then(()=>fn(item)),Promise.resolve());
+      sequential(newOnes,s=>{
+        return db.collection('userSlides').doc(currentUser.uid)
+          .collection('slides').doc(String(s.id))
+          .collection('chunks').orderBy('idx').get()
+          .then(cSnap=>{
+            if(cSnap.empty){D.slides.unshift({...s,base64:''});return;}
+            const b64='data:application/pdf;base64,'+cSnap.docs.map(d=>d.data().data).join('');
+            D.slides.unshift({...s,base64:b64});
+            loaded++;
+          }).catch(()=>{D.slides.unshift({...s,base64:''});});
+      }).then(()=>{
         D.slides.sort((a,b)=>new Date(b.addedAt)-new Date(a.addedAt));
         localStorage.setItem('capsula_v4',JSON.stringify(D));
         renderSlides();
-        showToast(loaded.length+' slayt senkronize edildi');
+        showToast(loaded+' slayt indirildi ✓');
       });
-    }).catch(console.warn);
+    }).catch(err=>showToast('Hata: '+(err.code||err.message)));
 }
 
-// ─────────────────────────── SLIDES ───────────────────────────────────────
-// D.slides = [{id, name, category, pages, size, addedAt, base64(ilk sayfa thumb)}]
+// ─────────────────────────── SLIDES ────────────────────────────────────────
+// D.slides = [{id, name, category, pages, size, addedAt, thumb, base64}]
 let slidesCurCat='Tümü';
 
 function uploadSlides(e){
   const files=[...e.target.files];
   if(!files.length)return;
-  let done=0,total=files.filter(f=>f.name.toLowerCase().endsWith('.pdf')).length;
-  if(!total){showToast('Sadece PDF destekleniyor');return;}
-
-  files.forEach(file=>{
-    if(!file.name.toLowerCase().endsWith('.pdf'))return;
-    if(file.size>15*1024*1024){showToast(file.name+' çok büyük (max 15MB)');return;}
-    showToast('Yükleniyor...');
+  const pdfs=files.filter(f=>f.name.toLowerCase().endsWith('.pdf'));
+  if(!pdfs.length){showToast('Sadece PDF destekleniyor');return;}
+  const processOne=(file)=>new Promise(resolve=>{
+    if(file.size>20*1024*1024){showToast(file.name+' çok büyük (max 20MB)');resolve();return;}
+    showToast(file.name+' işleniyor...');
     const reader=new FileReader();
     reader.onload=ev=>{
       const base64=ev.target.result;
-      const arr=new Uint8Array(atob(base64.split(',')[1]).split('').map(c=>c.charCodeAt(0)));
-
-      const tryRender=(onThumb)=>{
-        if(typeof pdfjsLib==='undefined'){onThumb('');return;}
-        pdfjsLib.getDocument({data:arr}).promise.then(pdf=>{
-          return pdf.getPage(1).then(page=>{
-            const vp=page.getViewport({scale:0.4});
-            const canvas=document.createElement('canvas');
-            canvas.width=vp.width;canvas.height=vp.height;
-            return page.render({canvasContext:canvas.getContext('2d'),viewport:vp}).promise.then(()=>{
-              onThumb(canvas.toDataURL('image/jpeg',0.6));
-            });
-          });
-        }).catch(()=>onThumb(''));
-      };
-
-      tryRender(thumb=>{
-        // pages sayısı
-        const getPages=(cb)=>{
-          if(typeof pdfjsLib==='undefined'){cb(0);return;}
-          pdfjsLib.getDocument({data:arr}).promise.then(p=>cb(p.numPages)).catch(()=>cb(0));
-        };
-        getPages(pages=>{
-          const slideId=Date.now()+'-'+Math.random().toString(36).slice(2);
-          const slide={
-            id:slideId,
-            name:file.name.replace(/\.pdf$/i,''),
-            category:'Genel',
-            pages,
-            size:file.size,
-            addedAt:new Date().toISOString(),
-            thumb,
-            base64
-          };
-          if(!D.slides)D.slides=[];
-          D.slides.unshift(slide);
-          // localStorage'a kaydet
-          localStorage.setItem('capsula_v4',JSON.stringify(D));
-          // Firestore'a thumb + metadata kaydet (base64 çok büyük olduğu için sadece meta)
-          if(currentUser&&db){
-            db.collection('userSlides').doc(currentUser.uid).collection('slides').doc(slideId).set({
-              id:slideId,
-              name:slide.name,
-              category:slide.category,
-              pages,
-              size:file.size,
-              addedAt:slide.addedAt,
-              thumb, // thumbnail Firestore'a sığar (~5KB)
-              // base64 çok büyük — Firestore doc limiti 1MB. Parçalara bölelim
-              hasData:true
-            }).then(()=>{
-              // PDF verisini 500KB'lık parçalara böl
-              const b64=base64.split(',')[1];
-              const chunkSize=600*1024; // 600KB
+      const rawB64=base64.split(',')[1];
+      const arr=new Uint8Array(rawB64.split('').map(c=>c.charCodeAt(0)));
+      const makeSlide=(thumb,pages)=>{
+        const slideId='slide-'+Date.now()+'-'+Math.random().toString(36).slice(2);
+        const slide={id:slideId,name:file.name.replace(/\.pdf$/i,''),category:'Genel',pages,size:file.size,addedAt:new Date().toISOString(),thumb,base64};
+        if(!D.slides)D.slides=[];
+        D.slides.unshift(slide);
+        localStorage.setItem('capsula_v4',JSON.stringify(D));
+        renderSlides();
+        if(currentUser&&db){
+          const ref=db.collection('userSlides').doc(currentUser.uid).collection('slides').doc(slideId);
+          ref.set({id:slideId,name:slide.name,category:slide.category,pages,size:file.size,addedAt:slide.addedAt,thumb})
+            .then(()=>{
+              const CHUNK=450*1024;
               const chunks=[];
-              for(let i=0;i<b64.length;i+=chunkSize)chunks.push(b64.slice(i,i+chunkSize));
-              const chunkPromises=chunks.map((chunk,idx)=>
-                db.collection('userSlides').doc(currentUser.uid).collection('slides').doc(slideId)
-                  .collection('chunks').doc(String(idx)).set({data:chunk,idx})
-              );
-              return Promise.all(chunkPromises);
-            }).catch(console.warn);
-          }
-          done++;
-          if(done===total){showToast(done+' PDF eklendi ✓');renderSlides();}
-        });
-      });
+              for(let i=0;i<rawB64.length;i+=CHUNK)chunks.push(rawB64.slice(i,i+CHUNK));
+              return chunks.reduce((p,chunk,idx)=>p.then(()=>
+                ref.collection('chunks').doc(String(idx).padStart(4,'0')).set({data:chunk,idx})
+              ),Promise.resolve());
+            }).then(()=>{showToast(slide.name+' buluta kaydedildi ✓');resolve();})
+            .catch(err=>{showToast('Yerel kaydedildi (bulut hatası: '+(err.code||'?')+')');resolve();});
+        } else resolve();
+      };
+      if(typeof pdfjsLib!=='undefined'){
+        pdfjsLib.getDocument({data:arr}).promise.then(pdf=>{
+          pdf.getPage(1).then(page=>{
+            const vp=page.getViewport({scale:0.4});
+            const cv=document.createElement('canvas');
+            cv.width=vp.width;cv.height=vp.height;
+            page.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise
+              .then(()=>makeSlide(cv.toDataURL('image/jpeg',0.6),pdf.numPages))
+              .catch(()=>makeSlide('',pdf.numPages));
+          }).catch(()=>makeSlide('',pdf.numPages));
+        }).catch(()=>makeSlide('',0));
+      } else makeSlide('',0);
     };
+    reader.onerror=()=>{showToast('Dosya okunamadı');resolve();};
     reader.readAsDataURL(file);
   });
+  pdfs.reduce((p,f)=>p.then(()=>processOne(f)),Promise.resolve());
   e.target.value='';
 }
 
