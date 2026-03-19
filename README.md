@@ -723,6 +723,22 @@ main{flex:1;overflow:hidden;position:relative;}
 .settings-row-label{font-size:.78rem;font-weight:300;color:var(--text2);}
 .settings-section{margin-bottom:16px;}
 .settings-section-title{font-size:.5rem;letter-spacing:.2em;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-bottom:9px;}
+.settings-accordion{display:flex;flex-direction:column;gap:6px;}
+.acc-item{border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.acc-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;font-size:.82rem;font-weight:400;color:var(--text2);transition:background .18s;}
+.acc-header:hover{background:var(--bg3);}
+.acc-body{padding:12px 14px;border-top:1px solid var(--border);background:var(--bg);}
+.acc-arrow.open{transform:rotate(180deg);}
+/* Bildirimler */
+.notif-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:7px;}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:4px;}
+.notif-dot.unread{background:var(--hard);}
+.notif-text{font-size:.76rem;font-weight:300;color:var(--text2);line-height:1.5;flex:1;}
+.notif-time{font-size:.54rem;font-family:'JetBrains Mono',monospace;color:var(--text3);flex-shrink:0;}
+/* Günlük AI prompt */
+.diary-ai-prompt{background:linear-gradient(135deg,rgba(124,111,247,.08),rgba(168,157,254,.05));border:1px solid rgba(124,111,247,.2);border-radius:12px;padding:12px 14px;margin-bottom:14px;}
+.diary-ai-prompt-label{font-size:.5rem;letter-spacing:.18em;color:var(--accent2);font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-bottom:6px;}
+.diary-ai-prompt-text{font-size:.82rem;color:var(--text2);line-height:1.6;font-weight:300;}
 .toggle{width:34px;height:19px;background:var(--bg3);border-radius:10px;position:relative;cursor:pointer;border:1px solid var(--border2);transition:background .28s;flex-shrink:0;}
 .toggle.on{background:var(--accent);}
 .toggle::after{content:'';width:13px;height:13px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:transform .28s;}
@@ -863,6 +879,10 @@ select.pf option{background:var(--bg2);color:var(--text);}
       <span id="pageTitle" style="font-size:.88rem;font-weight:500;color:var(--text);letter-spacing:.01em;">Capsula</span>
     </div>
     <div class="header-right">
+      <button onclick="openNotifications()" style="position:relative;background:none;border:none;cursor:pointer;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--text3);transition:background .18s;" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='none'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:18px;height:18px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span id="notifHeaderBadge" style="display:none;position:absolute;top:2px;right:2px;width:8px;height:8px;border-radius:50%;background:var(--hard);border:2px solid var(--bg);"></span>
+      </button>
       <button class="avatar-btn" id="avatarBtn" onclick="openProfile()">
         <img id="avatarImg" src="" style="display:none">
         <span class="avatar-initials" id="avatarInitials">KY</span>
@@ -907,9 +927,30 @@ select.pf option{background:var(--bg2);color:var(--text);}
     <div class="page" id="page-notes">
       <!-- Hızlı Not -->
       <div id="quickNoteBar" style="margin-bottom:14px;">
-        <div style="display:flex;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:12px 14px;transition:border-color .2s;" onfocusin="this.style.borderColor='rgba(124,111,247,.4)'" onfocusout="this.style.borderColor='var(--border)'">
-          <input type="text" id="quickNoteInput" placeholder="Aklına ne geldi? Yaz, kaydet..." style="flex:1;background:none;border:none;outline:none;font-family:'Sora',sans-serif;font-size:.9rem;color:var(--text);" onkeydown="if(event.key==='Enter')saveQuickNote()">
-          <button onclick="saveQuickNote()" style="background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:9px;padding:8px 16px;cursor:pointer;color:#fff;font-size:.78rem;font-family:'Sora',sans-serif;white-space:nowrap;flex-shrink:0;">+ Not</button>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:14px;transition:border-color .2s;" onfocusin="this.style.borderColor='rgba(124,111,247,.4)'" onfocusout="this.style.borderColor='var(--border)'">
+          <input type="text" id="quickNoteInput" placeholder="Aklına ne geldi? Yaz, kaydet..." style="width:100%;background:none;border:none;outline:none;font-family:'Sora',sans-serif;font-size:.92rem;color:var(--text);margin-bottom:10px;display:block;" onkeydown="if(event.key==='Enter')saveQuickNote()">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <div class="priority-pills" style="display:flex;gap:5px;" id="quickNotePriority">
+              <div class="pp easy sel" data-p="easy" onclick="selectQuickPrio('easy')">Kolay</div>
+              <div class="pp mid" data-p="mid" onclick="selectQuickPrio('mid')">Orta</div>
+              <div class="pp hard" data-p="hard" onclick="selectQuickPrio('hard')">Zor</div>
+            </div>
+            <div style="flex:1;"></div>
+            <label title="Fotoğraf" style="cursor:pointer;width:30px;height:30px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:15px;height:15px;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <input type="file" accept="image/*" style="display:none" onchange="quickNoteMedia(event,'image')">
+            </label>
+            <label title="Video" style="cursor:pointer;width:30px;height:30px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:15px;height:15px;"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+              <input type="file" accept="video/*" style="display:none" onchange="quickNoteMedia(event,'video')">
+            </label>
+            <label title="Ses" style="cursor:pointer;width:30px;height:30px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:15px;height:15px;"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+              <input type="file" accept="audio/*" style="display:none" onchange="quickNoteMedia(event,'audio')">
+            </label>
+            <button onclick="saveQuickNote()" style="background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:9px;padding:8px 16px;cursor:pointer;color:#fff;font-size:.78rem;font-family:'Sora',sans-serif;white-space:nowrap;">+ Not</button>
+          </div>
+          <div id="quickNoteMediaPreview" style="margin-top:8px;"></div>
         </div>
       </div>
       <div class="notes-grid" id="notes-grid"></div>
@@ -1002,7 +1043,7 @@ select.pf option{background:var(--bg2);color:var(--text);}
             <div id="pomoFlipSec" style="background:var(--bg3);border-radius:8px;padding:6px 14px;font-family:'JetBrains Mono',monospace;font-size:2rem;color:var(--accent);border:1px solid var(--border2);min-width:64px;text-align:center;">00</div>
           </div>
         </div>
-        <div style="font-size:.52rem;color:var(--text3);margin-top:-8px;margin-bottom:8px;font-family:'JetBrains Mono',monospace;opacity:.6;">çift tıkla · süreyi değiştir</div>
+        
         <div class="pomo-label" id="pomoLabel">Çalışma Seansı</div>
         <div class="pomo-controls">
           <button class="pomo-btn sec" onclick="resetPomo()">
@@ -1011,8 +1052,8 @@ select.pf option{background:var(--bg2);color:var(--text);}
           <button class="pomo-btn main" id="pomoPlayBtn" onclick="togglePomo()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="pomoIcon" style="width:18px;height:18px;"><polygon points="5 3 19 12 5 21 5 3" fill="currentColor"/></svg>
           </button>
-          <button class="pomo-btn sec" onclick="skipPomo()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><polyline points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+          <button class="pomo-btn sec" onclick="openPomoDurEdit()" title="Süre Ayarla">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/><path d="M16 16l2 2"/></svg>
           </button>
         </div>
         <div class="pomo-sessions" id="pomoSessions"></div>
@@ -1140,7 +1181,7 @@ select.pf option{background:var(--bg2);color:var(--text);}
     <button class="drawer-item" onclick="toggleDrawer();switchPage('reading')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Okuma Listesi</button>
     <button class="drawer-item" onclick="toggleDrawer();switchPage('pomodoro')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pomodoro</button>
     <button class="drawer-item" onclick="toggleDrawer();switchPage('schedule')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Ders Programı</button>
-    <button class="drawer-item" id="drawerReminderBtn" onclick="openReminderModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Hatırlatıcılar<span id="drawerReminderBadge" style="display:none;margin-left:auto;min-width:18px;height:18px;font-size:.52rem;border-radius:9px;background:var(--hard);color:#fff;align-items:center;justify-content:center;padding:0 4px;font-family:JetBrains Mono,monospace;"></span></button>
+    <button class="drawer-item" id="drawerReminderBtn" onclick="openNotifications()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Bildirimler<span id="drawerReminderBadge" style="display:none;margin-left:auto;min-width:18px;height:18px;font-size:.52rem;border-radius:9px;background:var(--hard);color:#fff;align-items:center;justify-content:center;padding:0 4px;font-family:JetBrains Mono,monospace;"></span></button>
     <button class="drawer-item" onclick="openBackupModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Yedekle & Geri Yükle</button>
     <button class="drawer-item" onclick="openFromDrawer('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Ayarlar</button>
     <div class="drawer-divider"></div>
@@ -1229,31 +1270,46 @@ select.pf option{background:var(--bg2);color:var(--text);}
   <div class="modal-box" style="max-height:88vh;overflow-y:auto;">
     <button class="modal-close-btn" onclick="closeModal('settingsModal')">✕</button>
     <div class="plabel" style="margin-bottom:14px">Ayarlar</div>
-    <div class="settings-section">
-      <div class="settings-section-title">Tema</div>
-      <div class="theme-grid">
-        <div class="theme-swatch active" data-theme="default" data-label="Varsayılan" style="background:linear-gradient(135deg,#0d0d12,#7c6ff7)" onclick="applyTheme('default',this)"></div>
-        <div class="theme-swatch" data-theme="midnight" data-label="Gece" style="background:linear-gradient(135deg,#050508,#818cf8)" onclick="applyTheme('midnight',this)"></div>
-        <div class="theme-swatch" data-theme="forest" data-label="Orman" style="background:linear-gradient(135deg,#060e08,#4ade80)" onclick="applyTheme('forest',this)"></div>
-        <div class="theme-swatch" data-theme="sunset" data-label="Batım" style="background:linear-gradient(135deg,#12080a,#f472b6)" onclick="applyTheme('sunset',this)"></div>
-        <div class="theme-swatch" data-theme="ocean" data-label="Okyanus" style="background:linear-gradient(135deg,#030d14,#38bdf8)" onclick="applyTheme('ocean',this)"></div>
-        <div class="theme-swatch" data-theme="sand" data-label="Kum" style="background:linear-gradient(135deg,#0f0d08,#fbbf24)" onclick="applyTheme('sand',this)"></div>
+    <div class="settings-accordion" id="settingsAccordion">
+    <!-- Tema -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc('acc-tema')">
+        <span>🎨 Tema</span><svg class="acc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;transition:transform .2s;"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="acc-body" id="acc-tema">
+        <div class="theme-grid">
+          <div class="theme-swatch active" data-theme="default" data-label="Varsayılan" style="background:linear-gradient(135deg,#0d0d12,#7c6ff7)" onclick="applyTheme('default',this)"></div>
+          <div class="theme-swatch" data-theme="midnight" data-label="Gece" style="background:linear-gradient(135deg,#050508,#818cf8)" onclick="applyTheme('midnight',this)"></div>
+          <div class="theme-swatch" data-theme="forest" data-label="Orman" style="background:linear-gradient(135deg,#060e08,#4ade80)" onclick="applyTheme('forest',this)"></div>
+          <div class="theme-swatch" data-theme="sunset" data-label="Batım" style="background:linear-gradient(135deg,#12080a,#f472b6)" onclick="applyTheme('sunset',this)"></div>
+          <div class="theme-swatch" data-theme="ocean" data-label="Okyanus" style="background:linear-gradient(135deg,#030d14,#38bdf8)" onclick="applyTheme('ocean',this)"></div>
+          <div class="theme-swatch" data-theme="sand" data-label="Kum" style="background:linear-gradient(135deg,#0f0d08,#fbbf24)" onclick="applyTheme('sand',this)"></div>
+        </div>
       </div>
     </div>
-    <div class="settings-section" style="margin-top:16px;">
-      <div class="settings-section-title">Dil</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
-        <button class="lang-btn active" id="langBtn-tr" onclick="setLang('tr')">🇹🇷 TR</button>
-        <button class="lang-btn" id="langBtn-en" onclick="setLang('en')">🇬🇧 EN</button>
-        <button class="lang-btn" id="langBtn-de" onclick="setLang('de')">🇩🇪 DE</button>
-        <button class="lang-btn" id="langBtn-fr" onclick="setLang('fr')">🇫🇷 FR</button>
-        <button class="lang-btn" id="langBtn-es" onclick="setLang('es')">🇪🇸 ES</button>
-        <button class="lang-btn" id="langBtn-ar" onclick="setLang('ar')">🇸🇦 AR</button>
+    <!-- Dil -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc('acc-dil')">
+        <span>🌐 Dil</span><svg class="acc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;transition:transform .2s;"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="acc-body" id="acc-dil" style="display:none;">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="lang-btn active" id="langBtn-tr" onclick="setLang('tr')">🇹🇷 TR</button>
+          <button class="lang-btn" id="langBtn-en" onclick="setLang('en')">🇬🇧 EN</button>
+          <button class="lang-btn" id="langBtn-de" onclick="setLang('de')">🇩🇪 DE</button>
+          <button class="lang-btn" id="langBtn-fr" onclick="setLang('fr')">🇫🇷 FR</button>
+          <button class="lang-btn" id="langBtn-es" onclick="setLang('es')">🇪🇸 ES</button>
+          <button class="lang-btn" id="langBtn-ar" onclick="setLang('ar')">🇸🇦 AR</button>
+        </div>
       </div>
     </div>
-    <div class="settings-section" style="margin-top:16px;">
-      <div class="settings-section-title">Pomodoro Saat Stili</div>
-      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px;" id="pomoStyleGrid">
+    <!-- Pomodoro Saat Stili -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc('acc-pomo')">
+        <span>🍅 Pomodoro Saat Stili</span><svg class="acc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;transition:transform .2s;"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="acc-body" id="acc-pomo" style="display:none;">
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;" id="pomoStyleGrid">
         <div onclick="setPomoStyle('ring')" class="pomo-style-opt active" id="ps-ring" title="Halka">
           <svg viewBox="0 0 40 40" style="width:36px;height:36px;"><circle cx="20" cy="20" r="15" fill="none" stroke="var(--border2)" stroke-width="4"/><circle cx="20" cy="20" r="15" fill="none" stroke="var(--accent)" stroke-width="4" stroke-dasharray="70 24" stroke-linecap="round" transform="rotate(-90 20 20)"/></svg>
           <span>Halka</span>
@@ -1275,9 +1331,14 @@ select.pf option{background:var(--bg2);color:var(--text);}
           <span>Minimal</span>
         </div>
       </div>
+      </div>
     </div>
-    <div class="settings-section" style="margin-top:16px;">
-      <div class="settings-section-title">Güvenlik</div>
+    <!-- Güvenlik -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc('acc-guvenlik')">
+        <span>🔒 Güvenlik</span><svg class="acc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;transition:transform .2s;"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="acc-body" id="acc-guvenlik" style="display:none;">
       <div class="settings-row"><span class="settings-row-label">PIN Kilidi</span><div class="toggle" id="pinToggle" onclick="togglePinSetting()"></div></div>
       <div id="pinSetupArea" style="display:none;margin-top:8px;">
         <div class="plabel" style="margin-bottom:4px">Yeni PIN (4 hane)</div>
@@ -1286,12 +1347,29 @@ select.pf option{background:var(--bg2);color:var(--text);}
           <button onclick="savePinCode()" style="background:var(--accent);border:none;border-radius:7px;padding:8px 13px;cursor:pointer;font-family:'Sora',sans-serif;font-size:.72rem;color:#fff;">Kaydet</button>
         </div>
       </div>
-      <div class="settings-row" style="margin-top:10px;">
-        <span class="settings-row-label">Şifre Değiştir</span>
-        <button onclick="sendPasswordChangeEmail()" id="changePasswordBtn" style="background:rgba(124,111,247,.12);border:1px solid rgba(124,111,247,.25);border-radius:8px;padding:5px 12px;font-size:.65rem;color:var(--accent2);cursor:pointer;font-family:'Sora',sans-serif;transition:all .2s;">Link Gönder</button>
       </div>
-      <div style="font-size:.6rem;color:var(--text3);margin-top:4px;line-height:1.5;">Email adresine şifre değiştirme linki gönderilir.</div>
     </div>
+    <!-- Kanban Ayarları -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc('acc-kanban')">
+        <span>📋 Kanban</span><svg class="acc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;transition:transform .2s;"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="acc-body" id="acc-kanban" style="display:none;">
+        <div class="settings-row"><span class="settings-row-label" style="font-size:.76rem;">Tamamlananları otomatik sil</span><div class="toggle" id="kanbanAutoDelete" onclick="toggleKanbanAutoDelete()"></div></div>
+        <div style="font-size:.62rem;color:var(--text3);margin-top:4px;line-height:1.5;">Tamamlanan kartlar 30 gün sonra çöpe taşınır. Kapatmak için bu ayarı kullanın.</div>
+      </div>
+    </div>
+    <!-- Okuma Listesi Ayarları -->
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc('acc-reading')">
+        <span>📚 Okuma Listesi</span><svg class="acc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;transition:transform .2s;"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="acc-body" id="acc-reading" style="display:none;">
+        <div class="settings-row"><span class="settings-row-label" style="font-size:.76rem;">Bitenleri otomatik arşivle</span><div class="toggle" id="readingAutoArchive" onclick="toggleReadingAutoArchive()"></div></div>
+        <div style="font-size:.62rem;color:var(--text3);margin-top:4px;line-height:1.5;">Tamamlanan kitaplar 30 gün sonra arşive taşınır. Kapatabilirsiniz.</div>
+      </div>
+    </div>
+    </div><!-- /settings-accordion -->
   </div>
 </div>
 
@@ -1410,14 +1488,36 @@ select.pf option{background:var(--bg2);color:var(--text);}
 
 <!-- READING ADD MODAL -->
 <div class="modal-overlay" id="readingAddModal">
-  <div class="modal-box" style="padding:22px;">
+  <div class="modal-box" style="padding:22px;max-height:88vh;overflow-y:auto;">
     <button class="modal-close-btn" onclick="closeModal('readingAddModal')">✕</button>
-    <div class="plabel" style="margin-bottom:12px">Kitap / Makale Ekle</div>
-    <input type="text" class="pf" id="readingTitleInput" placeholder="Başlık...">
-    <input type="text" class="pf" id="readingAuthorInput" placeholder="Yazar / Kaynak...">
-    <div class="plabel" style="margin-bottom:5px">Durum</div>
-    <select id="readingStatusInput" class="pf"><option value="toread">Okunacak</option><option value="reading">Okunuyor</option><option value="done">Tamamlandı</option></select>
-    <button class="p-save" onclick="saveReadingItem()" style="margin-top:10px;">Ekle</button>
+    <div class="plabel" style="margin-bottom:12px">Kitap / Makale / Makale Ekle</div>
+    <div class="plabel" style="margin-bottom:4px;font-size:.6rem;">Tür</div>
+    <select id="readingTypeInput" class="pf" style="margin-bottom:9px;"><option value="book">📚 Kitap</option><option value="article">📄 Makale</option><option value="paper">🔬 Akademik</option><option value="other">📎 Diğer</option></select>
+    <input type="text" class="pf" id="readingTitleInput" placeholder="Başlık *">
+    <input type="text" class="pf" id="readingAuthorInput" placeholder="Yazar / Kaynak">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div>
+        <div class="plabel" style="margin-bottom:4px;font-size:.6rem;">Toplam Sayfa</div>
+        <input type="number" class="pf" id="readingPagesInput" placeholder="örn. 320" min="1" style="margin-bottom:0;">
+      </div>
+      <div>
+        <div class="plabel" style="margin-bottom:4px;font-size:.6rem;">Bitiş Hedefi</div>
+        <input type="date" class="pf" id="readingGoalDate" style="margin-bottom:0;">
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px;">
+      <div>
+        <div class="plabel" style="margin-bottom:4px;font-size:.6rem;">Başlangıç Tarihi</div>
+        <input type="date" class="pf" id="readingStartDate" style="margin-bottom:0;" value="">
+      </div>
+      <div>
+        <div class="plabel" style="margin-bottom:4px;font-size:.6rem;">Durum</div>
+        <select id="readingStatusInput" class="pf" style="margin-bottom:0;"><option value="toread">📌 Okunacak</option><option value="reading">📖 Okunuyor</option><option value="done">✅ Tamamlandı</option></select>
+      </div>
+    </div>
+    <div class="plabel" style="margin-top:9px;margin-bottom:4px;font-size:.6rem;">Notlar (isteğe bağlı)</div>
+    <textarea class="pf" id="readingNotesInput" placeholder="Bu kitap hakkında not..." style="min-height:56px;resize:none;margin-bottom:0;"></textarea>
+    <button class="p-save" onclick="saveReadingItem()" style="margin-top:12px;">Ekle</button>
   </div>
 </div>
 
@@ -1628,6 +1728,18 @@ select.pf option{background:var(--bg2);color:var(--text);}
   </div>
 </div>
 
+<!-- BİLDİRİMLER MODAL -->
+<div class="modal-overlay" id="notificationsModal">
+  <div class="modal-box" style="max-height:82vh;display:flex;flex-direction:column;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div class="plabel">Bildirimler</div>
+      <button onclick="clearAllNotifs()" style="font-size:.62rem;font-family:'JetBrains Mono',monospace;color:var(--text3);background:none;border:none;cursor:pointer;text-decoration:underline;">Tümünü Temizle</button>
+    </div>
+    <button class="modal-close-btn" onclick="closeModal('notificationsModal')">✕</button>
+    <div id="notifList" style="flex:1;overflow-y:auto;"></div>
+  </div>
+</div>
+
 <!-- SPLASH SCREEN -->
 <div id="splashScreen">
   <div class="splash-particles" id="splashParticles"></div>
@@ -1702,11 +1814,14 @@ const _origSaveProfile = window.saveProfile;
 
 function initApp(){
   initPinToggle();autoTrash();updTrashBadge();updateProfileUI();initReminders();initLang();
+  initSettingsToggles();
+  updateNotifBadge();
+  checkSmartNotifications();
+  renderDiaryAIPrompt();
   setMode(curMode);
   renderTodos();renderNotes();renderDiary();renderDashboard();renderCalendar();
   renderKanban();renderReading();renderSchedule();renderExams();renderNotebook();renderPro();
-  // Chat konuşma listesini arka planda dinle (badge için)
-    }
+}
 
 const QUOTES=[
   {text:"Başarı, her gün tekrarlanan küçük çabaların toplamıdır.",author:"Robert Collier",tag:"Motivasyon"},
@@ -2284,6 +2399,7 @@ function renderNotes(){
 
 // ─────────────────────────── DIARY ────────────────────────────────────────
 function renderDiary(){
+  renderDiaryAIPrompt();
   const list=document.getElementById('diary-list');const empty=document.getElementById('diary-empty');
   if(!D.diary.length){list.innerHTML='';empty.style.display='block';return;}
   empty.style.display='none';
@@ -2616,12 +2732,38 @@ function renderKanban(){
   const cols=[{id:'todo',label:'Yapılacak'},{id:'doing',label:'Devam Eden'},{id:'done',label:'Tamamlandı'}];
   const clr={easy:'var(--easy)',mid:'var(--mid)',hard:'var(--hard)'};
   const lbl={easy:'Kolay',mid:'Orta',hard:'Zor'};
+  // Otomatik silme kontrolü
+  const autoDelete=localStorage.getItem('capsula_kanban_autodelete')!=='off';
+  if(autoDelete){
+    const cutoff=Date.now()-30*24*60*60*1000;
+    D.kanban.done=D.kanban.done.filter(card=>{
+      if(new Date(card.completedAt||card.createdAt||0).getTime()<cutoff){
+        D.trash.push({...card,type:'kanban',deletedAt:new Date().toISOString()});
+        return false;
+      }
+      return true;
+    });
+    saveData();
+  }
   document.getElementById('kanbanBoard').innerHTML=cols.map(col=>`
     <div class="kanban-col col-${col.id}">
       <div class="kanban-col-header"><span class="kanban-col-title">${col.label}</span><span class="kanban-count">${D.kanban[col.id].length}</span></div>
-      <div class="kanban-cards">${D.kanban[col.id].map(card=>`<div class="kanban-card"><div class="kanban-card-text">${escHtml(card.text)}</div><div style="display:flex;align-items:center;gap:4px;"><span class="todo-badge" style="color:${clr[card.priority]};background:${clr[card.priority]}18;">${lbl[card.priority]}</span></div><div class="kanban-move-btns">${col.id!=='todo'?`<button class="kmb" onclick="moveKanbanCard(${card.id},'${col.id}',-1)">← Geri</button>`:''} ${col.id!=='done'?`<button class="kmb" onclick="moveKanbanCard(${card.id},'${col.id}',1)">İleri →</button>`:''}</div></div>`).join('')}</div>
+      <div class="kanban-cards">${D.kanban[col.id].map(card=>`
+        <div class="kanban-card" style="position:relative;">
+          <button onclick="deleteKanbanCard(${card.id},'${col.id}')" style="position:absolute;top:4px;right:4px;background:none;border:none;cursor:pointer;color:var(--text3);font-size:.8rem;padding:2px 5px;border-radius:5px;transition:color .18s;" onmouseover="this.style.color='var(--hard)'" onmouseout="this.style.color='var(--text3)'">✕</button>
+          <div class="kanban-card-text" style="padding-right:20px;">${escHtml(card.text)}</div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:4px;"><span class="todo-badge" style="color:${clr[card.priority]};background:${clr[card.priority]}18;">${lbl[card.priority]}</span></div>
+          <div class="kanban-move-btns">${col.id!=='todo'?`<button class="kmb" onclick="moveKanbanCard(${card.id},'${col.id}',-1)">← Geri</button>`:''} ${col.id!=='done'?`<button class="kmb" onclick="moveKanbanCard(${card.id},'${col.id}',1)">İleri →</button>`:''}</div>
+        </div>`).join('')}
+      </div>
+      ${col.id==='done'?`<div style="font-size:.55rem;font-family:'JetBrains Mono',monospace;color:var(--text3);padding:6px 4px;line-height:1.5;opacity:.7;">⏱ Tamamlananlar 30 gün sonra otomatik silinir.<br>Ayarlar → Kanban'dan kapatabilirsiniz.</div>`:''}
       <button class="kanban-add-btn" onclick="openKanbanAdd()">+ Kart Ekle</button>
     </div>`).join('');
+}
+
+function deleteKanbanCard(id,col){
+  D.kanban[col]=D.kanban[col].filter(c=>c.id!==id);
+  saveData();renderKanban();showToast('Kart silindi');
 }
 
 // ─────────────────────────── WEEKLY ───────────────────────────────────────
@@ -2662,7 +2804,24 @@ function calcStreak(){let s=0;const now=new Date();now.setHours(0,0,0,0);for(let
 
 // ─────────────────────────── READING ──────────────────────────────────────
 function openReadingAdd(){document.getElementById('readingTitleInput').value='';document.getElementById('readingAuthorInput').value='';document.getElementById('readingStatusInput').value='toread';openModal('readingAddModal');}
-function saveReadingItem(){const title=document.getElementById('readingTitleInput').value.trim();if(!title)return;D.reading.push({id:Date.now(),title,author:document.getElementById('readingAuthorInput').value.trim(),status:document.getElementById('readingStatusInput').value,createdAt:new Date().toISOString()});saveData();closeModal('readingAddModal');renderReading();showToast('Eklendi');}
+function saveReadingItem(){
+  const title=document.getElementById('readingTitleInput').value.trim();
+  if(!title)return;
+  const today=new Date().toISOString().split('T')[0];
+  D.reading.push({
+    id:Date.now(),title,
+    author:document.getElementById('readingAuthorInput').value.trim(),
+    type:document.getElementById('readingTypeInput')?.value||'book',
+    pages:parseInt(document.getElementById('readingPagesInput')?.value)||0,
+    goalDate:document.getElementById('readingGoalDate')?.value||'',
+    startDate:document.getElementById('readingStartDate')?.value||today,
+    notes:document.getElementById('readingNotesInput')?.value.trim()||'',
+    status:document.getElementById('readingStatusInput').value,
+    pagesRead:0,
+    createdAt:new Date().toISOString()
+  });
+  saveData();closeModal('readingAddModal');renderReading();showToast('Eklendi 📚');
+}
 function cycleReadingStatus(id){const item=D.reading.find(r=>r.id===id);if(!item)return;const cycle={toread:'reading',reading:'done',done:'toread'};item.status=cycle[item.status];saveData();renderReading();}
 function renderReading(){
   const groups={reading:[],toread:[],done:[]};D.reading.forEach(r=>groups[r.status].push(r));
@@ -3290,6 +3449,204 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 function clearAllData(){showConfirm('Tüm veriler silinecek. Emin misin?',()=>{D={todos:[],completedTodos:[],trash:[],contentTrash:[],calPlans:{},notes:[],diary:[],kanban:{todo:[],doing:[],done:[]},reading:[],schedule:[],exams:[],notebook:[],profile:D.profile};saveData();toggleDrawer();renderTodos();renderNotes();renderDiary();renderDashboard();updTrashBadge();renderSchedule();renderExams();renderNotebook();showToast('Veriler silindi');});}
 
 // ─────────────────────────── INIT ─────────────────────────────────────────
+// ─────────────────────────── ACCORDION (SETTINGS) ─────────────────────────
+function toggleAcc(id){
+  const body=document.getElementById(id);
+  if(!body)return;
+  const isOpen=body.style.display!=='none';
+  body.style.display=isOpen?'none':'block';
+  const header=body.previousElementSibling;
+  const arrow=header?.querySelector('.acc-arrow');
+  if(arrow)arrow.classList.toggle('open',!isOpen);
+}
+
+// ─────────────────────────── KANBAN / OKUMA TOGGLELAR ─────────────────────
+function toggleKanbanAutoDelete(){
+  const tog=document.getElementById('kanbanAutoDelete');
+  const cur=localStorage.getItem('capsula_kanban_autodelete')!=='off';
+  localStorage.setItem('capsula_kanban_autodelete',cur?'off':'on');
+  tog?.classList.toggle('on',!cur);
+  showToast(cur?'Otomatik silme kapatıldı':'Otomatik silme açıldı');
+}
+function toggleReadingAutoArchive(){
+  const tog=document.getElementById('readingAutoArchive');
+  const cur=localStorage.getItem('capsula_reading_autoarchive')!=='off';
+  localStorage.setItem('capsula_reading_autoarchive',cur?'off':'on');
+  tog?.classList.toggle('on',!cur);
+  showToast(cur?'Otomatik arşiv kapatıldı':'Otomatik arşiv açıldı');
+}
+function initSettingsToggles(){
+  const kd=document.getElementById('kanbanAutoDelete');
+  const ra=document.getElementById('readingAutoArchive');
+  if(kd)kd.classList.toggle('on',localStorage.getItem('capsula_kanban_autodelete')!=='off');
+  if(ra)ra.classList.toggle('on',localStorage.getItem('capsula_reading_autoarchive')!=='off');
+  const ps=document.getElementById('ps-'+pomoStyle);
+  if(ps)ps.classList.add('active');
+}
+
+// ─────────────────────────── HIZLI NOT MEDIA ──────────────────────────────
+let quickNoteMediaData=[];
+let quickNotePrio='easy';
+function selectQuickPrio(p){
+  quickNotePrio=p;
+  document.querySelectorAll('#quickNotePriority .pp').forEach(el=>{
+    el.classList.toggle('sel',el.dataset.p===p);
+  });
+}
+function quickNoteMedia(e,type){
+  const file=e.target.files[0];if(!file)return;
+  if(file.size>10*1024*1024){showToast('Max 10MB');return;}
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    quickNoteMediaData.push({type,data:ev.target.result,name:file.name});
+    const prev=document.getElementById('quickNoteMediaPreview');
+    if(prev){
+      const tag=type==='image'?`<img src="${ev.target.result}" style="max-height:80px;border-radius:8px;margin-right:6px;">`
+        :type==='video'?`<video src="${ev.target.result}" style="max-height:80px;border-radius:8px;" controls></video>`
+        :`<div style="background:var(--bg3);border-radius:8px;padding:6px 10px;font-size:.7rem;color:var(--text2);">🎵 ${file.name}</div>`;
+      prev.innerHTML=(prev.innerHTML||'')+tag;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+// saveQuickNote'u güncelle
+const _origSaveQN=window.saveQuickNote;
+window.saveQuickNote=function(){
+  const inp=document.getElementById('quickNoteInput');
+  const text=inp?.value.trim();
+  if(!text&&!quickNoteMediaData.length)return;
+  const note={
+    id:Date.now(),
+    title:(text||'').slice(0,40)+(text.length>40?'...':''),
+    content:text,
+    media:[...quickNoteMediaData],
+    tags:['hızlı'],
+    priority:quickNotePrio,
+    pinned:true,
+    createdAt:new Date().toISOString()
+  };
+  D.notes.unshift(note);
+  saveData();renderNotes();
+  if(inp)inp.value='';
+  quickNoteMediaData=[];
+  const prev=document.getElementById('quickNoteMediaPreview');
+  if(prev)prev.innerHTML='';
+  showToast('Not eklendi ✓');
+};
+
+// ─────────────────────────── BİLDİRİMLER SİSTEMİ ─────────────────────────
+function getNotifications(){
+  return JSON.parse(localStorage.getItem('capsula_notifs')||'[]');
+}
+function addNotification(text,type='info'){
+  const notifs=getNotifications();
+  notifs.unshift({id:Date.now(),text,type,time:new Date().toISOString(),read:false});
+  if(notifs.length>50)notifs.pop();
+  localStorage.setItem('capsula_notifs',JSON.stringify(notifs));
+  updateNotifBadge();
+}
+function updateNotifBadge(){
+  const notifs=getNotifications();
+  const unread=notifs.filter(n=>!n.read).length;
+  const badge=document.getElementById('notifHeaderBadge');
+  const drawerBadge=document.getElementById('drawerReminderBadge');
+  if(badge)badge.style.display=unread>0?'block':'none';
+  if(drawerBadge){
+    if(unread>0){drawerBadge.style.display='flex';drawerBadge.textContent=unread>9?'9+':unread;}
+    else drawerBadge.style.display='none';
+  }
+}
+function openNotifications(){
+  const notifs=getNotifications();
+  // Okundu işaretle
+  notifs.forEach(n=>n.read=true);
+  localStorage.setItem('capsula_notifs',JSON.stringify(notifs));
+  updateNotifBadge();
+  const list=document.getElementById('notifList');
+  if(!notifs.length){
+    list.innerHTML='<div style="text-align:center;padding:30px;color:var(--text3);font-size:.74rem;">Henüz bildirim yok</div>';
+  } else {
+    list.innerHTML=notifs.map(n=>`
+      <div class="notif-item">
+        <div class="notif-dot${n.read?'':' unread'}"></div>
+        <div class="notif-text">${escHtml(n.text)}</div>
+        <div class="notif-time">${new Date(n.time).toLocaleDateString('tr-TR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div>
+      </div>`).join('');
+  }
+  openModal('notificationsModal');
+}
+function clearAllNotifs(){
+  localStorage.setItem('capsula_notifs','[]');
+  updateNotifBadge();
+  closeModal('notificationsModal');
+  showToast('Bildirimler temizlendi');
+}
+function checkSmartNotifications(){
+  const now=new Date();
+  // Okuma listesi - hedef tarih yaklaşıyor mu?
+  D.reading.filter(r=>r.status==='reading'&&r.goalDate).forEach(r=>{
+    const goal=new Date(r.goalDate);
+    const diff=Math.ceil((goal-now)/(1000*60*60*24));
+    const key=`notif_reading_${r.id}_${r.goalDate}`;
+    if(diff===3&&!localStorage.getItem(key)){
+      addNotification(`📚 "${r.title}" için 3 gün kaldı! Okumayı hızlandırma vakti.`,'reading');
+      localStorage.setItem(key,'1');
+    } else if(diff===7&&!localStorage.getItem(key+'_7')){
+      addNotification(`📖 "${r.title}" — hedefe 1 hafta kaldı.`,'reading');
+      localStorage.setItem(key+'_7','1');
+    }
+  });
+  // Haftalık özet - Pazar günü
+  if(now.getDay()===0){
+    const weekKey=`notif_weekly_${now.toISOString().split('T')[0]}`;
+    if(!localStorage.getItem(weekKey)){
+      const done=D.completedTodos.filter(t=>{
+        const d=new Date(t.completedAt||0);
+        return now-d<7*24*60*60*1000;
+      }).length;
+      const books=D.reading.filter(r=>r.status==='done'&&r.completedAt&&(now-new Date(r.completedAt))<7*24*60*60*1000).length;
+      if(done>0||books>0){
+        addNotification(`🎉 Bu hafta ${done} görev tamamladın${books>0?` ve ${books} kitap bitirdin`:''} — harika gidiyor!`,'weekly');
+        localStorage.setItem(weekKey,'1');
+      }
+    }
+  }
+}
+
+// ─────────────────────────── GÜNLÜK AI ÖNERİSİ ───────────────────────────
+const DIARY_PROMPTS=[
+  {emoji:'✍️',text:'Bugün seni en çok ne şaşırttı? Beklenmedik bir an, küçük bir detay bile olsa yaz.'},
+  {emoji:'🌊',text:'Bugün duygularınla nasıl bir akış yaşadın? Sabahtan akşama nasıl değişti?'},
+  {emoji:'💡',text:'Bugün aklına gelen en ilginç fikir neydi? Çılgın da olsa yaz!'},
+  {emoji:'🤝',text:'Bugün biriyle yaşadığın anı anlat. Seni nasıl hissettirdi?'},
+  {emoji:'🎯',text:'Bugün tamamladığın küçük bir şeyi kutla. Neydi ve nasıl hissettirdi?'},
+  {emoji:'🌱',text:'Bugün neyi öğrendin? Bir bilgi, bir his, bir farkındalık...'},
+  {emoji:'🔄',text:'Bugünü yeniden yaşasaydın ne farklı yapardın? Neden?'},
+  {emoji:'🌅',text:'Bu anı, 10 yıl sonra nasıl hatırlamak istersin? Yaz, gelecekteki kendin okusun.'},
+  {emoji:'💭',text:'Şu an aklındaki en büyük soru nedir? Cevabını bilmesen de sorunu yaz.'},
+  {emoji:'🎁',text:'Bugün sana "hediye" edilmiş gibi gelen bir an var mıydı? Küçük de olsa...'},
+  {emoji:'🧠',text:'Bugün beyninin sana söylediği ile kalbinin söylediği çakıştı mı? Yoksa çelişti mi?'},
+  {emoji:'🌍',text:'Dünya bu gün sana nasıldı? Hava, insanlar, haberler — içinde nasıl bir yer kapladı?'},
+];
+function getDiaryPrompt(){
+  const day=new Date().getDate()+new Date().getMonth()*31;
+  return DIARY_PROMPTS[day%DIARY_PROMPTS.length];
+}
+function renderDiaryAIPrompt(){
+  const p=getDiaryPrompt();
+  const existing=document.getElementById('diaryAIPromptBox');
+  if(existing)existing.remove();
+  const page=document.getElementById('page-diary');
+  if(!page)return;
+  const box=document.createElement('div');
+  box.id='diaryAIPromptBox';
+  box.className='diary-ai-prompt';
+  box.innerHTML=`<div class="diary-ai-prompt-label">✦ Bugünün İlham Sorusu</div>
+    <div class="diary-ai-prompt-text">${p.emoji} ${escHtml(p.text)}</div>`;
+  page.insertBefore(box,page.firstChild);
+}
+
 window.addEventListener('load',()=>{
   initTheme();
   // Auth state değişince initApp çağrılıyor, burada sadece splash ve seed data
