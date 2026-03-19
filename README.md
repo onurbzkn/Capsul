@@ -162,11 +162,13 @@ header{
 .mode-btn:hover:not(.active){color:var(--text2);background:rgba(255,255,255,.04);}
 
 /* ── MAIN ────────────────────────────────────────────────────────────────── */
-main{flex:1;overflow:hidden;position:relative;}
+main{flex:1;overflow:hidden;position:relative;isolation:auto;}
 .page{position:absolute;inset:0;overflow-y:auto;opacity:0;pointer-events:none;
   transition:opacity .22s,transform .22s;transform:translateY(6px);
   padding:16px 16px calc(var(--nav-h) + 20px);}
 .page.active{opacity:1;pointer-events:all;transform:translateY(0);}
+/* NOT: opacity/transform olan elementler stacking context yaratır.
+   viewOverlay gibi fixed elementler bundan etkilenmesin diye z-index yüksek tutuldu. */
 #page-chat{overflow:hidden;padding:0;display:flex;flex-direction:column;}
 /* ── LIQUID GLASS NAV ────────────────────────────────────────────────────── */
 .nav-wrap{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav-h) + env(safe-area-inset-bottom,0px));display:flex;align-items:flex-start;justify-content:center;padding:8px 16px 0;z-index:100;pointer-events:none;}
@@ -802,7 +804,7 @@ select.pf option{background:var(--bg2);color:var(--text);}
 .tag-chip{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:8px;font-size:.5rem;font-family:'JetBrains Mono',monospace;border:1px solid;cursor:pointer;transition:all .18s;}
 
 /* ── VIEW ────────────────────────────────────────────────────────────────── */
-.view-overlay{position:fixed;inset:0;background:rgba(0,0,0,.86);z-index:250;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .28s;backdrop-filter:blur(8px);}
+.view-overlay{position:fixed;inset:0;background:rgba(0,0,0,.86);z-index:1500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .28s;backdrop-filter:blur(8px);}
 .view-overlay.open{opacity:1;pointer-events:all;}
 .view-sheet{width:100%;max-width:680px;background:var(--bg2);border-radius:20px 20px 0 0;border:1px solid var(--border);border-bottom:none;max-height:88vh;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .38s cubic-bezier(.4,0,.2,1);overflow:hidden;}
 .view-overlay.open .view-sheet{transform:translateY(0);}
@@ -1236,7 +1238,7 @@ select.pf option{background:var(--bg2);color:var(--text);}
     <div class="drawer-divider"></div>
     <button class="drawer-item" onclick="openFromDrawer('privacy')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Gizlilik</button>
     <button class="drawer-item" onclick="openFromDrawer('help')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Yardım</button>
-    <a href="mailto:onurbozkan472@gmail.com" class="drawer-item" style="text-decoration:none;" onclick="toggleDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Bize Ulaşın</a>
+    <button class="drawer-item" onclick="toggleDrawer();setTimeout(openContactModal,300)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Bize Ulaşın</button>
     <div class="drawer-divider"></div>
     <button class="drawer-item danger" onclick="clearAllData()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Tüm Verileri Sil</button>
   </div>
@@ -2661,6 +2663,72 @@ function saveScheduleEdit(id){
   saveData();renderSchedule();document.getElementById('schedEditModal')?.remove();showToast('Ders güncellendi ✓');
 }
 
+function openContactModal(){
+  document.getElementById('contactModal')?.remove();
+  const modal=document.createElement('div');
+  modal.id='contactModal';
+  modal.style.cssText='position:fixed;inset:0;z-index:3500;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:22px;width:100%;max-width:360px;position:relative;">
+    <button onclick="document.getElementById('contactModal').remove()" style="position:absolute;top:10px;right:12px;background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--text3);">✕</button>
+    <div style="font-size:.86rem;font-weight:500;color:var(--text);margin-bottom:4px;">✉️ Bize Ulaşın</div>
+    <div style="font-size:.62rem;color:var(--text3);margin-bottom:14px;">Öneri, hata bildirimi veya her türlü mesajınızı bekliyoruz.</div>
+    <div style="font-size:.66rem;color:var(--text3);margin-bottom:4px;">Adınız</div>
+    <input type="text" id="contactName" placeholder="Adınız..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:'Sora',sans-serif;font-size:.82rem;color:var(--text);outline:none;margin-bottom:8px;box-sizing:border-box;">
+    <div style="font-size:.66rem;color:var(--text3);margin-bottom:4px;">E-posta (yanıt için)</div>
+    <input type="email" id="contactEmail" placeholder="ornek@mail.com" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:'Sora',sans-serif;font-size:.82rem;color:var(--text);outline:none;margin-bottom:8px;box-sizing:border-box;">
+    <div style="font-size:.66rem;color:var(--text3);margin-bottom:4px;">Mesajınız</div>
+    <textarea id="contactMsg" placeholder="Mesajınızı yazın..." rows="4" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:'Sora',sans-serif;font-size:.82rem;color:var(--text);outline:none;resize:none;margin-bottom:12px;box-sizing:border-box;"></textarea>
+    <button id="contactSendBtn" onclick="sendContactForm()" style="width:100%;padding:11px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:10px;color:#fff;font-family:'Sora',sans-serif;font-size:.84rem;cursor:pointer;transition:opacity .2s;">Gönder</button>
+    <div id="contactStatus" style="text-align:center;font-size:.68rem;color:var(--text3);margin-top:8px;display:none;"></div>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+}
+
+async function sendContactForm(){
+  const name=document.getElementById('contactName')?.value.trim();
+  const email=document.getElementById('contactEmail')?.value.trim();
+  const msg=document.getElementById('contactMsg')?.value.trim();
+  if(!msg){showToast('Mesaj boş olamaz');return;}
+  const btn=document.getElementById('contactSendBtn');
+  const status=document.getElementById('contactStatus');
+  btn.disabled=true;btn.textContent='Gönderiliyor...';btn.style.opacity='.6';
+  // EmailJS ile gönder (public key gerekmiyor - sadece template)
+  try{
+    const res=await fetch('https://api.emailjs.com/api/v1.0/email/send',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        service_id:'service_capsula',
+        template_id:'template_contact',
+        user_id:'YOUR_PUBLIC_KEY',
+        template_params:{
+          from_name:name||'Anonim',
+          from_email:email||'belirtilmedi',
+          message:msg,
+          app_version:'Capsula v4'
+        }
+      })
+    });
+    if(res.ok){
+      btn.style.display='none';
+      status.style.display='block';status.style.color='var(--easy)';
+      status.textContent='✓ Mesajınız iletildi! Teşekkür ederiz.';
+      showToast('Mesaj gönderildi ✓');
+    } else {
+      throw new Error('API hatası');
+    }
+  }catch(e){
+    // EmailJS kurulmamışsa mailto fallback
+    const subject=encodeURIComponent('Capsula Uygulama Geri Bildirimi');
+    const body=encodeURIComponent(`Ad: ${name||'-'}\nEmail: ${email||'-'}\n\n${msg}`);
+    window.location.href=`mailto:onurbozkan472@gmail.com?subject=${subject}&body=${body}`;
+    btn.disabled=false;btn.textContent='Gönder';btn.style.opacity='1';
+    status.style.display='block';status.style.color='var(--text3)';
+    status.textContent='Mail uygulamanız açıldı.';
+  }
+}
+
 function checkRecurringTodos(){
   const today=new Date().toISOString().split('T')[0];
   const lastCheck=localStorage.getItem('capsula_recurring_check');
@@ -2963,16 +3031,17 @@ function renderNotes(){
   grid.innerHTML=D.notes.map(n=>{
     const media=(n.media||[]).map(m=>`<span class="note-media-tag">${m.type}</span>`).join('');
     const tags=(n.tags||[]).map(t=>`<span class="note-tag-chip" style="color:${tagColor(t)};border-color:${tagColor(t)}44;">#${escHtml(t)}</span>`).join('');
-    return`<div class="note-card" style="overflow:visible;">
-      <button onclick="openNoteEdit(${n.id})" style="position:absolute;top:-6px;right:-6px;z-index:10;width:26px;height:26px;background:var(--bg3);border:1px solid var(--border);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);transition:all .18s;box-shadow:0 2px 6px rgba(0,0,0,.3);" onmouseover="this.style.background='var(--accent)';this.style.color='#fff';this.style.borderColor='var(--accent)'" onmouseout="this.style.background='var(--bg3)';this.style.color='var(--text3)';this.style.borderColor='var(--border)'">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:11px;height:11px;pointer-events:none;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      </button>
-      <div onclick="viewEntry('note',${n.id})" style="cursor:pointer;flex:1;display:flex;flex-direction:column;gap:7px;">
+    return`<div class="note-card" style="overflow:hidden;cursor:pointer;padding:0;">
+      <div onclick="viewEntry('note',${n.id})" style="padding:14px 14px 10px;display:flex;flex-direction:column;gap:6px;">
         <div class="note-card-title">${escHtml(n.title||'Başlıksız')}</div>
         <div class="note-card-preview">${escHtml(n.content||'')}</div>
         ${tags?`<div style="display:flex;gap:3px;flex-wrap:wrap;">${tags}</div>`:''}
         <div style="display:flex;gap:3px;flex-wrap:wrap;">${media}</div>
         <div class="note-card-date">${fmtDate(n.createdAt)}</div>
+      </div>
+      <div style="display:flex;border-top:1px solid var(--border);">
+        <button onclick="openNoteEdit(${n.id})" style="flex:1;background:none;border:none;border-right:1px solid var(--border);padding:7px 0;font-size:.62rem;color:var(--text3);cursor:pointer;font-family:'Sora',sans-serif;transition:background .15s;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">✏️ Düzenle</button>
+        <button onclick="deleteNoteConfirm(${n.id})" style="flex:1;background:none;border:none;padding:7px 0;font-size:.62rem;color:var(--text3);cursor:pointer;font-family:'Sora',sans-serif;transition:background .15s;" onmouseover="this.style.background='rgba(248,113,113,.08)';this.style.color='var(--hard)'" onmouseout="this.style.background='none';this.style.color='var(--text3)'">🗑 Sil</button>
       </div>
     </div>`;
   }).join('');
@@ -3034,6 +3103,11 @@ function viewEntry(type,id){
   const arr=type==='note'?D.notes:D.diary;
   const entry=arr.find(e=>e.id===id);if(!entry)return;
   viewingEntry={type,id};
+  // viewOverlay'i body'nin direkt altına al (transform stacking context sorununu önlemek için)
+  const overlay=document.getElementById('viewOverlay');
+  if(overlay&&overlay.parentElement!==document.body){
+    document.body.appendChild(overlay);
+  }
   const badge=document.getElementById('viewBadge');badge.textContent=type==='note'?'Not':'Günlük Girişi';badge.className='etb '+type;
   const editBtn=document.getElementById('viewEditBtn');
   if(editBtn)editBtn.style.display=type==='note'?'inline-flex':'none';
@@ -3042,7 +3116,7 @@ function viewEntry(type,id){
   const tagsH=(entry.tags||[]).length?`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;">${(entry.tags||[]).map(t=>`<span class="tag-chip" style="color:${tagColor(t)};border-color:${tagColor(t)}44;">#${escHtml(t)}</span>`).join('')}</div>`:'';
   document.getElementById('viewBody').innerHTML=`${entry.mood?`<div style="font-size:1.3rem;margin-bottom:7px">${entry.mood}</div>`:''}<div class="view-title">${escHtml(entry.title)}</div><div class="view-meta">${fmtDateFull(entry.createdAt)}</div>${tagsH}<div class="view-text">${escHtml(entry.content)}</div>${mH}<button class="view-delete-btn" id="viewDeleteBtn">🗑 Çöpe Taşı</button>`;
   document.getElementById('viewDeleteBtn').addEventListener('click',()=>deleteEntry());
-  document.getElementById('viewOverlay').classList.add('open');
+  overlay.classList.add('open');
 }
 function openCurrentEntryEdit(){
   if(!viewingEntry)return;
