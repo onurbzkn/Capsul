@@ -1236,6 +1236,7 @@ select.pf option{background:var(--bg2);color:var(--text);}
     <div class="drawer-divider"></div>
     <button class="drawer-item" onclick="openFromDrawer('privacy')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Gizlilik</button>
     <button class="drawer-item" onclick="openFromDrawer('help')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Yardım</button>
+    <a href="mailto:onurbozkan472@gmail.com" class="drawer-item" style="text-decoration:none;" onclick="toggleDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Bize Ulaşın</a>
     <div class="drawer-divider"></div>
     <button class="drawer-item danger" onclick="clearAllData()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Tüm Verileri Sil</button>
   </div>
@@ -1717,6 +1718,7 @@ select.pf option{background:var(--bg2);color:var(--text);}
     <div class="view-handle"></div>
     <div class="view-header">
       <span class="etb" id="viewBadge">Not</span>
+      <button id="viewEditBtn" onclick="openCurrentEntryEdit()" style="background:none;border:1px solid var(--border);border-radius:7px;padding:5px 10px;cursor:pointer;font-size:.62rem;color:var(--text2);font-family:'JetBrains Mono',monospace;margin-right:6px;transition:all .18s;" onmouseover="this.style.borderColor='var(--accent2)';this.style.color='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">✏️ Düzenle</button>
       <button class="view-close-btn" onclick="closeView()">✕</button>
     </div>
     <div class="view-body" id="viewBody"></div>
@@ -2900,22 +2902,52 @@ function dropTodoOnDay(e,dateKey){
 }
 function renderTodos(){
   const labels={hard:'Zor',mid:'Orta',easy:'Kolay'};
+  const clr={easy:'var(--easy)',mid:'var(--mid)',hard:'var(--hard)'};
   const today=new Date();today.setHours(0,0,0,0);
   const todayKey=today.toISOString().split('T')[0];
-  const noDue=D.todos.filter(t=>!t.dueDate);
-  const dated=D.todos.filter(t=>t.dueDate).sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
-  let html='';
-  const overdue=dated.filter(t=>new Date(t.dueDate)<today);
-  if(overdue.length){html+=`<div class="todo-group"><div class="todo-group-label" style="color:var(--hard)">⚠ Gecikmiş</div>`;overdue.forEach(t=>html+=todoItemHtml(t,labels,getDueLabel(t.dueDate),'overdue'));html+='</div>';}
-  const todayTodos=dated.filter(t=>t.dueDate===todayKey);
-  if(todayTodos.length){html+=`<div class="todo-group"><div class="todo-group-label" style="color:var(--easy)">Bugün</div>`;todayTodos.forEach(t=>html+=todoItemHtml(t,labels,'Bugün','today'));html+='</div>';}
-  const future=dated.filter(t=>new Date(t.dueDate)>today&&t.dueDate!==todayKey);
-  if(future.length){const mg={};future.forEach(t=>{const[y,m]=t.dueDate.split('-');const k=`${y}-${m}`;if(!mg[k])mg[k]=[];mg[k].push(t);});const mn=['','Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];Object.keys(mg).sort().forEach(k=>{const[y,m]=k.split('-');html+=`<div class="todo-group"><div class="todo-group-label">${mn[+m]} ${y}</div>`;mg[k].forEach(t=>html+=todoItemHtml(t,labels,getDueLabel(t.dueDate),getDueClass(t.dueDate)));html+='</div>';});}
-  if(noDue.length){html+=`<div class="todo-group"><div class="todo-group-label">Tarihi Yok</div>`;noDue.forEach(t=>html+=todoItemHtml(t,labels,'',''));html+='</div>';}
+  // 3 öncelik sütunu
+  const cols=[
+    {key:'easy',lbl:'Kolay',clr:'var(--easy)',ico:'🟢'},
+    {key:'mid',lbl:'Orta',clr:'var(--mid)',ico:'🟡'},
+    {key:'hard',lbl:'Zor',clr:'var(--hard)',ico:'🔴'},
+  ];
+  let html='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;">';
+  cols.forEach(col=>{
+    const items=D.todos.filter(t=>(t.priority||'mid')===col.key);
+    html+=`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+      <div style="padding:9px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:5px;">
+        <span style="font-size:.6rem;">${col.ico}</span>
+        <span style="font-size:.72rem;font-weight:500;color:${col.clr};">${col.lbl}</span>
+        <span style="font-size:.58rem;font-family:'JetBrains Mono',monospace;color:var(--text3);margin-left:auto;">${items.length}</span>
+      </div>
+      <div style="padding:8px 8px;display:flex;flex-direction:column;gap:5px;min-height:60px;">`;
+    items.forEach(t=>{
+      const isOverdue=t.dueDate&&new Date(t.dueDate)<today;
+      const isToday=t.dueDate===todayKey;
+      html+=`<div style="background:var(--bg3);border:1px solid ${isOverdue?'rgba(248,113,113,.3)':isToday?'rgba(124,111,247,.25)':'var(--border)'};border-radius:8px;padding:7px 8px;cursor:pointer;position:relative;" ondragstart="dragTodo(event,${t.id})" draggable="true">
+        <div style="font-size:.72rem;color:var(--text2);line-height:1.4;padding-right:28px;" onclick="openTodoEdit(${t.id})">${escHtml(t.text)}</div>
+        ${t.dueDate?`<div style="font-size:.54rem;font-family:'JetBrains Mono',monospace;color:${isOverdue?'var(--hard)':isToday?'var(--accent2)':'var(--text3)'};margin-top:3px;">${isToday?'Bugün':getDueLabel(t.dueDate)}</div>`:''}
+        ${t.repeat?`<div style="font-size:.5rem;color:var(--accent2);">🔁 ${t.repeat==='daily'?'Günlük':t.repeat==='weekly'?'Haftalık':'Aylık'}</div>`:''}
+        <button onclick="completeTodo(${t.id})" style="position:absolute;top:5px;right:5px;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;" onmouseover="this.style.background='var(--easy)';this.style.borderColor='var(--easy)'" onmouseout="this.style.background='none';this.style.borderColor='var(--border)'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:9px;height:9px;pointer-events:none;"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+      </div>`;
+    });
+    if(!items.length)html+=`<div style="font-size:.64rem;color:var(--text3);text-align:center;padding:10px 0;font-style:italic;">Görev yok</div>`;
+    html+='</div></div>';
+  });
+  html+='</div>';
   if(!D.todos.length)html='<div class="empty-state">Aktif görev yok 🎉</div>';
   document.getElementById('todo-active-list').innerHTML=html;
   let ch='';
-  if(D.completedTodos.length){ch=`<button class="completed-toggle ${completedOpen?'open':''}" onclick="toggleCompleted()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>Tamamlananlar<span class="completed-badge">${D.completedTodos.length}</span></button><div class="completed-list ${completedOpen?'open':''}">`;D.completedTodos.forEach(t=>{ch+=`<div class="todo-item done ${t.priority}" id="todo-done-${t.id}"><div class="todo-check" onclick="uncompleteTodo(${t.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:9px;height:9px;color:var(--text3)"><polyline points="20 6 9 17 4 12"/></svg></div><div class="todo-body"><div class="todo-text">${escHtml(t.text)}</div><div class="todo-meta"><span class="due-tag">${fmtDate(t.completedAt)}</span></div></div><button onclick="moveTodoToTrash(${t.id})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:.75rem;padding:2px 4px;" onmouseover="this.style.color='var(--hard)'" onmouseout="this.style.color='var(--text3)'">🗑</button></div>`;});ch+='</div>';}
+  if(D.completedTodos.length){
+    ch=`<button class="completed-toggle ${completedOpen?'open':''}" onclick="toggleCompleted()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>Tamamlananlar<span class="completed-badge">${D.completedTodos.length}</span></button>
+    <div class="completed-list ${completedOpen?'open':''}">`;
+    D.completedTodos.forEach(t=>{
+      ch+=`<div class="todo-item done ${t.priority}" id="todo-done-${t.id}"><div class="todo-check" onclick="uncompleteTodo(${t.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:9px;height:9px;color:var(--text3)"><polyline points="20 6 9 17 4 12"/></svg></div><div class="todo-body"><div class="todo-text">${escHtml(t.text)}</div><div class="todo-meta"><span class="due-tag">${fmtDate(t.completedAt)}</span></div></div><button onclick="moveTodoToTrash(${t.id})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:.75rem;padding:2px 4px;" onmouseover="this.style.color='var(--hard)'" onmouseout="this.style.color='var(--text3)'">🗑</button></div>`;
+    });
+    ch+='</div>';
+  }
   document.getElementById('todo-completed-section').innerHTML=ch;
 }
 function toggleCompleted(){completedOpen=!completedOpen;renderTodos();}
@@ -3003,12 +3035,19 @@ function viewEntry(type,id){
   const entry=arr.find(e=>e.id===id);if(!entry)return;
   viewingEntry={type,id};
   const badge=document.getElementById('viewBadge');badge.textContent=type==='note'?'Not':'Günlük Girişi';badge.className='etb '+type;
+  const editBtn=document.getElementById('viewEditBtn');
+  if(editBtn)editBtn.style.display=type==='note'?'inline-flex':'none';
   let mH='';
   if(entry.media?.length){const imgs=entry.media.filter(m=>m.type==='image').map(m=>`<img src="${m.data}">`).join('');const vids=entry.media.filter(m=>m.type==='video').map(m=>`<video src="${m.data}" controls style="width:100%;border-radius:9px;margin-top:7px"></video>`).join('');const auds=entry.media.filter(m=>m.type==='audio').map(m=>`<audio src="${m.data}" controls style="width:100%;margin-top:7px"></audio>`).join('');mH=`<div class="view-media-grid">${imgs}${vids}</div>${auds}`;}
   const tagsH=(entry.tags||[]).length?`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;">${(entry.tags||[]).map(t=>`<span class="tag-chip" style="color:${tagColor(t)};border-color:${tagColor(t)}44;">#${escHtml(t)}</span>`).join('')}</div>`:'';
   document.getElementById('viewBody').innerHTML=`${entry.mood?`<div style="font-size:1.3rem;margin-bottom:7px">${entry.mood}</div>`:''}<div class="view-title">${escHtml(entry.title)}</div><div class="view-meta">${fmtDateFull(entry.createdAt)}</div>${tagsH}<div class="view-text">${escHtml(entry.content)}</div>${mH}<button class="view-delete-btn" id="viewDeleteBtn">🗑 Çöpe Taşı</button>`;
   document.getElementById('viewDeleteBtn').addEventListener('click',()=>deleteEntry());
   document.getElementById('viewOverlay').classList.add('open');
+}
+function openCurrentEntryEdit(){
+  if(!viewingEntry)return;
+  closeView();
+  setTimeout(()=>openNoteEdit(viewingEntry.id),200);
 }
 function closeView(){document.getElementById('viewOverlay').classList.remove('open');}
 document.getElementById('viewOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('viewOverlay'))closeView();});
@@ -3312,14 +3351,48 @@ function renderPomoTodos(){
   const items=D.todos.filter(t=>!t.dueDate||t.dueDate<=tk).slice(0,8);
   document.getElementById('pomoTodoList').innerHTML=items.length?items.map(t=>`<div class="pomo-todo-item ${pomoTaskId===t.id?'selected':''}" onclick="setPomoTask(${t.id})"><div class="todo-dot ${t.priority}"></div><div class="todo-text">${escHtml(t.text)}</div></div>`).join(''):'<div class="empty-state">Görev yok</div>';
 }
-function setPomoTask(id){pomoTaskId=id;const t=D.todos.find(x=>x.id===id);if(t)document.getElementById('pomoTaskLbl').textContent='🎯 '+t.text;renderPomoTodos();}
+function setPomoTask(id){
+  if(pomoTaskId===id){pomoTaskId=null;document.getElementById('pomoTaskLbl').textContent='Görev seçmek için aşağıya tıkla';}
+  else{pomoTaskId=id;const t=D.todos.find(x=>x.id===id);if(t)document.getElementById('pomoTaskLbl').textContent='🎯 '+t.text;}
+  renderPomoTodos();
+}
 
 // ─────────────────────────── KANBAN ───────────────────────────────────────
 function selKanbanP(p){kanbanPriority=p;document.querySelectorAll('[data-kp]').forEach(el=>el.classList.toggle('sel',el.dataset.kp===p));}
 function openKanbanAdd(){openModal('kanbanAddModal');}
 function saveKanbanCard(){const text=document.getElementById('kanbanAddText').value.trim();const col=document.getElementById('kanbanAddCol').value;if(!text)return;D.kanban[col].push({id:Date.now(),text,priority:kanbanPriority,createdAt:new Date().toISOString()});saveData();closeModal('kanbanAddModal');document.getElementById('kanbanAddText').value='';renderKanban();showToast('Kart eklendi');}
 function moveKanbanCard(id,fromCol,dir){const cols=['todo','doing','done'];const fi=cols.indexOf(fromCol);const ti=fi+dir;if(ti<0||ti>2)return;const idx=D.kanban[fromCol].findIndex(c=>c.id===id);if(idx===-1)return;const card=D.kanban[fromCol].splice(idx,1)[0];D.kanban[cols[ti]].push(card);saveData();renderKanban();}
-function syncKanbanFromTodos(){D.todos.forEach(t=>{const exists=Object.values(D.kanban).some(col=>col.some(c=>c.id===t.id));if(!exists)D.kanban.todo.push({id:t.id,text:t.text,priority:t.priority,createdAt:t.createdAt});});saveData();renderKanban();showToast('Görevler aktarıldı');}
+function syncKanbanFromTodos(){
+  const notInKanban=D.todos.filter(t=>!Object.values(D.kanban).some(col=>col.some(c=>c.id===t.id)));
+  if(!notInKanban.length){showToast('Tüm görevler zaten aktarılmış');return;}
+  const modal=document.createElement('div');
+  modal.id='kanbanImportModal';
+  modal.style.cssText='position:fixed;inset:0;z-index:3500;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const clr={easy:'var(--easy)',mid:'var(--mid)',hard:'var(--hard)'};
+  modal.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px;width:100%;max-width:380px;max-height:80vh;display:flex;flex-direction:column;">
+    <div style="font-size:.86rem;font-weight:500;color:var(--text);margin-bottom:12px;">📋 Hangi görevleri aktaralım?</div>
+    <div style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+      ${notInKanban.map(t=>`<label style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg3);border-radius:9px;cursor:pointer;border:1px solid var(--border);">
+        <input type="checkbox" value="${t.id}" checked style="accent-color:var(--accent);width:15px;height:15px;flex-shrink:0;">
+        <div style="flex:1;min-width:0;"><div style="font-size:.78rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(t.text)}</div><div style="font-size:.58rem;color:${clr[t.priority||'mid']};">${t.priority==='easy'?'Kolay':t.priority==='hard'?'Zor':'Orta'}</div></div>
+      </label>`).join('')}
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="document.getElementById('kanbanImportModal').remove()" style="flex:1;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;color:var(--text2);font-family:'Sora',sans-serif;font-size:.8rem;cursor:pointer;">İptal</button>
+      <button id="kanbanImportBtn" style="flex:1;padding:10px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:9px;color:#fff;font-family:'Sora',sans-serif;font-size:.8rem;cursor:pointer;">Aktar</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  document.getElementById('kanbanImportBtn').onclick=()=>{
+    const checked=[...modal.querySelectorAll('input[type=checkbox]:checked')].map(i=>parseInt(i.value));
+    let count=0;
+    D.todos.filter(t=>checked.includes(t.id)).forEach(t=>{
+      D.kanban.todo.push({id:t.id,text:t.text,priority:t.priority,createdAt:t.createdAt});count++;
+    });
+    saveData();renderKanban();modal.remove();showToast(count+' görev aktarıldı ✓');
+  };
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+}
 function renderKanban(){
   const cols=[{id:'todo',label:'Yapılacak'},{id:'doing',label:'Devam Eden'},{id:'done',label:'Tamamlandı'}];
   const clr={easy:'var(--easy)',mid:'var(--mid)',hard:'var(--hard)'};
@@ -3532,67 +3605,94 @@ function saveReadingItem(){
 }
 function cycleReadingStatus(id){const item=D.reading.find(r=>r.id===id);if(!item)return;const cycle={toread:'reading',reading:'done',done:'toread'};item.status=cycle[item.status];saveData();renderReading();}
 function renderReading(){
-  const groups={reading:[],toread:[],done:[]};
-  D.reading.forEach(r=>groups[r.status].push(r));
-  const labels={reading:'📖 Okunuyor',toread:'📌 Okunacak',done:'✅ Tamamlandı'};
+  const cols=[
+    {key:'reading',lbl:'📖 Okunuyor',clr:'var(--accent2)'},
+    {key:'toread',lbl:'📌 Okunacak',clr:'var(--text3)'},
+    {key:'done',lbl:'✅ Bitti',clr:'var(--easy)'},
+  ];
   const typeIco={book:'📚',article:'📄',paper:'🔬',other:'📎'};
-  let html='';
-
-  // Okunuyor grubunu üstte göster - ilerleme çubuğuyla
-  if(groups.reading.length){
-    html+=`<div class="reading-group-title">${labels.reading}</div>`;
-    groups.reading.forEach(item=>{
-      const pct=item.pages?Math.min(100,Math.round((item.pagesRead||0)/item.pages*100)):0;
+  // 3 sütun layout
+  let html='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;">';
+  cols.forEach(col=>{
+    const items=D.reading.filter(r=>r.status===col.key);
+    html+=`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+      <div style="padding:9px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:5px;">
+        <span style="font-size:.68rem;font-weight:500;color:${col.clr};">${col.lbl}</span>
+        <span style="font-size:.58rem;font-family:'JetBrains Mono',monospace;color:var(--text3);margin-left:auto;">${items.length}</span>
+      </div>
+      <div style="padding:8px;display:flex;flex-direction:column;gap:6px;min-height:60px;">`;
+    items.forEach(item=>{
       const ico=typeIco[item.type||'book']||'📚';
-      html+=`<div class="reading-item" style="flex-direction:column;align-items:stretch;gap:8px;" onclick="openReadingDetail(${item.id})">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="font-size:1.2rem;flex-shrink:0;">${ico}</div>
+      const pct=item.pages?Math.min(100,Math.round((item.pagesRead||0)/item.pages*100)):0;
+      html+=`<div style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:8px;position:relative;">
+        <div style="display:flex;align-items:flex-start;gap:5px;margin-bottom:${item.pages&&col.key==='reading'?'5px':'0'};">
+          <span style="font-size:.8rem;flex-shrink:0;">${ico}</span>
           <div style="flex:1;min-width:0;">
-            <div class="reading-title">${escHtml(item.title)}</div>
-            ${item.author?`<div class="reading-author">${escHtml(item.author)}</div>`:''}
+            <div style="font-size:.68rem;color:var(--text2);line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${escHtml(item.title)}</div>
+            ${item.author?`<div style="font-size:.56rem;color:var(--text3);margin-top:1px;">${escHtml(item.author)}</div>`:''}
           </div>
-          <button onclick="event.stopPropagation();openReadingPageUpdate(${item.id})" style="background:var(--accent);border:none;border-radius:7px;padding:4px 10px;font-size:.62rem;color:#fff;cursor:pointer;white-space:nowrap;">Sayfa gir</button>
+          <div style="display:flex;gap:2px;flex-shrink:0;">
+            <button onclick="cycleReadingStatus(${item.id})" title="Durum değiştir" style="background:none;border:1px solid var(--border);border-radius:5px;cursor:pointer;color:var(--text3);width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:.58rem;transition:all .15s;" onmouseover="this.style.background='rgba(124,111,247,.15)'" onmouseout="this.style.background='none'">↕</button>
+            <button onclick="openReadingEdit(${item.id})" title="Düzenle" style="background:none;border:1px solid var(--border);border-radius:5px;cursor:pointer;color:var(--text3);width:20px;height:20px;display:flex;align-items:center;justify-content:center;transition:all .15s;" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text3)'">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:9px;height:9px;pointer-events:none;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button onclick="deleteReadingItem(${item.id})" title="Sil" style="background:none;border:1px solid var(--border);border-radius:5px;cursor:pointer;color:var(--text3);width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:.7rem;transition:all .15s;" onmouseover="this.style.color='var(--hard)'" onmouseout="this.style.color='var(--text3)'">✕</button>
+          </div>
         </div>
-        ${item.pages?`
-        <div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
-            <span style="font-size:.58rem;color:var(--text3);">${item.pagesRead||0} / ${item.pages} sayfa</span>
-            <span style="font-size:.58rem;font-family:'JetBrains Mono',monospace;color:var(--accent2);">${pct}%</span>
-          </div>
-          <div style="background:var(--bg3);border-radius:4px;height:5px;overflow:hidden;">
-            <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width .4s;"></div>
-          </div>
-          ${getReadingAIEstimate(item)}
-        </div>`:''}
+        ${item.pages&&col.key==='reading'?`<div style="background:var(--bg2);border-radius:3px;height:3px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;"></div></div><div style="font-size:.5rem;color:var(--accent2);font-family:'JetBrains Mono',monospace;margin-top:2px;">${pct}%</div>`:''}
+        ${item.goalDate&&col.key!=='done'?`<div style="font-size:.5rem;color:var(--text3);margin-top:2px;">🎯 ${item.goalDate}</div>`:''}
       </div>`;
     });
-  }
-
-  ['toread','done'].forEach(s=>{
-    if(!groups[s].length)return;
-    html+=`<div class="reading-group-title">${labels[s]}</div>`;
-    groups[s].forEach(item=>{
-      const ico=typeIco[item.type||'book']||'📚';
-      const pct=item.pages?Math.min(100,Math.round((item.pagesRead||0)/item.pages*100)):0;
-      html+=`<div class="reading-item" onclick="openReadingDetail(${item.id})">
-        <div style="font-size:1.1rem;flex-shrink:0;">${ico}</div>
-        <div class="reading-info" style="flex:1;min-width:0;">
-          <div class="reading-title">${escHtml(item.title)}</div>
-          ${item.author?`<div class="reading-author">${escHtml(item.author)}</div>`:''}
-          ${item.pages&&s==='done'?`<div style="font-size:.56rem;color:var(--easy);margin-top:2px;">${item.pages} sayfa tamamlandı</div>`:''}
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-          <span class="reading-badge ${item.status}">${s==='done'?'✓':'📌'}</span>
-          ${item.goalDate?`<span style="font-size:.52rem;font-family:'JetBrains Mono',monospace;color:var(--text3);">${item.goalDate}</span>`:''}
-        </div>
-      </div>`;
-    });
+    if(!items.length)html+=`<div style="font-size:.62rem;color:var(--text3);text-align:center;padding:12px 0;font-style:italic;">Boş</div>`;
+    html+='</div></div>';
   });
-
-  document.getElementById('readingList').innerHTML=html||'<div class="empty-state">Okuma listesi boş.<br>Üstten kitap ekle.</div>';
+  html+='</div>';
+  document.getElementById('readingList').innerHTML=html;
   updateReadingTodayCard();
 }
 
+function openReadingEdit(id){
+  const item=D.reading.find(r=>r.id===id);if(!item)return;
+  const modal=document.createElement('div');
+  modal.id='readingEditModal';
+  modal.style.cssText='position:fixed;inset:0;z-index:3500;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:22px;width:100%;max-width:360px;max-height:88vh;overflow-y:auto;position:relative;">
+    <button onclick="document.getElementById('readingEditModal').remove()" style="position:absolute;top:10px;right:12px;background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--text3);">✕</button>
+    <div style="font-size:.86rem;font-weight:500;color:var(--text);margin-bottom:14px;">✏️ Düzenle</div>
+    <input type="text" id="reTitle" value="${escHtml(item.title)}" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:'Sora',sans-serif;font-size:.84rem;color:var(--text);outline:none;margin-bottom:8px;box-sizing:border-box;">
+    <input type="text" id="reAuthor" value="${escHtml(item.author||'')}" placeholder="Yazar..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:'Sora',sans-serif;font-size:.82rem;color:var(--text);outline:none;margin-bottom:8px;box-sizing:border-box;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+      <div><div style="font-size:.62rem;color:var(--text3);margin-bottom:3px;">Toplam Sayfa</div><input type="number" id="rePages" value="${item.pages||''}" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:'Sora',sans-serif;font-size:.8rem;color:var(--text);outline:none;box-sizing:border-box;"></div>
+      <div><div style="font-size:.62rem;color:var(--text3);margin-bottom:3px;">Okunan Sayfa</div><input type="number" id="reRead" value="${item.pagesRead||0}" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:'Sora',sans-serif;font-size:.8rem;color:var(--text);outline:none;box-sizing:border-box;"></div>
+    </div>
+    <div style="font-size:.62rem;color:var(--text3);margin-bottom:3px;">Durum</div>
+    <select id="reStatus" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:'Sora',sans-serif;font-size:.8rem;color:var(--text);outline:none;margin-bottom:8px;box-sizing:border-box;">
+      <option value="toread" ${item.status==='toread'?'selected':''}>📌 Okunacak</option>
+      <option value="reading" ${item.status==='reading'?'selected':''}>📖 Okunuyor</option>
+      <option value="done" ${item.status==='done'?'selected':''}>✅ Tamamlandı</option>
+    </select>
+    <div style="display:flex;gap:8px;margin-top:6px;">
+      <button onclick="saveReadingEdit(${id})" style="flex:1;padding:11px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:10px;color:#fff;font-family:'Sora',sans-serif;font-size:.84rem;cursor:pointer;">Kaydet</button>
+      <button onclick="deleteReadingItem(${id});document.getElementById('readingEditModal')?.remove()" style="padding:11px 14px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);border-radius:10px;color:var(--hard);font-family:'Sora',sans-serif;font-size:.84rem;cursor:pointer;">Sil</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+}
+function saveReadingEdit(id){
+  const item=D.reading.find(r=>r.id===id);if(!item)return;
+  item.title=document.getElementById('reTitle')?.value.trim()||item.title;
+  item.author=document.getElementById('reAuthor')?.value.trim()||'';
+  item.pages=parseInt(document.getElementById('rePages')?.value)||0;
+  item.pagesRead=parseInt(document.getElementById('reRead')?.value)||0;
+  item.status=document.getElementById('reStatus')?.value||item.status;
+  if(item.status==='done'&&!item.completedAt)item.completedAt=new Date().toISOString();
+  saveData();renderReading();document.getElementById('readingEditModal')?.remove();showToast('Güncellendi ✓');
+}
+function deleteReadingItem(id){
+  D.reading=D.reading.filter(r=>r.id!==id);
+  saveData();renderReading();showToast('Silindi');
+}
 function getReadingAIEstimate(item){
   if(!item.pages||!item.pagesRead||!item.startDate)return'';
   const start=new Date(item.startDate);const now=new Date();
@@ -4459,7 +4559,6 @@ function updateNotifBadge(){
 }
 function openNotifications(){
   const notifs=getNotifications();
-  // Okundu işaretle
   notifs.forEach(n=>n.read=true);
   localStorage.setItem('capsula_notifs',JSON.stringify(notifs));
   updateNotifBadge();
@@ -4467,14 +4566,25 @@ function openNotifications(){
   if(!notifs.length){
     list.innerHTML='<div style="text-align:center;padding:30px;color:var(--text3);font-size:.74rem;">Henüz bildirim yok</div>';
   } else {
-    list.innerHTML=notifs.map(n=>`
-      <div class="notif-item">
+    list.innerHTML=notifs.map((n,idx)=>`
+      <div class="notif-item" style="position:relative;">
         <div class="notif-dot${n.read?'':' unread'}"></div>
-        <div class="notif-text">${escHtml(n.text)}</div>
-        <div class="notif-time">${new Date(n.time).toLocaleDateString('tr-TR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div>
+        <div class="notif-text" style="flex:1;padding-right:28px;">${escHtml(n.text)}</div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div class="notif-time">${new Date(n.time).toLocaleDateString('tr-TR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div>
+          <button onclick="deleteNotif(${n.id})" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:2px 4px;border-radius:4px;font-size:.7rem;transition:color .15s;" onmouseover="this.style.color='var(--hard)'" onmouseout="this.style.color='var(--text3)'" title="Sil">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+          </button>
+        </div>
       </div>`).join('');
   }
   openModal('notificationsModal');
+}
+function deleteNotif(id){
+  const notifs=getNotifications().filter(n=>n.id!==id);
+  localStorage.setItem('capsula_notifs',JSON.stringify(notifs));
+  updateNotifBadge();
+  openNotifications(); // yenile
 }
 function clearAllNotifs(){
   localStorage.setItem('capsula_notifs','[]');
