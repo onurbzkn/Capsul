@@ -1,0 +1,14 @@
+{
+  "packageId": "com.capsulaapp.app",
+  "host": "capsulaapp.com",
+  "name": "Capsula",
+  "launcherName": "Capsula",
+  "display": "standalone",
+  "orientation": "portrait",
+  "themeColor": "#0d0d12",
+  "backgroundColor": "#0d0d12",
+  "startUrl": "/app/",
+  "iconUrl": "https://capsulaapp.com/icon.png",
+  "signingMode": "none",
+  "generatorApp": "bubblewrap"
+}
