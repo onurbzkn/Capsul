@@ -3,6 +3,6 @@
   "target": {
     "namespace": "android_app",
     "package_name": "com.capsulaapp.twa",
-    "sha256_cert_fingerprints": ["9A:04:EC:B6:61:49:55:BB:A0:A1:0F:18:B0:7F:C1:8A:B3:43:09:54:AA:73:8A:45:55:88:65:67:C7:96:ED:0E"]
+    "sha256_cert_fingerprints": ["2E:45:D9:3C:38:3E:57:11:16:AE:62:BB:44:FA:12:30:C3:DF:7D:4A:91:CA:30:95:1A:88:2A:35:D0:82:5F:FA"]
   }
 }]
