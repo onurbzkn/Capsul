@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
@@ -400,6 +400,10 @@ main{flex:1;overflow:hidden;position:relative;}
 .dash-quote-author{font-size:.54rem;color:var(--accent2);font-family:'JetBrains Mono',monospace;letter-spacing:.1em;}
 
 /* ── POMODORO ────────────────────────────────────────────────────────────── */
+.pomo-style-opt{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:10px;cursor:pointer;border:1.5px solid var(--border);transition:all .18s;background:var(--bg2);}
+.pomo-style-opt span{font-size:.52rem;font-family:'JetBrains Mono',monospace;color:var(--text3);}
+.pomo-style-opt.active{border-color:var(--accent);background:rgba(124,111,247,.1);}
+.pomo-style-opt.active span{color:var(--accent2);}
 .pomo-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px;text-align:center;position:relative;overflow:hidden;}
 .pomo-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(124,111,247,.08),transparent 60%);pointer-events:none;}
 .pomo-modes{display:flex;gap:6px;justify-content:center;margin-bottom:16px;}
@@ -879,9 +883,9 @@ select.pf option{background:var(--bg2);color:var(--text);}
 
     <!-- TODO -->
     <div class="page" id="page-todo">
-      <div class="todo-add-card">
-        <div class="todo-add-row1">
-          <input type="text" id="todoInput" placeholder="Yeni görev..." onkeydown="if(event.key==='Enter')addTodo()">
+      <div class="todo-add-card" style="padding:14px 14px 12px;margin-bottom:14px;">
+        <div class="todo-add-row1" style="margin-bottom:10px;">
+          <input type="text" id="todoInput" placeholder="Ne yapacaksın?" style="font-size:.92rem;padding:12px 14px;" onkeydown="if(event.key==='Enter')addTodo()">
         </div>
         <div class="todo-add-row2">
           <div class="priority-pills">
@@ -902,9 +906,11 @@ select.pf option{background:var(--bg2);color:var(--text);}
     <!-- NOTES -->
     <div class="page" id="page-notes">
       <!-- Hızlı Not -->
-      <div id="quickNoteBar" style="display:flex;gap:8px;margin-bottom:12px;">
-        <input type="text" id="quickNoteInput" placeholder="Hızlı not al..." style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:9px 13px;font-family:'Sora',sans-serif;font-size:.82rem;color:var(--text);outline:none;transition:border-color .2s;" onfocus="this.style.borderColor='rgba(124,111,247,.4)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')saveQuickNote()">
-        <button onclick="saveQuickNote()" style="background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:10px;padding:9px 14px;cursor:pointer;color:#fff;font-size:.78rem;font-family:'Sora',sans-serif;white-space:nowrap;transition:opacity .2s;">+ Ekle</button>
+      <div id="quickNoteBar" style="margin-bottom:14px;">
+        <div style="display:flex;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:12px 14px;transition:border-color .2s;" onfocusin="this.style.borderColor='rgba(124,111,247,.4)'" onfocusout="this.style.borderColor='var(--border)'">
+          <input type="text" id="quickNoteInput" placeholder="Aklına ne geldi? Yaz, kaydet..." style="flex:1;background:none;border:none;outline:none;font-family:'Sora',sans-serif;font-size:.9rem;color:var(--text);" onkeydown="if(event.key==='Enter')saveQuickNote()">
+          <button onclick="saveQuickNote()" style="background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:9px;padding:8px 16px;cursor:pointer;color:#fff;font-size:.78rem;font-family:'Sora',sans-serif;white-space:nowrap;flex-shrink:0;">+ Not</button>
+        </div>
       </div>
       <div class="notes-grid" id="notes-grid"></div>
       <div class="empty-state" id="notes-empty" style="display:none">Henüz not yok.<br>Sağ alttaki + ile başla.</div>
@@ -968,17 +974,35 @@ select.pf option{background:var(--bg2);color:var(--text);}
     <div class="page" id="page-pomodoro">
       <div class="pomo-card">
         <div class="pomo-modes">
-          <button class="pomo-mode-btn active" id="pomoBtnWork" onclick="setPomoMode('work')">Çalışma · 25dk</button>
-          <button class="pomo-mode-btn" id="pomoBtnShort" onclick="setPomoMode('short')">Kısa Mola · 5dk</button>
-          <button class="pomo-mode-btn" id="pomoBtnLong" onclick="setPomoMode('long')">Uzun Mola · 15dk</button>
+          <button class="pomo-mode-btn active" id="pomoBtnWork" onclick="setPomoMode('work')">Çalışma · <span id="pomoWorkLbl">25</span>dk</button>
+          <button class="pomo-mode-btn" id="pomoBtnShort" onclick="setPomoMode('short')">Kısa · <span id="pomoShortLbl">5</span>dk</button>
+          <button class="pomo-mode-btn" id="pomoBtnLong" onclick="setPomoMode('long')">Uzun · <span id="pomoLongLbl">15</span>dk</button>
         </div>
-        <div class="pomo-ring">
-          <svg class="pomo-svg" viewBox="0 0 140 140">
+        <div class="pomo-ring" id="pomoRingWrap" ondblclick="openPomoDurEdit()">
+          <svg class="pomo-svg" viewBox="0 0 140 140" id="pomoRingSVG" style="display:block;">
             <circle class="pomo-track" cx="70" cy="70" r="60"/>
             <circle class="pomo-prog work" id="pomoRing" cx="70" cy="70" r="60"/>
           </svg>
+          <!-- Analog saat (gizli başlar) -->
+          <svg id="pomoClockSVG" viewBox="0 0 140 140" style="display:none;width:140px;height:140px;">
+            <circle cx="70" cy="70" r="60" fill="none" stroke="var(--border2)" stroke-width="3"/>
+            <circle cx="70" cy="70" r="2" fill="var(--accent)"/>
+            <line id="clockHrHand" x1="70" y1="70" x2="70" y2="30" stroke="var(--text)" stroke-width="3" stroke-linecap="round"/>
+            <line id="clockMinHand" x1="70" y1="70" x2="70" y2="18" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <!-- Minimal conic -->
+          <div id="pomoMinimalWrap" style="display:none;width:140px;height:140px;border-radius:50%;background:conic-gradient(var(--accent) 0deg, var(--bg3) 0deg);display:none;align-items:center;justify-content:center;">
+            <div style="width:90px;height:90px;border-radius:50%;background:var(--bg2);"></div>
+          </div>
           <div class="pomo-time" id="pomoTime">25:00</div>
+          <!-- Flip stili -->
+          <div id="pomoFlipWrap" style="display:none;flex-direction:column;align-items:center;gap:4px;">
+            <div id="pomoFlipMin" style="background:var(--bg3);border-radius:8px;padding:6px 14px;font-family:'JetBrains Mono',monospace;font-size:2rem;color:var(--text);border:1px solid var(--border2);min-width:64px;text-align:center;">25</div>
+            <div style="font-size:1.2rem;color:var(--text3);">:</div>
+            <div id="pomoFlipSec" style="background:var(--bg3);border-radius:8px;padding:6px 14px;font-family:'JetBrains Mono',monospace;font-size:2rem;color:var(--accent);border:1px solid var(--border2);min-width:64px;text-align:center;">00</div>
+          </div>
         </div>
+        <div style="font-size:.52rem;color:var(--text3);margin-top:-8px;margin-bottom:8px;font-family:'JetBrains Mono',monospace;opacity:.6;">çift tıkla · süreyi değiştir</div>
         <div class="pomo-label" id="pomoLabel">Çalışma Seansı</div>
         <div class="pomo-controls">
           <button class="pomo-btn sec" onclick="resetPomo()">
@@ -1109,37 +1133,24 @@ select.pf option{background:var(--bg2);color:var(--text);}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:18px;height:18px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
     </button>
   </div>
-  <!-- Dil seçici -->
-  <div style="padding:8px 14px;border-bottom:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap;">
-    <span style="font-size:.48rem;letter-spacing:.15em;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;display:flex;align-items:center;margin-right:2px;">Dil:</span>
-    <button class="lang-btn active" id="langBtn-tr" onclick="setLang('tr')">🇹🇷 TR</button>
-    <button class="lang-btn" id="langBtn-en" onclick="setLang('en')">🇬🇧 EN</button>
-    <button class="lang-btn" id="langBtn-de" onclick="setLang('de')">🇩🇪 DE</button>
-    <button class="lang-btn" id="langBtn-fr" onclick="setLang('fr')">🇫🇷 FR</button>
-    <button class="lang-btn" id="langBtn-es" onclick="setLang('es')">🇪🇸 ES</button>
-    <button class="lang-btn" id="langBtn-ar" onclick="setLang('ar')">🇸🇦 AR</button>
-  </div>
   <div class="drawer-menu">
-    <div class="drawer-section-label" id="dl-general">Genel</div>
-    <button class="drawer-item" onclick="openFromDrawer('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span id="dl-profile">Profilim</span></button>
-    <button class="drawer-item" onclick="openFromDrawer('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg><span id="dl-settings">Ayarlar</span></button>
-    <button class="drawer-item" onclick="openCalendarFromDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span id="dl-calendar">Takvim</span></button>
-    <button class="drawer-item" onclick="toggleDrawer();switchPage('diary')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Günlük</button>
+    <button class="drawer-item" onclick="openFromDrawer('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profilim</button>
+    <button class="drawer-item" onclick="openCalendarFromDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Takvim</button>
     <button class="drawer-item" onclick="toggleDrawer();switchPage('kanban')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="10" rx="1"/><rect x="14" y="17" width="7" height="4" rx="1"/></svg>Kanban</button>
+    <button class="drawer-item" onclick="toggleDrawer();switchPage('reading')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Okuma Listesi</button>
     <button class="drawer-item" onclick="toggleDrawer();switchPage('pomodoro')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pomodoro</button>
     <button class="drawer-item" onclick="toggleDrawer();switchPage('schedule')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Ders Programı</button>
-    <button class="drawer-item" onclick="toggleDrawer();switchPage('reading')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Okuma Listesi</button>
-    <button class="drawer-item" onclick="openFromDrawer('trash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg><span id="dl-trash">Çöp Kutusu</span><span class="trash-badge" id="trashBadge" style="display:none">0</span></button>
-    <button class="drawer-item" onclick="openBackupModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span id="dl-backup">Yedekle & Geri Yükle</span></button>
-    <button class="drawer-item" id="drawerReminderBtn" onclick="openReminderModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span id="dl-reminders">Hatırlatıcılar</span><span id="drawerReminderBadge" style="display:none;margin-left:auto;min-width:18px;height:18px;font-size:.52rem;border-radius:9px;background:var(--hard);color:#fff;align-items:center;justify-content:center;padding:0 4px;font-family:JetBrains Mono,monospace;"></span></button>
+    <button class="drawer-item" id="drawerReminderBtn" onclick="openReminderModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Hatırlatıcılar<span id="drawerReminderBadge" style="display:none;margin-left:auto;min-width:18px;height:18px;font-size:.52rem;border-radius:9px;background:var(--hard);color:#fff;align-items:center;justify-content:center;padding:0 4px;font-family:JetBrains Mono,monospace;"></span></button>
+    <button class="drawer-item" onclick="openBackupModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Yedekle & Geri Yükle</button>
+    <button class="drawer-item" onclick="openFromDrawer('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Ayarlar</button>
     <div class="drawer-divider"></div>
-    <div class="drawer-section-label" id="dl-about">Hakkında</div>
-    <button class="drawer-item" onclick="openFromDrawer('privacy')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span id="dl-privacy">Gizlilik Politikası</span></button>
-    <button class="drawer-item" onclick="openFromDrawer('terms')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span id="dl-terms">Kullanım Koşulları</span></button>
-    <button class="drawer-item" onclick="openFromDrawer('help')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span id="dl-help">Yardım</span></button>
+    <button class="drawer-item" onclick="toggleDrawer();switchPage('diary')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Günlük</button>
+    <button class="drawer-item" onclick="openFromDrawer('trash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Çöp Kutusu<span class="trash-badge" id="trashBadge" style="display:none">0</span></button>
     <div class="drawer-divider"></div>
-    <button class="drawer-item danger" onclick="clearAllData()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg><span id="dl-cleardata">Tüm Verileri Sil</span></button>
-    <button class="drawer-item" id="signOutBtn" onclick="authSignOut()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span id="dl-signout">Çıkış Yap</span></button>
+    <button class="drawer-item" onclick="openFromDrawer('privacy')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Gizlilik</button>
+    <button class="drawer-item" onclick="openFromDrawer('help')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Yardım</button>
+    <div class="drawer-divider"></div>
+    <button class="drawer-item danger" onclick="clearAllData()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Tüm Verileri Sil</button>
   </div>
   <div class="drawer-footer">Capsula v4 · Pro / Ana / Öğrenci</div>
 </div>
@@ -1170,8 +1181,8 @@ select.pf option{background:var(--bg2);color:var(--text);}
         
         <div class="plabel">Ad Soyad</div>
         <input type="text" class="pf" id="profileName" placeholder="Adınız Soyadınız">
-        <div class="plabel">E-posta <span style="font-size:.5rem;color:var(--text3);">(değiştirilemez)</span></div>
-        <input type="text" class="pf" id="profileEmail" placeholder="ornek@eposta.com" readonly style="opacity:.6;cursor:not-allowed;">
+        <div class="plabel">E-posta</div>
+        <input type="text" class="pf" id="profileEmail" placeholder="ornek@eposta.com" >
         <div class="plabel">Biyografi</div>
         <textarea class="pf" id="profileBio" placeholder="Kendini birkaç cümleyle anlat..." style="min-height:72px;resize:none;line-height:1.6;"></textarea>
         <div class="plabel">Motto</div>
@@ -1227,6 +1238,42 @@ select.pf option{background:var(--bg2);color:var(--text);}
         <div class="theme-swatch" data-theme="sunset" data-label="Batım" style="background:linear-gradient(135deg,#12080a,#f472b6)" onclick="applyTheme('sunset',this)"></div>
         <div class="theme-swatch" data-theme="ocean" data-label="Okyanus" style="background:linear-gradient(135deg,#030d14,#38bdf8)" onclick="applyTheme('ocean',this)"></div>
         <div class="theme-swatch" data-theme="sand" data-label="Kum" style="background:linear-gradient(135deg,#0f0d08,#fbbf24)" onclick="applyTheme('sand',this)"></div>
+      </div>
+    </div>
+    <div class="settings-section" style="margin-top:16px;">
+      <div class="settings-section-title">Dil</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
+        <button class="lang-btn active" id="langBtn-tr" onclick="setLang('tr')">🇹🇷 TR</button>
+        <button class="lang-btn" id="langBtn-en" onclick="setLang('en')">🇬🇧 EN</button>
+        <button class="lang-btn" id="langBtn-de" onclick="setLang('de')">🇩🇪 DE</button>
+        <button class="lang-btn" id="langBtn-fr" onclick="setLang('fr')">🇫🇷 FR</button>
+        <button class="lang-btn" id="langBtn-es" onclick="setLang('es')">🇪🇸 ES</button>
+        <button class="lang-btn" id="langBtn-ar" onclick="setLang('ar')">🇸🇦 AR</button>
+      </div>
+    </div>
+    <div class="settings-section" style="margin-top:16px;">
+      <div class="settings-section-title">Pomodoro Saat Stili</div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px;" id="pomoStyleGrid">
+        <div onclick="setPomoStyle('ring')" class="pomo-style-opt active" id="ps-ring" title="Halka">
+          <svg viewBox="0 0 40 40" style="width:36px;height:36px;"><circle cx="20" cy="20" r="15" fill="none" stroke="var(--border2)" stroke-width="4"/><circle cx="20" cy="20" r="15" fill="none" stroke="var(--accent)" stroke-width="4" stroke-dasharray="70 24" stroke-linecap="round" transform="rotate(-90 20 20)"/></svg>
+          <span>Halka</span>
+        </div>
+        <div onclick="setPomoStyle('digital')" class="pomo-style-opt" id="ps-digital" title="Dijital">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.9rem;color:var(--accent);letter-spacing:.05em;padding:4px 0;">25:00</div>
+          <span>Dijital</span>
+        </div>
+        <div onclick="setPomoStyle('clock')" class="pomo-style-opt" id="ps-clock" title="Analog">
+          <svg viewBox="0 0 40 40" style="width:36px;height:36px;"><circle cx="20" cy="20" r="16" fill="none" stroke="var(--border2)" stroke-width="2"/><circle cx="20" cy="20" r="1.5" fill="var(--accent)"/><line x1="20" y1="20" x2="20" y2="7" stroke="var(--text)" stroke-width="2" stroke-linecap="round"/><line x1="20" y1="20" x2="28" y2="20" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span>Analog</span>
+        </div>
+        <div onclick="setPomoStyle('flip')" class="pomo-style-opt" id="ps-flip" title="Flip">
+          <div style="background:var(--bg3);border-radius:5px;padding:3px 6px;font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--text);border:1px solid var(--border2);">25</div>
+          <span>Flip</span>
+        </div>
+        <div onclick="setPomoStyle('minimal')" class="pomo-style-opt" id="ps-minimal" title="Minimal">
+          <div style="width:28px;height:28px;border-radius:50%;background:conic-gradient(var(--accent) 70%, var(--bg3) 0);display:flex;align-items:center;justify-content:center;"><div style="width:18px;height:18px;border-radius:50%;background:var(--bg2);"></div></div>
+          <span>Minimal</span>
+        </div>
       </div>
     </div>
     <div class="settings-section" style="margin-top:16px;">
@@ -1581,51 +1628,6 @@ select.pf option{background:var(--bg2);color:var(--text);}
   </div>
 </div>
 
-<!-- AUTH SCREEN -->
-<div id="authScreen" style="display:none;position:fixed;inset:0;z-index:3000;background:var(--bg);flex-direction:column;align-items:center;justify-content:center;padding:24px;">
-  <div style="width:100%;max-width:340px;">
-    <div style="text-align:center;margin-bottom:32px;">
-      <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--diary));display:flex;align-items:center;justify-content:center;margin:0 auto 12px;box-shadow:0 0 28px rgba(124,111,247,.4);">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:26px;height:26px;"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><circle cx="17.5" cy="17.5" r="3.5"/></svg>
-      </div>
-      <div style="font-family:'JetBrains Mono',monospace;font-size:1.4rem;font-weight:500;letter-spacing:.1em;color:var(--text);">CAPSULA</div>
-      <div style="font-size:.68rem;color:var(--text3);margin-top:4px;">kişisel alan · her şey burada</div>
-    </div>
-
-    <!-- Tab -->
-    <div style="display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:3px;margin-bottom:20px;">
-      <button id="authTabLogin" onclick="switchAuthTab('login')" style="flex:1;padding:7px;border-radius:9px;border:none;background:var(--accent);color:#fff;font-family:'Sora',sans-serif;font-size:.75rem;font-weight:500;cursor:pointer;transition:all .2s;">Giriş Yap</button>
-      <button id="authTabRegister" onclick="switchAuthTab('register')" style="flex:1;padding:7px;border-radius:9px;border:none;background:transparent;color:var(--text3);font-family:'Sora',sans-serif;font-size:.75rem;cursor:pointer;transition:all .2s;">Kayıt Ol</button>
-    </div>
-
-    <div id="authError" style="display:none;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:9px;padding:9px 12px;font-size:.72rem;color:var(--hard);margin-bottom:12px;text-align:center;"></div>
-
-    <input type="text" id="authNameInput" placeholder="Ad Soyad" style="display:none;width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;font-family:'Sora',sans-serif;font-size:.84rem;color:var(--text);outline:none;margin-bottom:10px;transition:border-color .2s;" onfocus="this.style.borderColor='rgba(124,111,247,.4)'" onblur="this.style.borderColor='var(--border)'">
-    <input type="text" id="authUsernameInput" placeholder="Kullanıcı adı (herkese görünür)" style="display:none;width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;font-family:'Sora',sans-serif;font-size:.84rem;color:var(--text);outline:none;margin-bottom:10px;transition:border-color .2s;" onfocus="this.style.borderColor='rgba(124,111,247,.4)'" onblur="this.style.borderColor='var(--border)'">
-    <input type="email" id="authEmailInput" placeholder="E-posta" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;font-family:'Sora',sans-serif;font-size:.84rem;color:var(--text);outline:none;margin-bottom:10px;transition:border-color .2s;" onfocus="this.style.borderColor='rgba(124,111,247,.4)'" onblur="this.style.borderColor='var(--border)'">
-    <input type="password" id="authPasswordInput" placeholder="Şifre" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;font-family:'Sora',sans-serif;font-size:.84rem;color:var(--text);outline:none;margin-bottom:16px;transition:border-color .2s;" onfocus="this.style.borderColor='rgba(124,111,247,.4)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')authSubmit()">
-
-    <button onclick="authSubmit()" id="authSubmitBtn" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:10px;cursor:pointer;font-family:'Sora',sans-serif;font-size:.84rem;font-weight:500;color:#fff;margin-bottom:12px;transition:opacity .2s;">Giriş Yap</button>
-
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-      <div style="flex:1;height:1px;background:var(--border);"></div>
-      <span style="font-size:.62rem;color:var(--text3);font-family:'JetBrains Mono',monospace;">VEYA</span>
-      <div style="flex:1;height:1px;background:var(--border);"></div>
-    </div>
-
-    <button onclick="authGoogle()" style="width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;cursor:pointer;font-family:'Sora',sans-serif;font-size:.82rem;color:var(--text2);display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='var(--bg2)'">
-      <svg viewBox="0 0 24 24" style="width:18px;height:18px;"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-      Google ile devam et
-    </button>
-
-    <div id="authForgotWrap" style="text-align:center;margin-top:12px;">
-      <span onclick="authForgotPassword()" style="font-size:.65rem;color:var(--text3);cursor:pointer;font-family:'JetBrains Mono',monospace;text-decoration:underline;text-underline-offset:3px;">Şifremi unuttum</span>
-    </div>
-  </div>
-</div>
-
-
-
 <!-- SPLASH SCREEN -->
 <div id="splashScreen">
   <div class="splash-particles" id="splashParticles"></div>
@@ -1678,236 +1680,27 @@ select.pf option{background:var(--bg2);color:var(--text);}
 
 <div class="toast" id="toast"></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
 <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" crossorigin="anonymous"></script>
 <script>
-// ─────────────────────────── FIREBASE ─────────────────────────────────────
-const firebaseConfig = {
-  apiKey: "AIzaSyDXxiqon0Q-E_AYLxT1Yhz01Kwb7WTuTJw",
-  authDomain: "capsula-6b5b8.firebaseapp.com",
-  projectId: "capsula-6b5b8",
-  storageBucket: "capsula-6b5b8.firebasestorage.app",
-  messagingSenderId: "951927360233",
-  appId: "1:951927360233:web:b3d8c62eae93c668a0be78"
-};
-
-let auth=null, db=null;
-try{
-  firebase.initializeApp(firebaseConfig);
-  auth=firebase.auth();
-  db=firebase.firestore();
-}catch(e){console.warn('Firebase yüklenemedi:',e);}
-
 let currentUser=null;
-let unsubscribeSnapshot=null;
 
 // ── AUTH EKRANI ────────────────────────────────────────────────────────────
-function showAuthScreen(){
-  const el=document.getElementById('authScreen');
-  el.style.display='flex';
-}
-function hideAuthScreen(){
-  const el=document.getElementById('authScreen');
-  el.style.display='none';
-}
-
-function switchAuthTab(tab){
-  const isLogin = tab==='login';
-  document.getElementById('authTabLogin').style.background = isLogin?'var(--accent)':'transparent';
-  document.getElementById('authTabLogin').style.color = isLogin?'#fff':'var(--text3)';
-  document.getElementById('authTabRegister').style.background = !isLogin?'var(--accent)':'transparent';
-  document.getElementById('authTabRegister').style.color = !isLogin?'#fff':'var(--text3)';
-  document.getElementById('authNameInput').style.display = isLogin?'none':'block';
-  document.getElementById('authUsernameInput').style.display = isLogin?'none':'block';
-  document.getElementById('authSubmitBtn').textContent = isLogin?'Giriş Yap':'Kayıt Ol';
-  document.getElementById('authForgotWrap').style.display = isLogin?'block':'none';
-  document.getElementById('authError').style.display='none';
-  window._authTab = tab;
-}
-window._authTab = 'login';
-
-function setAuthError(msg){
-  const el=document.getElementById('authError');
-  el.textContent=msg;el.style.display='block';
-}
-
-function authSubmit(){
-  const email=document.getElementById('authEmailInput').value.trim();
-  const password=document.getElementById('authPasswordInput').value;
-  const btn=document.getElementById('authSubmitBtn');
-  if(!email||!password){setAuthError('Email ve şifre gerekli');return;}
-  btn.textContent='...';btn.disabled=true;
-  if(window._authTab==='login'){
-    auth.signInWithEmailAndPassword(email,password)
-      .catch(e=>{btn.textContent='Giriş Yap';btn.disabled=false;setAuthError(authErrMsg(e.code));});
-  } else {
-    const name=document.getElementById('authNameInput').value.trim();
-    const username=document.getElementById('authUsernameInput').value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
-    if(!name){setAuthError('Ad Soyad gerekli');btn.textContent='Kayıt Ol';btn.disabled=false;return;}
-    if(username.length<3){setAuthError('Kullanıcı adı en az 3 karakter olmalı');btn.textContent='Kayıt Ol';btn.disabled=false;return;}
-    // Kullanıcı adı benzersiz mi?
-    db.collection('usernames').doc(username).get().then(doc=>{
-      if(doc.exists){setAuthError('Bu kullanıcı adı alınmış');btn.textContent='Kayıt Ol';btn.disabled=false;return;}
-      auth.createUserWithEmailAndPassword(email,password).then(cred=>{
-        return Promise.all([
-          cred.user.updateProfile({displayName:name}),
-          db.collection('usernames').doc(username).set({uid:cred.user.uid}),
-          db.collection('users').doc(cred.user.uid).set({
-            name,username,email,badge:'student',bio:'',motto:'',goal:'',
-            accentColor:'purple',createdAt:firebase.firestore.FieldValue.serverTimestamp(),
-            friends:[],friendRequests:[]
-          })
-        ]);
-      }).catch(e=>{btn.textContent='Kayıt Ol';btn.disabled=false;setAuthError(authErrMsg(e.code));});
-    });
-  }
-}
-
-function authGoogle(){
-  const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider).then(cred=>{
-    return db.collection('users').doc(cred.user.uid).get().then(doc=>{
-      if(!doc.exists){
-        // Email'den kullanıcı adı oluştur, benzersiz yap
-        let baseUsername = cred.user.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g,'');
-        if(baseUsername.length<3) baseUsername='user'+baseUsername;
-        // Benzersizlik kontrolü
-        return db.collection('usernames').doc(baseUsername).get().then(uDoc=>{
-          const finalUsername = uDoc.exists ? baseUsername+'_'+Math.floor(Math.random()*999) : baseUsername;
-          return Promise.all([
-            db.collection('users').doc(cred.user.uid).set({
-              name:cred.user.displayName||'Kullanıcı',
-              username:finalUsername,email:cred.user.email,badge:'student',
-              bio:'',motto:'',goal:'',accentColor:'purple',
-              createdAt:firebase.firestore.FieldValue.serverTimestamp(),
-              friends:[],friendRequests:[]
-            }),
-            db.collection('usernames').doc(finalUsername).set({uid:cred.user.uid})
-          ]);
-        });
-      }
-    });
-  }).catch(e=>setAuthError(authErrMsg(e.code)));
-}
-
-function authForgotPassword(){
-  const email=document.getElementById('authEmailInput').value.trim();
-  if(!email){setAuthError('Önce email adresini gir');return;}
-  const errEl=document.getElementById('authError');
-  errEl.style.color='var(--text3)';
-  setAuthError('Gönderiliyor...');
-  auth.sendPasswordResetEmail(email,{
-    url: window.location.href, // Sıfırlamadan sonra geri dönsün
-    handleCodeInApp: false
-  })
-  .then(()=>{
-    errEl.style.color='var(--easy)';
-    setAuthError('✓ Sıfırlama linki gönderildi! Spam klasörünü de kontrol et.');
-  })
-  .catch(e=>{
-    errEl.style.color='var(--hard)';
-    setAuthError(authErrMsg(e.code));
-  });
-}
-
-// İçerideyken şifre değiştirme
-function sendPasswordChangeEmail(){
-  if(!currentUser?.email){showToast('Email bulunamadı');return;}
-  auth.sendPasswordResetEmail(currentUser.email,{url:window.location.href})
-    .then(()=>showToast('Şifre değiştirme linki emailine gönderildi ✓'))
-    .catch(e=>showToast('Hata: '+authErrMsg(e.code)));
-}
-
-function authSignOut(){
-  showConfirm('Çıkış yapmak istediğine emin misin?',()=>{
-    if(unsubscribeSnapshot)unsubscribeSnapshot();
-    auth.signOut().then(()=>{toggleDrawer();});
-  });
-}
-
-function authErrMsg(code){
-  const msgs={
-    'auth/user-not-found':'Bu email ile kayıtlı hesap yok',
-    'auth/wrong-password':'Şifre yanlış',
-    'auth/email-already-in-use':'Bu email zaten kullanımda',
-    'auth/weak-password':'Şifre en az 6 karakter olmalı',
-    'auth/invalid-email':'Geçersiz email adresi',
-    'auth/too-many-requests':'Çok fazla deneme. Bir süre bekle',
-    'auth/popup-closed-by-user':'Giriş iptal edildi',
-    'auth/network-request-failed':'Bağlantı hatası',
-    'auth/invalid-api-key':'Geçersiz API key — lütfen geliştiriciye bildirin',
-    'auth/api-key-not-valid':'API key geçersiz — config hatası',
-  };
-  return msgs[code]||'Hata kodu: '+code;
-}
-
-// ── FIRESTORE SYNC ─────────────────────────────────────────────────────────
-function startFirestoreSync(uid){
-  if(unsubscribeSnapshot)unsubscribeSnapshot();
-  unsubscribeSnapshot = db.collection('userData').doc(uid)
-    .onSnapshot(doc=>{
-      if(doc.exists){
-        const remote = doc.data();
-        const savedAvatar=D.profile.avatar; // Avatar'ı koru
-        const keys=['todos','completedTodos','trash','contentTrash','calPlans','notes','diary','kanban','reading','schedule','exams','notebook'];
-        keys.forEach(k=>{if(remote[k]!==undefined)D[k]=remote[k];});
-        D.profile.avatar=savedAvatar; // Avatar'ı geri yükle
-        localStorage.setItem('capsula_v4',JSON.stringify(D));
-        renderTodos();renderNotes();renderDiary();renderDashboard();
-        renderCalendar();renderKanban();renderReading();
-        renderSchedule();renderExams();renderNotebook();
-        updTrashBadge();updateReminderBadge();
-      }
-    },err=>console.warn('Firestore sync err:',err));
-}
-
-function saveData(){
-  localStorage.setItem('capsula_v4',JSON.stringify(D));
-  if(!currentUser)return;
-  const data={};
-  const keys=['todos','completedTodos','trash','contentTrash','calPlans','notes','diary','kanban','reading','schedule','exams','notebook'];
-  keys.forEach(k=>data[k]=D[k]||[]);
-  data.calPlans=D.calPlans||{};
-  data.kanban=D.kanban||{todo:[],doing:[],done:[]};
-  data.updatedAt=firebase.firestore.FieldValue.serverTimestamp();
-  db.collection('userData').doc(currentUser.uid).set(data,{merge:true}).catch(console.warn);
-}
-
-function loadUserData(uid){
-  initApp();
-}
 
 
-function saveProfileToFirestore(){}
+
+
+
+// ── VERİ KAYIT ─────────────────────────────────────────────────────────────
+function saveData(){localStorage.setItem('capsula_v4',JSON.stringify(D));}
+
+
+
 // saveProfile fonksiyonunu güncelle
 const _origSaveProfile = window.saveProfile;
 
-// ── AUTH STATE ─────────────────────────────────────────────────────────────
-if(auth){auth.onAuthStateChanged(user=>{
-  currentUser=user;
-  if(user){
-    document.getElementById('signOutBtn').style.display='flex';
-    loadUserData(user.uid);
-      } else {
-    document.getElementById('signOutBtn').style.display='none';
-    if(unsubscribeSnapshot){unsubscribeSnapshot();unsubscribeSnapshot=null;}
-    D={todos:[],completedTodos:[],trash:[],contentTrash:[],calPlans:{},notes:[],diary:[],
-       kanban:{todo:[],doing:[],done:[]},reading:[],schedule:[],exams:[],notebook:[],
-       profile:{name:'Kullanıcı',email:'',avatar:'',theme:D?.profile?.theme||'default'}};
-    showAuthScreen();
-    document.getElementById('authEmailInput').value='';
-    document.getElementById('authPasswordInput').value='';
-    document.getElementById('authError').style.display='none';
-    switchAuthTab('login');
-  }
-});}
+
 
 function initApp(){
-  hideAuthScreen();
   initPinToggle();autoTrash();updTrashBadge();updateProfileUI();initReminders();initLang();
   setMode(curMode);
   renderTodos();renderNotes();renderDiary();renderDashboard();renderCalendar();
@@ -2016,7 +1809,9 @@ let editorType='note', editorMediaFiles=[], editorTags=[], selMoodVal='😊';
 let calYear=new Date().getFullYear(), calMonth=new Date().getMonth(), selCalDay=new Date().getDate();
 let viewingEntry=null, completedOpen=false, _confirmCb=null;
 let pomoMode='work', pomoRunning=false, pomoSecs=25*60, pomoInterval=null, pomoSessions=0, pomoTaskId=null;
-const POMO_DUR={work:25*60,short:5*60,long:15*60};
+let pomoStyle=localStorage.getItem('capsula_pomo_style')||'ring';
+const POMO_DUR_CUSTOM=JSON.parse(localStorage.getItem('capsula_pomo_dur')||'{"work":25,"short":5,"long":15}');
+const POMO_DUR={get work(){return POMO_DUR_CUSTOM.work*60;},get short(){return POMO_DUR_CUSTOM.short*60;},get long(){return POMO_DUR_CUSTOM.long*60;}};
 
 const ICO_SEARCH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
 const MODES={
@@ -2025,21 +1820,21 @@ const MODES={
     {id:'todo',lbl:'Görev',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>'},
     {id:'pomodoro',lbl:'Odak',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',center:true},
     {id:'schedule',lbl:'Program',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'},
-    {id:'calendar',lbl:'Takvim',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'},
+    {id:'search',lbl:'Ara',ico:ICO_SEARCH},
   ],
   pro:[
     {id:'notes',lbl:'Not',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'},
     {id:'todo',lbl:'Görev',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>'},
     {id:'pomodoro',lbl:'Odak',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',center:true},
     {id:'schedule',lbl:'Program',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'},
-    {id:'calendar',lbl:'Takvim',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'},
+    {id:'search',lbl:'Ara',ico:ICO_SEARCH},
   ],
   uni:[
     {id:'notes',lbl:'Not',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'},
     {id:'todo',lbl:'Görev',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>'},
     {id:'pomodoro',lbl:'Odak',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',center:true},
     {id:'schedule',lbl:'Program',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'},
-    {id:'calendar',lbl:'Takvim',ico:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'},
+    {id:'search',lbl:'Ara',ico:ICO_SEARCH},
   ],
 };
 const PAGE_TITLES={home:'Ana Ekran',slides:'Slaytlar',todo:'Görevler',notes:'Notlar',diary:'Günlük',search:'Arama',calendar:'Takvim',pomodoro:'Pomodoro',kanban:'Kanban',weekly:'Haftalık Özet',reading:'Okuma Listesi',pro:'Profesyonel',schedule:'Ders Programı',exams:'Sınav Takvimi',notebook:'Not Defteri',chat:'Sohbet'};
@@ -2185,7 +1980,7 @@ const ACCENT_COLORS=[
 function openProfile(){
   const p=D.profile;
   document.getElementById('profileName').value=p.name||'';
-  document.getElementById('profileEmail').value=currentUser?.email||p.email||'';
+  document.getElementById('profileEmail').value=p.email||'';
   document.getElementById('profileBio').value=p.bio||'';
   document.getElementById('profileMotto').value=p.motto||'';
   document.getElementById('profileGoal').value=p.goal||'';
@@ -2309,7 +2104,7 @@ function updateProfileUI(){
   ['avatarInitials','drawerAvatarInitials','profileAvatarInitials'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=initials;});
   document.getElementById('drawerUserName').textContent=p.name;
   // Email Firebase'den göster
-  const emailDisplay=currentUser?.email||p.email||'';
+  const emailDisplay=p.email||'';
   document.getElementById('drawerUserEmail').textContent=emailDisplay?'@'+(p.username||emailDisplay.split('@')[0]):'';
   // Header profil adı ve badge
   const hname=document.getElementById('profHeaderName');if(hname)hname.textContent=p.name;
@@ -2345,12 +2140,7 @@ function handleAvatarUpload(e){
       const imgEl=document.getElementById('profileAvatarImg');
       imgEl.src=thumb;imgEl.style.display='block';
       document.getElementById('profileAvatarInitials').style.display='none';
-      const rw=document.getElementById('removeAvatarWrap');if(rw)rw.style.display='block';
-      // Firestore'daki users koleksiyonuna da kaydet (arkadaşlar görebilsin)
-      if(currentUser){
-        db.collection('users').doc(currentUser.uid).update({avatarThumb:thumb}).catch(console.warn);
-      }
-      showToast('Fotoğraf güncellendi ✓');
+      const rw=document.getElementById('removeAvatarWrap');if(rw)rw.style.display='block';      showToast('Fotoğraf güncellendi ✓');
     };
     img2.src=ev.target.result;
   };
@@ -2365,8 +2155,8 @@ function removeAvatar(){
   img.src='';img.style.display='none';
   document.getElementById('profileAvatarInitials').style.display='';
   const rw=document.getElementById('removeAvatarWrap');if(rw)rw.style.display='none';
-  if(currentUser){
-    db.collection('users').doc(currentUser.uid).update({avatarThumb:''}).catch(console.warn);
+  if(false){// auth kaldırıldı
+
   }
   showToast('Fotoğraf kaldırıldı');
 }
@@ -2741,9 +2531,72 @@ function togglePomo(){
 function skipPomo(){pomoRunning=false;clearInterval(pomoInterval);setPomoMode(pomoMode==='work'?'short':'work');}
 function updatePomoDisplay(){
   const m=Math.floor(pomoSecs/60),s=pomoSecs%60;
-  document.getElementById('pomoTime').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  const timeStr=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
   const total=POMO_DUR[pomoMode];const prog=(total-pomoSecs)/total;
-  document.getElementById('pomoRing').style.strokeDashoffset=2*Math.PI*60*(1-prog);
+  const st=pomoStyle||'ring';
+  const ringWrap=document.getElementById('pomoRingSVG');
+  const clockWrap=document.getElementById('pomoClockSVG');
+  const flipWrap=document.getElementById('pomoFlipWrap');
+  const minimalWrap=document.getElementById('pomoMinimalWrap');
+  const timeEl=document.getElementById('pomoTime');
+  if(ringWrap)ringWrap.style.display='none';
+  if(clockWrap)clockWrap.style.display='none';
+  if(flipWrap)flipWrap.style.display='none';
+  if(minimalWrap)minimalWrap.style.display='none';
+  if(timeEl)timeEl.style.display='none';
+  if(st==='ring'||st==='digital'){
+    if(ringWrap)ringWrap.style.display='block';
+    if(timeEl){timeEl.style.display='block';timeEl.textContent=timeStr;}
+    const ring=document.getElementById('pomoRing');
+    if(ring)ring.style.strokeDashoffset=st==='ring'?2*Math.PI*60*(1-prog):2*Math.PI*60;
+  } else if(st==='clock'){
+    if(clockWrap)clockWrap.style.display='block';
+    if(timeEl){timeEl.style.display='block';timeEl.textContent=timeStr;}
+    const minAngle=(s/60)*360-90;const hrAngle=(m/60)*360-90;
+    const hrEl=document.getElementById('clockHrHand');const minEl=document.getElementById('clockMinHand');
+    if(hrEl){const r=hrAngle*Math.PI/180;hrEl.setAttribute('x2',String(70+40*Math.cos(r)));hrEl.setAttribute('y2',String(70+40*Math.sin(r)));}
+    if(minEl){const r=minAngle*Math.PI/180;minEl.setAttribute('x2',String(70+50*Math.cos(r)));minEl.setAttribute('y2',String(70+50*Math.sin(r)));}
+  } else if(st==='flip'){
+    if(flipWrap)flipWrap.style.display='flex';
+    const fMin=document.getElementById('pomoFlipMin');const fSec=document.getElementById('pomoFlipSec');
+    if(fMin)fMin.textContent=String(m).padStart(2,'0');if(fSec)fSec.textContent=String(s).padStart(2,'0');
+  } else if(st==='minimal'){
+    if(minimalWrap){minimalWrap.style.display='flex';const deg=prog*360;minimalWrap.style.background=`conic-gradient(var(--accent) ${deg}deg, var(--bg3) ${deg}deg)`;}
+    if(timeEl){timeEl.style.display='block';timeEl.textContent=timeStr;}
+  }
+}
+function openPomoDurEdit(){
+  if(pomoRunning)return;
+  const w=POMO_DUR_CUSTOM.work,sh=POMO_DUR_CUSTOM.short,lo=POMO_DUR_CUSTOM.long;
+  const modal=document.createElement('div');
+  modal.className='modal-overlay';modal.style.display='flex';
+  modal.innerHTML=`<div class="modal-box" style="padding:20px;">
+    <button class="modal-close-btn" onclick="this.closest('.modal-overlay').remove()">✕</button>
+    <div class="plabel" style="margin-bottom:14px;">Süre Ayarla (dakika)</div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:.75rem;color:var(--text2);width:80px;">Çalışma</span><input type="range" min="5" max="90" value="${w}" id="durWork" style="flex:1;" oninput="document.getElementById('durWorkVal').textContent=this.value"><span id="durWorkVal" style="font-size:.8rem;font-family:'JetBrains Mono',monospace;color:var(--accent2);width:28px;">${w}</span></div>
+      <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:.75rem;color:var(--text2);width:80px;">Kısa Mola</span><input type="range" min="1" max="30" value="${sh}" id="durShort" style="flex:1;" oninput="document.getElementById('durShortVal').textContent=this.value"><span id="durShortVal" style="font-size:.8rem;font-family:'JetBrains Mono',monospace;color:var(--easy);width:28px;">${sh}</span></div>
+      <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:.75rem;color:var(--text2);width:80px;">Uzun Mola</span><input type="range" min="5" max="45" value="${lo}" id="durLong" style="flex:1;" oninput="document.getElementById('durLongVal').textContent=this.value"><span id="durLongVal" style="font-size:.8rem;font-family:'JetBrains Mono',monospace;color:var(--note);width:28px;">${lo}</span></div>
+    </div>
+    <button onclick="savePomoDur()" style="width:100%;margin-top:14px;padding:10px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:10px;color:#fff;font-family:'Sora',sans-serif;font-size:.82rem;cursor:pointer;">Kaydet</button>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+}
+function savePomoDur(){
+  POMO_DUR_CUSTOM.work=parseInt(document.getElementById('durWork').value);
+  POMO_DUR_CUSTOM.short=parseInt(document.getElementById('durShort').value);
+  POMO_DUR_CUSTOM.long=parseInt(document.getElementById('durLong').value);
+  localStorage.setItem('capsula_pomo_dur',JSON.stringify(POMO_DUR_CUSTOM));
+  const wl=document.getElementById('pomoWorkLbl');const sl=document.getElementById('pomoShortLbl');const ll=document.getElementById('pomoLongLbl');
+  if(wl)wl.textContent=POMO_DUR_CUSTOM.work;if(sl)sl.textContent=POMO_DUR_CUSTOM.short;if(ll)ll.textContent=POMO_DUR_CUSTOM.long;
+  document.querySelector('.modal-overlay:last-of-type')?.remove();
+  setPomoMode(pomoMode);showToast('Süreler güncellendi ✓');
+}
+function setPomoStyle(s){
+  pomoStyle=s;localStorage.setItem('capsula_pomo_style',s);
+  document.querySelectorAll('.pomo-style-opt').forEach(el=>el.classList.toggle('active',el.id==='ps-'+s));
+  updatePomoDisplay();showToast('Saat stili değiştirildi');
 }
 function updatePomoSessions(){const c=document.getElementById('pomoSessions');c.innerHTML=Array.from({length:4},(_,i)=>`<div class="pomo-sess-dot${i<pomoSessions%4?' done':''}"></div>`).join('');}
 function renderPomoTodos(){
@@ -3471,27 +3324,7 @@ window.addEventListener('load',()=>{
   };
 
   runSplash(()=>{
-    if(!auth){
-      // Firebase yüklenemedi — offline mod, direkt uygulamaya gir
-      initApp();
-      return;
-    }
-    if(currentUser){
-      const hasPIN=localStorage.getItem('capsula_pin');
-      if(hasPIN)document.getElementById('pinScreen').style.display='flex';
-      else if(isFirstVisit)setTimeout(showWelcomeCard,500);
-    } else {
-      let authResolved=false;
-      const unsub=auth.onAuthStateChanged(u=>{
-        if(authResolved)return;
-        authResolved=true;
-        unsub();
-        if(!u)showAuthScreen();
-      });
-      setTimeout(()=>{
-        if(!authResolved){authResolved=true;showAuthScreen();}
-      },4000);
-    }
+    initApp();
   });
 });
 
