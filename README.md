@@ -2238,6 +2238,7 @@ function initApp(){
   renderKanban();renderReading();renderSchedule();renderExams();renderNotebook();renderPro();
   // Chat konuşma listesini arka planda dinle (badge için)
   if(currentUser)loadConversations();
+  if(currentUser)loadUserSlides();
 }
 
 const QUOTES=[
@@ -3180,6 +3181,36 @@ function renderReading(){
   document.getElementById('readingList').innerHTML=html||'<div class="empty-state">Okuma listesi boş.<br>Üstten kitap ekle.</div>';
 }
 
+function loadUserSlides(){
+  if(!currentUser||!db)return;
+  db.collection('userSlides').doc(currentUser.uid).collection('slides')
+    .orderBy('addedAt','desc').get().then(snap=>{
+      if(snap.empty)return;
+      const remoteSlides=snap.docs.map(d=>d.data());
+      // Yerel slides ile birleştir — id'ye göre
+      if(!D.slides)D.slides=[];
+      const localIds=new Set(D.slides.map(s=>String(s.id)));
+      const newOnes=remoteSlides.filter(s=>!localIds.has(String(s.id)));
+      if(!newOnes.length)return;
+      // Yeni slaytların PDF verisini chunks'tan çek
+      const promises=newOnes.map(s=>
+        db.collection('userSlides').doc(currentUser.uid).collection('slides').doc(s.id)
+          .collection('chunks').orderBy('idx').get().then(cSnap=>{
+            if(cSnap.empty)return{...s,base64:''};
+            const b64Parts=cSnap.docs.map(d=>d.data().data).join('');
+            return{...s,base64:'data:application/pdf;base64,'+b64Parts};
+          }).catch(()=>({...s,base64:''}))
+      );
+      Promise.all(promises).then(loaded=>{
+        loaded.forEach(sl=>{if(sl)D.slides.push(sl);});
+        D.slides.sort((a,b)=>new Date(b.addedAt)-new Date(a.addedAt));
+        localStorage.setItem('capsula_v4',JSON.stringify(D));
+        renderSlides();
+        showToast(loaded.length+' slayt senkronize edildi');
+      });
+    }).catch(console.warn);
+}
+
 // ─────────────────────────── SLIDES ───────────────────────────────────────
 // D.slides = [{id, name, category, pages, size, addedAt, base64(ilk sayfa thumb)}]
 let slidesCurCat='Tümü';
@@ -3187,46 +3218,82 @@ let slidesCurCat='Tümü';
 function uploadSlides(e){
   const files=[...e.target.files];
   if(!files.length)return;
-  let done=0;
+  let done=0,total=files.filter(f=>f.name.toLowerCase().endsWith('.pdf')).length;
+  if(!total){showToast('Sadece PDF destekleniyor');return;}
+
   files.forEach(file=>{
-    if(!file.name.toLowerCase().endsWith('.pdf')){showToast('Sadece PDF destekleniyor');return;}
-    if(file.size>20*1024*1024){showToast(file.name+' çok büyük (max 20MB)');return;}
+    if(!file.name.toLowerCase().endsWith('.pdf'))return;
+    if(file.size>15*1024*1024){showToast(file.name+' çok büyük (max 15MB)');return;}
+    showToast('Yükleniyor...');
     const reader=new FileReader();
     reader.onload=ev=>{
       const base64=ev.target.result;
-      // PDF.js ile ilk sayfayı render et
-      pdfjsLib.getDocument({data:atob(base64.split(',')[1])}).promise.then(pdf=>{
-        return pdf.getPage(1).then(page=>{
-          const vp=page.getViewport({scale:0.5});
-          const canvas=document.createElement('canvas');
-          canvas.width=vp.width;canvas.height=vp.height;
-          return page.render({canvasContext:canvas.getContext('2d'),viewport:vp}).promise.then(()=>{
-            const thumb=canvas.toDataURL('image/jpeg',0.7);
-            const slide={
-              id:Date.now()+Math.random(),
-              name:file.name.replace(/\.pdf$/i,''),
-              category:'Genel',
-              pages:pdf.numPages,
-              size:file.size,
-              addedAt:new Date().toISOString(),
-              thumb,
-              base64 // tam PDF
-            };
-            if(!D.slides)D.slides=[];
-            D.slides.unshift(slide);
-            localStorage.setItem('capsula_v4',JSON.stringify(D));
-            done++;
-            if(done===files.length){showToast(done+' PDF eklendi ✓');renderSlides();}
+      const arr=new Uint8Array(atob(base64.split(',')[1]).split('').map(c=>c.charCodeAt(0)));
+
+      const tryRender=(onThumb)=>{
+        if(typeof pdfjsLib==='undefined'){onThumb('');return;}
+        pdfjsLib.getDocument({data:arr}).promise.then(pdf=>{
+          return pdf.getPage(1).then(page=>{
+            const vp=page.getViewport({scale:0.4});
+            const canvas=document.createElement('canvas');
+            canvas.width=vp.width;canvas.height=vp.height;
+            return page.render({canvasContext:canvas.getContext('2d'),viewport:vp}).promise.then(()=>{
+              onThumb(canvas.toDataURL('image/jpeg',0.6));
+            });
           });
+        }).catch(()=>onThumb(''));
+      };
+
+      tryRender(thumb=>{
+        // pages sayısı
+        const getPages=(cb)=>{
+          if(typeof pdfjsLib==='undefined'){cb(0);return;}
+          pdfjsLib.getDocument({data:arr}).promise.then(p=>cb(p.numPages)).catch(()=>cb(0));
+        };
+        getPages(pages=>{
+          const slideId=Date.now()+'-'+Math.random().toString(36).slice(2);
+          const slide={
+            id:slideId,
+            name:file.name.replace(/\.pdf$/i,''),
+            category:'Genel',
+            pages,
+            size:file.size,
+            addedAt:new Date().toISOString(),
+            thumb,
+            base64
+          };
+          if(!D.slides)D.slides=[];
+          D.slides.unshift(slide);
+          // localStorage'a kaydet
+          localStorage.setItem('capsula_v4',JSON.stringify(D));
+          // Firestore'a thumb + metadata kaydet (base64 çok büyük olduğu için sadece meta)
+          if(currentUser&&db){
+            db.collection('userSlides').doc(currentUser.uid).collection('slides').doc(slideId).set({
+              id:slideId,
+              name:slide.name,
+              category:slide.category,
+              pages,
+              size:file.size,
+              addedAt:slide.addedAt,
+              thumb, // thumbnail Firestore'a sığar (~5KB)
+              // base64 çok büyük — Firestore doc limiti 1MB. Parçalara bölelim
+              hasData:true
+            }).then(()=>{
+              // PDF verisini 500KB'lık parçalara böl
+              const b64=base64.split(',')[1];
+              const chunkSize=600*1024; // 600KB
+              const chunks=[];
+              for(let i=0;i<b64.length;i+=chunkSize)chunks.push(b64.slice(i,i+chunkSize));
+              const chunkPromises=chunks.map((chunk,idx)=>
+                db.collection('userSlides').doc(currentUser.uid).collection('slides').doc(slideId)
+                  .collection('chunks').doc(String(idx)).set({data:chunk,idx})
+              );
+              return Promise.all(chunkPromises);
+            }).catch(console.warn);
+          }
+          done++;
+          if(done===total){showToast(done+' PDF eklendi ✓');renderSlides();}
         });
-      }).catch(()=>{
-        // PDF.js yüklü değilse thumbsuz kaydet
-        const slide={id:Date.now()+Math.random(),name:file.name.replace(/\.pdf$/i,''),category:'Genel',pages:'?',size:file.size,addedAt:new Date().toISOString(),thumb:'',base64};
-        if(!D.slides)D.slides=[];
-        D.slides.unshift(slide);
-        localStorage.setItem('capsula_v4',JSON.stringify(D));
-        done++;
-        if(done===files.length){showToast(done+' PDF eklendi');renderSlides();}
       });
     };
     reader.readAsDataURL(file);
@@ -3281,23 +3348,79 @@ function renderSlides(){
 }
 
 function openSlide(id){
-  const s=D.slides.find(x=>x.id==id);if(!s||!s.base64)return;
-  // PDF'i yeni sekmede veya modal içinde aç
-  const blob=dataURLtoBlob(s.base64);
-  const url=URL.createObjectURL(blob);
-  // Tam ekran modal
+  const s=D.slides.find(x=>String(x.id)===String(id));
+  if(!s||!s.base64)return;
+
+  // PDF.js ile tam ekran modal
   const modal=document.createElement('div');
-  modal.style.cssText='position:fixed;inset:0;z-index:4000;background:#000;display:flex;flex-direction:column;';
+  modal.id='pdfViewerModal';
+  modal.style.cssText='position:fixed;inset:0;z-index:4000;background:#111;display:flex;flex-direction:column;';
   modal.innerHTML=`
-    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(13,13,18,.95);border-bottom:1px solid var(--border);flex-shrink:0;">
-      <button onclick="this.closest('div[style]').remove();URL.revokeObjectURL('${url}')" style="background:none;border:none;color:var(--text2);cursor:pointer;padding:4px 8px;border-radius:8px;font-size:.8rem;font-family:'Sora',sans-serif;display:flex;align-items:center;gap:6px;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:16px;height:16px;"><polyline points="15 18 9 12 15 6"/></svg> Geri
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(13,13,18,.97);border-bottom:1px solid rgba(255,255,255,.1);flex-shrink:0;">
+      <button onclick="document.getElementById('pdfViewerModal').remove()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;cursor:pointer;padding:6px 12px;border-radius:8px;font-size:.75rem;font-family:'Sora',sans-serif;display:flex;align-items:center;gap:6px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;"><polyline points="15 18 9 12 15 6"/></svg> Geri
       </button>
-      <div style="flex:1;font-size:.82rem;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(s.name)}</div>
-      <span style="font-size:.6rem;font-family:'JetBrains Mono',monospace;color:var(--text3);">${s.pages} sayfa</span>
+      <div style="flex:1;font-size:.82rem;font-weight:500;color:#f0eeff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(s.name)}</div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+        <button onclick="pdfPrevPage()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;cursor:pointer;width:32px;height:32px;border-radius:8px;font-size:1rem;display:flex;align-items:center;justify-content:center;">‹</button>
+        <span id="pdfPageInfo" style="font-size:.68rem;font-family:'JetBrains Mono',monospace;color:rgba(255,255,255,.5);white-space:nowrap;">1 / ?</span>
+        <button onclick="pdfNextPage()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;cursor:pointer;width:32px;height:32px;border-radius:8px;font-size:1rem;display:flex;align-items:center;justify-content:center;">›</button>
+      </div>
     </div>
-    <iframe src="${url}" style="flex:1;border:none;width:100%;background:#1a1a1a;"></iframe>`;
+    <div style="flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:16px;background:#1a1a1a;">
+      <canvas id="pdfCanvas" style="max-width:100%;box-shadow:0 8px 32px rgba(0,0,0,.6);border-radius:4px;"></canvas>
+    </div>
+    <div id="pdfLoading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(17,17,17,.9);z-index:10;">
+      <div style="text-align:center;color:rgba(255,255,255,.6);">
+        <div style="font-size:.8rem;font-family:'Sora',sans-serif;margin-bottom:8px;">PDF yükleniyor...</div>
+        <div style="width:48px;height:2px;background:rgba(124,111,247,.3);border-radius:2px;margin:0 auto;overflow:hidden;"><div style="width:40%;height:100%;background:var(--accent);animation:loadBar .8s ease-in-out infinite alternate;border-radius:2px;"></div></div>
+      </div>
+    </div>`;
   document.body.appendChild(modal);
+
+  // PDF.js ile yükle
+  const data=atob(s.base64.split(',')[1]);
+  const arr=new Uint8Array(data.length);
+  for(let i=0;i<data.length;i++)arr[i]=data.charCodeAt(i);
+
+  window._pdfDoc=null;
+  window._pdfPage=1;
+
+  pdfjsLib.getDocument({data:arr}).promise.then(pdf=>{
+    window._pdfDoc=pdf;
+    window._pdfPage=1;
+    document.getElementById('pdfLoading').style.display='none';
+    renderPdfPage();
+  }).catch(err=>{
+    document.getElementById('pdfLoading').innerHTML='<div style="color:#f87171;font-size:.8rem;padding:20px;">PDF açılamadı: '+err.message+'</div>';
+  });
+}
+
+function renderPdfPage(){
+  if(!window._pdfDoc)return;
+  const canvas=document.getElementById('pdfCanvas');
+  if(!canvas)return;
+  const pageInfo=document.getElementById('pdfPageInfo');
+  if(pageInfo)pageInfo.textContent=window._pdfPage+' / '+window._pdfDoc.numPages;
+  window._pdfDoc.getPage(window._pdfPage).then(page=>{
+    const vw=canvas.parentElement.clientWidth-32;
+    const vp0=page.getViewport({scale:1});
+    const scale=Math.min(vw/vp0.width,3);
+    const vp=page.getViewport({scale});
+    canvas.width=vp.width;
+    canvas.height=vp.height;
+    page.render({canvasContext:canvas.getContext('2d'),viewport:vp});
+  });
+}
+
+function pdfNextPage(){
+  if(!window._pdfDoc)return;
+  if(window._pdfPage<window._pdfDoc.numPages){window._pdfPage++;renderPdfPage();}
+}
+
+function pdfPrevPage(){
+  if(!window._pdfDoc)return;
+  if(window._pdfPage>1){window._pdfPage--;renderPdfPage();}
 }
 
 function dataURLtoBlob(dataURL){
@@ -3401,85 +3524,123 @@ function renderChatPage(){
 
 function loadConversations(){
   if(convListUnsub)convListUnsub();
+  if(!currentUser||!db)return;
   const uid=currentUser.uid;
+
+  // Index gerektirmeyen basit sorgu — sadece members filtrele, sıralama client'ta
   convListUnsub=db.collection('conversations')
     .where('members','array-contains',uid)
-    .orderBy('lastMsgAt','desc')
     .onSnapshot(snap=>{
       let totalUnread=0;
-      const convItems=snap.docs.map(doc=>{
-        const d=doc.data();
-        const otherUid=d.members.find(m=>m!==uid);
-        const unread=d.unreadCount?.[uid]||0;
-        totalUnread+=unread;
-        return{id:doc.id,otherUid,data:d,unread};
-      });
+      const convItems=snap.docs
+        .map(doc=>{
+          const d=doc.data();
+          const otherUid=d.members?.find(m=>m!==uid);
+          if(!otherUid)return null;
+          const unread=d.unreadCount?.[uid]||0;
+          totalUnread+=unread;
+          return{id:doc.id,otherUid,data:d,unread};
+        })
+        .filter(Boolean)
+        .sort((a,b)=>{
+          const ta=a.data.lastMsgAt?.toDate?.()||new Date(0);
+          const tb=b.data.lastMsgAt?.toDate?.()||new Date(0);
+          return tb-ta;
+        });
 
-      // Arkadaş listesini de çek — konuşması olmayanlar da görünsün
+      // Arkadaş listesini çek
       db.collection('users').doc(uid).get().then(myDoc=>{
         const myFriends=myDoc.data()?.friends||[];
-        // Konuşması olan arkadaşların uid listesi
         const convUids=convItems.map(c=>c.otherUid);
-        // Konuşması olmayan arkadaşlar
         const noConvFriends=myFriends.filter(f=>!convUids.includes(f));
 
-        // Konuşması olan arkadaşların profillerini çek
-        const convPromises=convItems.map(item=>db.collection('users').doc(item.otherUid).get());
-        // Konuşması olmayan arkadaşların profillerini çek
-        const noConvPromises=noConvFriends.map(f=>db.collection('users').doc(f).get());
+        const allUids=[...convUids,...noConvFriends];
+        if(!allUids.length){
+          document.getElementById('chatConvList').innerHTML='<div class="chat-empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:36px;height:36px;opacity:.3;margin-bottom:12px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div>Henüz arkadaşın yok</div><div style="font-size:.65rem;margin-top:4px;opacity:.6;">Drawer\'dan arkadaş ekleyebilirsin</div></div>';
+          updateChatNavBadge(0);
+          return;
+        }
 
-        Promise.all([Promise.all(convPromises),Promise.all(noConvPromises)]).then(([convDocs,noConvDocs])=>{
+        // Tüm kullanıcı profillerini çek
+        Promise.all(allUids.map(u=>db.collection('users').doc(u).get())).then(userDocs=>{
+          const userMap={};
+          userDocs.forEach(d=>{if(d.exists)userMap[d.id]=d.data();});
+
           let html='';
-          // Önce konuşmalar
-          convDocs.forEach((udoc,i)=>{
-            const u=udoc.exists?udoc.data():{name:'Kullanıcı',username:'',avatarThumb:''};
-            const item=convItems[i];
-            const d=item.data;
-            const isActive=activeChatUid===item.otherUid;
-            const timeStr=d.lastMsgAt?fmtChatTime(d.lastMsgAt.toDate?.()||new Date(d.lastMsgAt)):'';
-            const avatarHtml=u.avatarThumb?`<img src="${u.avatarThumb}">`:`<span>${(u.name||'?').slice(0,2).toUpperCase()}</span>`;
-            html+=`<div class="chat-conv-item${isActive?' active':''}" onclick="openChat('${item.otherUid}')">
-              <div class="chat-conv-avatar">${avatarHtml}</div>
-              <div class="chat-conv-info">
-                <div class="chat-conv-name">${escHtml(u.name||'')}</div>
-                <div class="chat-conv-preview">${item.unread>0?`<strong>${escHtml(d.lastMsg||'')}</strong>`:escHtml(d.lastMsg||'Merhaba de!')}</div>
-              </div>
-              <div class="chat-conv-meta">
-                <div class="chat-conv-time">${timeStr}</div>
-                ${item.unread>0?`<div class="chat-conv-badge">${item.unread}</div>`:''}
-              </div>
-            </div>`;
-          });
-          // Konuşması olmayan arkadaşlar (yeni sohbet başlatmak için)
-          if(noConvDocs.length){
-            if(convDocs.length) html+=`<div style="font-size:.52rem;letter-spacing:.15em;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;padding:12px 4px 6px;">Arkadaşlar</div>`;
-            noConvDocs.forEach(udoc=>{
-              if(!udoc.exists)return;
-              const u=udoc.data();
+          // Konuşmalar
+          if(convItems.length){
+            convItems.forEach(item=>{
+              const u=userMap[item.otherUid]||{name:'Kullanıcı',username:'',avatarThumb:''};
+              const d=item.data;
+              const isActive=activeChatUid===item.otherUid;
+              const timeStr=d.lastMsgAt?fmtChatTime(d.lastMsgAt.toDate?.()||new Date(d.lastMsgAt)):'';
               const avatarHtml=u.avatarThumb?`<img src="${u.avatarThumb}">`:`<span>${(u.name||'?').slice(0,2).toUpperCase()}</span>`;
-              html+=`<div class="chat-conv-item" onclick="openChat('${udoc.id}')">
+              html+=`<div class="chat-conv-item${isActive?' active':''}" onclick="openChat('${item.otherUid}')">
                 <div class="chat-conv-avatar">${avatarHtml}</div>
                 <div class="chat-conv-info">
                   <div class="chat-conv-name">${escHtml(u.name||'')}</div>
-                  <div class="chat-conv-preview" style="font-style:italic;">Merhaba de 👋</div>
+                  <div class="chat-conv-preview">${item.unread>0?`<b>${escHtml(d.lastMsg||'')}</b>`:escHtml(d.lastMsg||'')}</div>
                 </div>
                 <div class="chat-conv-meta">
-                  <div class="chat-conv-time" style="color:var(--accent2);font-size:.55rem;">Yeni</div>
+                  <div class="chat-conv-time">${timeStr}</div>
+                  ${item.unread>0?`<div class="chat-conv-badge">${item.unread}</div>`:''}
                 </div>
               </div>`;
             });
           }
-          if(!html){
-            html='<div class="chat-empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:36px;height:36px;opacity:.3;margin-bottom:12px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div>Henüz arkadaşın yok</div><div style="font-size:.65rem;margin-top:4px;opacity:.6;">Drawer\'dan arkadaş ekleyebilirsin</div></div>';
+          // Konuşması olmayan arkadaşlar
+          if(noConvFriends.length){
+            if(convItems.length)html+=`<div style="font-size:.52rem;letter-spacing:.15em;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;padding:12px 6px 6px;">Arkadaşlar</div>`;
+            noConvFriends.forEach(fuid=>{
+              const u=userMap[fuid];
+              if(!u)return;
+              const avatarHtml=u.avatarThumb?`<img src="${u.avatarThumb}">`:`<span>${(u.name||'?').slice(0,2).toUpperCase()}</span>`;
+              html+=`<div class="chat-conv-item" onclick="openChat('${fuid}')">
+                <div class="chat-conv-avatar">${avatarHtml}</div>
+                <div class="chat-conv-info">
+                  <div class="chat-conv-name">${escHtml(u.name||'')}</div>
+                  <div class="chat-conv-preview" style="font-style:italic;opacity:.7;">Merhaba de 👋</div>
+                </div>
+                <div class="chat-conv-meta">
+                  <div style="font-size:.55rem;color:var(--accent2);">Yeni</div>
+                </div>
+              </div>`;
+            });
           }
-          document.getElementById('chatConvList').innerHTML=html;
+          if(!html)html='<div class="chat-empty-state">Henüz kimse yok</div>';
+          const el=document.getElementById('chatConvList');
+          if(el)el.innerHTML=html;
           const tb=document.getElementById('chatUnreadTotal');
-          if(totalUnread>0){tb.style.display='';tb.textContent=totalUnread+' yeni';}
-          else tb.style.display='none';
+          if(tb){if(totalUnread>0){tb.style.display='';tb.textContent=totalUnread+' yeni';}else tb.style.display='none';}
           updateChatNavBadge(totalUnread);
         });
-      }).catch(err=>{console.warn('conv list err',err);});
-    },err=>console.warn('conv list err',err));
+      }).catch(err=>console.warn('friends fetch err',err));
+    },err=>{
+      console.warn('conv list err',err);
+      // Index hatası olabilir — sadece arkadaşları göster
+      db.collection('users').doc(uid).get().then(myDoc=>{
+        const myFriends=myDoc.data()?.friends||[];
+        if(!myFriends.length){
+          const el=document.getElementById('chatConvList');
+          if(el)el.innerHTML='<div class="chat-empty-state">Henüz arkadaşın yok</div>';
+          return;
+        }
+        Promise.all(myFriends.map(f=>db.collection('users').doc(f).get())).then(docs=>{
+          let html='';
+          docs.forEach(d=>{
+            if(!d.exists)return;
+            const u=d.data();
+            const avatarHtml=u.avatarThumb?`<img src="${u.avatarThumb}">`:`<span>${(u.name||'?').slice(0,2).toUpperCase()}</span>`;
+            html+=`<div class="chat-conv-item" onclick="openChat('${d.id}')">
+              <div class="chat-conv-avatar">${avatarHtml}</div>
+              <div class="chat-conv-info"><div class="chat-conv-name">${escHtml(u.name||'')}</div><div class="chat-conv-preview" style="font-style:italic;opacity:.7;">Merhaba de 👋</div></div>
+            </div>`;
+          });
+          const el=document.getElementById('chatConvList');
+          if(el)el.innerHTML=html||'<div class="chat-empty-state">Henüz kimse yok</div>';
+        });
+      });
+    });
 }
 
 function updateChatNavBadge(count){
