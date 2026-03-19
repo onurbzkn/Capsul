@@ -914,6 +914,12 @@ select.pf option{background:var(--bg2);color:var(--text);}
             <div class="pp hard" data-p="hard" onclick="selectPriority('hard')">Zor</div>
           </div>
           <input type="datetime-local" class="date-pick" id="todoDate" title="Tarih ve saat seç">
+          <select id="todoRepeat" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:4px 7px;font-family:'Sora',sans-serif;font-size:.65rem;color:var(--text2);outline:none;cursor:pointer;">
+            <option value="">Tekrar yok</option>
+            <option value="daily">Her gün 🔁</option>
+            <option value="weekly">Her hafta</option>
+            <option value="monthly">Her ay</option>
+          </select>
           <button class="add-todo-btn" onclick="addTodo()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
@@ -1081,6 +1087,22 @@ select.pf option{background:var(--bg2);color:var(--text);}
 
     <!-- READING (Uni) -->
     <div class="page" id="page-reading">
+      <!-- Bugün oku kutusu -->
+      <div id="readingTodayCard" style="display:none;background:linear-gradient(135deg,rgba(124,111,247,.1),rgba(168,157,254,.06));border:1px solid rgba(124,111,247,.25);border-radius:14px;padding:14px;margin-bottom:14px;">
+        <div style="font-size:.52rem;letter-spacing:.15em;font-family:'JetBrains Mono',monospace;color:var(--accent2);text-transform:uppercase;margin-bottom:8px;">📖 Şu An Okuduğun</div>
+        <div id="readingActiveTitle" style="font-size:.86rem;font-weight:500;color:var(--text);margin-bottom:10px;"></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <div style="flex:1;background:var(--bg3);border-radius:6px;height:6px;overflow:hidden;">
+            <div id="readingProgressBar" style="height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:6px;transition:width .4s;width:0%;"></div>
+          </div>
+          <span id="readingProgressPct" style="font-size:.62rem;font-family:'JetBrains Mono',monospace;color:var(--accent2);flex-shrink:0;">0%</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="number" id="readingPageInput" placeholder="Sayfa no" min="1" style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-family:'Sora',sans-serif;font-size:.8rem;color:var(--text);outline:none;" onkeydown="if(event.key==='Enter')updateReadingPage()">
+          <button onclick="updateReadingPage()" style="background:var(--accent);border:none;border-radius:8px;padding:7px 14px;color:#fff;font-family:'Sora',sans-serif;font-size:.72rem;cursor:pointer;white-space:nowrap;">Güncelle</button>
+        </div>
+        <div id="readingAIEstimate" style="margin-top:8px;font-size:.68rem;color:var(--text3);font-style:italic;line-height:1.5;"></div>
+      </div>
       <div class="action-row">
         <button class="action-btn a-uni" onclick="openReadingAdd()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Kitap / Makale Ekle
@@ -1815,6 +1837,7 @@ function initApp(){
   initSettingsToggles();
   updateNotifBadge();
   checkSmartNotifications();
+  checkRecurringTodos();
   renderDiaryAIPrompt();
   setMode(curMode);
   renderTodos();renderNotes();renderDiary();renderDashboard();renderCalendar();
@@ -2000,11 +2023,16 @@ function switchPage(page){
 // ─────────────────────────── THEME ────────────────────────────────────────
 const THEMES=['default','midnight','forest','sunset','ocean','sand'];
 function applyTheme(name,el){
+  // Akıcı geçiş
+  document.body.style.transition='background .4s,color .4s';
+  document.documentElement.style.transition='--bg .4s,--bg2 .4s,--bg3 .4s';
   THEMES.forEach(t=>document.body.classList.remove('theme-'+t));
   if(name!=='default')document.body.classList.add('theme-'+name);
   document.querySelectorAll('.theme-swatch').forEach(s=>s.classList.remove('active'));
   if(el)el.classList.add('active');
+  else{const sw=document.querySelector(`.theme-swatch[data-theme="${name}"]`);if(sw)sw.classList.add('active');}
   D.profile.theme=name;saveData();
+  setTimeout(()=>document.body.style.transition='',500);
 }
 function initTheme(){
   const t=D.profile.theme||'default';
@@ -2428,13 +2456,73 @@ function updTrashBadge(){if(!D.contentTrash)D.contentTrash=[];const total=(D.tra
 
 // ─────────────────────────── TODO ─────────────────────────────────────────
 function selectPriority(p){curPriority=p;document.querySelectorAll('.pp').forEach(el=>el.classList.toggle('sel',el.dataset.p===p));}
-function addTodo(){const inp=document.getElementById('todoInput');const text=inp.value.trim();if(!text)return;const rawDue=document.getElementById('todoDate').value;let dueDate=null,dueTime=null;if(rawDue){const[d,t]=rawDue.split('T');dueDate=d;dueTime=t?t.slice(0,5):null;}D.todos.push({id:Date.now(),text,priority:curPriority,dueDate:dueDate||null,dueTime:dueTime||null,createdAt:new Date().toISOString()});inp.value='';document.getElementById('todoDate').value='';saveData();renderTodos();updateReminderBadge();showToast('Görev eklendi');}
+function addTodo(){
+  const inp=document.getElementById('todoInput');
+  const text=inp.value.trim();if(!text)return;
+  const rawDue=document.getElementById('todoDate').value;
+  let dueDate=null,dueTime=null;
+  if(rawDue){const[d,t]=rawDue.split('T');dueDate=d;dueTime=t?t.slice(0,5):null;}
+  const repeat=document.getElementById('todoRepeat')?.value||'';
+  D.todos.push({id:Date.now(),text,priority:curPriority,dueDate:dueDate||null,dueTime:dueTime||null,repeat:repeat||null,createdAt:new Date().toISOString()});
+  inp.value='';document.getElementById('todoDate').value='';
+  if(document.getElementById('todoRepeat'))document.getElementById('todoRepeat').value='';
+  saveData();renderTodos();updateReminderBadge();showToast('Görev eklendi');
+}
+
+// Tekrarlayan görevleri kontrol et - her gün initApp'te çağrılır
+function checkRecurringTodos(){
+  const today=new Date().toISOString().split('T')[0];
+  const lastCheck=localStorage.getItem('capsula_recurring_check');
+  if(lastCheck===today)return;
+  localStorage.setItem('capsula_recurring_check',today);
+  const toAdd=[];
+  D.completedTodos.filter(t=>t.repeat).forEach(t=>{
+    const completed=t.completedAt?.split('T')[0]||'';
+    if(!completed)return;
+    const cDate=new Date(completed);
+    const tDate=new Date(today);
+    let shouldAdd=false;
+    if(t.repeat==='daily')shouldAdd=true;
+    else if(t.repeat==='weekly'){const diff=(tDate-cDate)/(1000*60*60*24);shouldAdd=diff>=7;}
+    else if(t.repeat==='monthly'){shouldAdd=tDate.getMonth()!==cDate.getMonth()||tDate.getFullYear()!==cDate.getFullYear();}
+    if(shouldAdd&&!D.todos.some(x=>x.text===t.text&&x.repeat===t.repeat)){
+      toAdd.push({id:Date.now()+Math.random(),text:t.text,priority:t.priority,dueDate:today,dueTime:t.dueTime||null,repeat:t.repeat,createdAt:new Date().toISOString()});
+    }
+  });
+  if(toAdd.length){D.todos.push(...toAdd);saveData();renderTodos();showToast(`${toAdd.length} tekrarlayan görev eklendi 🔁`);}
+}
 function completeTodo(id){const idx=D.todos.findIndex(t=>t.id===id);if(idx===-1)return;const el=document.getElementById('todo-'+id);if(el)el.classList.add('completing');setTimeout(()=>{const t=D.todos.splice(idx,1)[0];t.completedAt=new Date().toISOString();D.completedTodos.unshift(t);saveData();renderTodos();showToast('Tamamlandı ✓');},360);}
 function uncompleteTodo(id){const idx=D.completedTodos.findIndex(t=>t.id===id);if(idx===-1)return;const t=D.completedTodos.splice(idx,1)[0];delete t.completedAt;D.todos.push(t);saveData();renderTodos();}
 function moveTodoToTrash(id){const idx=D.completedTodos.findIndex(t=>t.id===id);if(idx===-1)return;const t=D.completedTodos.splice(idx,1)[0];t.trashedAt=new Date().toISOString();D.trash.push(t);saveData();updTrashBadge();renderTodos();showToast('Çöpe taşındı');}
 function getDueClass(dd){if(!dd)return'';const diff=Math.ceil((new Date(dd)-new Date())/86400000);if(diff<0)return'overdue';if(diff===0)return'today';if(diff<=3)return'soon';return'';}
 function getDueLabel(dd){if(!dd)return'';const diff=Math.ceil((new Date(dd)-new Date())/86400000);if(diff<0)return Math.abs(diff)+'g gecikti';if(diff===0)return'Bugün';if(diff===1)return'Yarın';return fmtDate(dd);}
-function todoItemHtml(t,labels,dl,dc){const timeStr=t.dueTime?`<span class="due-tag" style="color:var(--text3);">⏰ ${t.dueTime}</span>`:'';return`<div class="todo-item ${t.priority}" id="todo-${t.id}"><div class="todo-check" onclick="completeTodo(${t.id})"></div><div class="todo-body"><div class="todo-text">${escHtml(t.text)}</div><div class="todo-meta"><span class="todo-badge">${labels[t.priority]}</span>${dl?`<span class="due-tag ${dc}">${dl}</span>`:''}${timeStr}</div></div><div class="todo-dot"></div></div>`;}
+function todoItemHtml(t,labels,dl,dc){
+  const timeStr=t.dueTime?`<span class="due-tag" style="color:var(--text3);">⏰ ${t.dueTime}</span>`:'';
+  const repeatIco=t.repeat?`<span style="font-size:.58rem;color:var(--accent2);margin-left:3px;">${t.repeat==='daily'?'🔁 Günlük':t.repeat==='weekly'?'🔁 Haftalık':'🔁 Aylık'}</span>`:'';
+  return`<div class="todo-item ${t.priority}" id="todo-${t.id}" draggable="true" ondragstart="dragTodo(event,${t.id})">
+    <div class="todo-check" onclick="completeTodo(${t.id})"></div>
+    <div class="todo-body">
+      <div class="todo-text">${escHtml(t.text)}</div>
+      <div class="todo-meta">
+        <span class="todo-badge">${labels[t.priority]}</span>
+        ${dl?`<span class="due-tag ${dc}">${dl}</span>`:''}
+        ${timeStr}${repeatIco}
+      </div>
+    </div>
+    <div class="todo-dot"></div>
+  </div>`;
+}
+
+function dragTodo(e,id){e.dataTransfer.setData('todoId',String(id));e.dataTransfer.effectAllowed='move';}
+function dropTodoOnDay(e,dateKey){
+  e.preventDefault();
+  const id=parseInt(e.dataTransfer.getData('todoId'));
+  const todo=D.todos.find(t=>t.id===id);
+  if(!todo)return;
+  todo.dueDate=dateKey;
+  saveData();renderTodos();renderCalendar();
+  showToast(`Görev taşındı → ${dateKey}`);
+}
 function renderTodos(){
   const labels={hard:'Zor',mid:'Orta',easy:'Kolay'};
   const today=new Date();today.setHours(0,0,0,0);
@@ -2592,7 +2680,13 @@ function renderCalendar(){
   if(!D.calPlans)D.calPlans={};
   let html='';
   for(let i=0;i<sd;i++)html+=`<div class="cal-day other">${dip-sd+1+i}</div>`;
-  for(let d=1;d<=dim;d++){const isToday=d===today.getDate()&&calMonth===today.getMonth()&&calYear===today.getFullYear();const hasPlan=!!D.calPlans[calDayKey(calYear,calMonth,d)];const hasTodo=todoDays.has(d);const isOverdue=overdueDays.has(d);html+=`<div class="cal-day${isToday?' today':''}${d===selCalDay?' selected':''}${diaryDays.has(d)?' has-entry':''}${hasPlan?' has-plan':''}${hasTodo?' has-todo':''}${isOverdue?' overdue-dot':''}" onclick="selectDay(${d})">${d}</div>`;}
+  for(let d=1;d<=dim;d++){
+    const isToday=d===today.getDate()&&calMonth===today.getMonth()&&calYear===today.getFullYear();
+    const hasPlan=!!D.calPlans[calDayKey(calYear,calMonth,d)];
+    const hasTodo=todoDays.has(d);const isOverdue=overdueDays.has(d);
+    const dk=calDayKey(calYear,calMonth,d);
+    html+=`<div class="cal-day${isToday?' today':''}${d===selCalDay?' selected':''}${diaryDays.has(d)?' has-entry':''}${hasPlan?' has-plan':''}${hasTodo?' has-todo':''}${isOverdue?' overdue-dot':''}" onclick="selectDay(${d})" ondragover="event.preventDefault();this.style.background='rgba(124,111,247,.2)'" ondragleave="this.style.background=''" ondrop="dropTodoOnDay(event,'${dk}');this.style.background=''">${d}</div>`;
+  }
   const rem=42-sd-dim;for(let d=1;d<=rem;d++)html+=`<div class="cal-day other">${d}</div>`;
   document.getElementById('calGrid').innerHTML=html;
   const q=getDayQuote(calYear,calMonth,selCalDay);
@@ -2863,39 +2957,155 @@ function deleteKanbanCard(id,col){
 
 // ─────────────────────────── WEEKLY ───────────────────────────────────────
 function renderWeekly(){
-  const now=new Date();const ws=new Date(now);ws.setDate(now.getDate()-now.getDay()+1);ws.setHours(0,0,0,0);
+  const now=new Date();
+  const ws=new Date(now);ws.setDate(now.getDate()-((now.getDay()+6)%7));ws.setHours(0,0,0,0);
   const we=new Date(ws);we.setDate(ws.getDate()+7);
+  const todayKey=now.toISOString().split('T')[0];
+
+  // Bu hafta istatistikleri
   const cw=D.completedTodos.filter(t=>new Date(t.completedAt)>=ws&&new Date(t.completedAt)<we);
   const dw=D.diary.filter(e=>new Date(e.createdAt)>=ws&&new Date(e.createdAt)<we);
   const nw=D.notes.filter(n=>new Date(n.createdAt)>=ws&&new Date(n.createdAt)<we);
-  const days=['Pt','Sa','Ça','Pe','Cu','Ct','Pz'];
-  const barData=days.map((_,i)=>{const d=new Date(ws);d.setDate(ws.getDate()+i);const dk=d.toISOString().split('T')[0];return D.completedTodos.filter(t=>t.completedAt?.startsWith(dk)).length;});
-  const maxBar=Math.max(...barData,1);
-  const barColors=['var(--accent)','var(--note)','var(--easy)','var(--mid)','var(--hard)','var(--diary)','var(--accent2)'];
   const streak=calcStreak();
+
+  // Günlük bar verisi (Pzt-Paz)
+  const days=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+  const barData=days.map((_,i)=>{
+    const d=new Date(ws);d.setDate(ws.getDate()+i);
+    const dk=d.toISOString().split('T')[0];
+    return{
+      count:D.completedTodos.filter(t=>t.completedAt?.startsWith(dk)).length,
+      isToday:dk===todayKey,
+      day:days[i]
+    };
+  });
+  const maxBar=Math.max(...barData.map(b=>b.count),1);
+
+  // Son 4 haftanın karşılaştırması
+  const weeklyTrend=[];
+  for(let w=0;w<4;w++){
+    const wStart=new Date(ws);wStart.setDate(ws.getDate()-w*7);
+    const wEnd=new Date(wStart);wEnd.setDate(wStart.getDate()+7);
+    weeklyTrend.unshift(D.completedTodos.filter(t=>{const d=new Date(t.completedAt);return d>=wStart&&d<wEnd;}).length);
+  }
+
+  // Öncelik dağılımı
+  const byPrio={easy:0,mid:0,hard:0};
+  cw.forEach(t=>byPrio[t.priority||'mid']++);
+  const prioTotal=cw.length||1;
+
+  // Bugün tamamlanan
+  const todayDone=D.completedTodos.filter(t=>t.completedAt?.startsWith(todayKey));
+
   document.getElementById('weeklyContent').innerHTML=`
-    <div class="weekly-card">
-      <div class="weekly-card-title">Bu Haftanın Özeti</div>
-      <div class="weekly-stats">
-        <div class="wstat-box"><div class="wstat-num">${cw.length}</div><div class="wstat-label">Görev</div></div>
-        <div class="wstat-box"><div class="wstat-num">${dw.length}</div><div class="wstat-label">Günlük</div></div>
-        <div class="wstat-box"><div class="wstat-num">${nw.length}</div><div class="wstat-label">Not</div></div>
+    <!-- Streak kartı -->
+    <div class="weekly-card" style="background:linear-gradient(135deg,rgba(124,111,247,.12),rgba(168,157,254,.06));border-color:rgba(124,111,247,.25);">
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div style="font-size:2.4rem;line-height:1;">${streak>=7?'🔥':streak>=3?'⚡':'✨'}</div>
+        <div style="flex:1;">
+          <div style="font-size:1.8rem;font-weight:600;color:var(--accent2);font-family:'JetBrains Mono',monospace;line-height:1;">${streak}</div>
+          <div style="font-size:.72rem;color:var(--text2);margin-top:2px;">günlük seri 🔥</div>
+          <div style="font-size:.6rem;color:var(--text3);margin-top:1px;">${streak>=7?'Harika gidiyorsun! Devam et 💪':streak>=3?'İyi momentum, devam!':'Her gün bir adım at'}</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:1.2rem;font-weight:600;color:var(--easy);font-family:'JetBrains Mono',monospace;">${todayDone.length}</div>
+          <div style="font-size:.56rem;color:var(--text3);">bugün</div>
+        </div>
       </div>
-      <div class="week-bars">${barData.map((v,i)=>`<div class="week-bar" style="height:${Math.max(4,(v/maxBar)*44)}px;background:${barColors[i]};"></div>`).join('')}</div>
-      <div class="week-bar-labels">${days.map(d=>`<div class="week-bar-label">${d}</div>`).join('')}</div>
     </div>
+
+    <!-- Bu hafta özeti -->
     <div class="weekly-card">
-      <div class="streak-row"><div class="streak-num">${streak}</div><div class="streak-info"><div class="streak-label">Günlük Seri 🔥</div><div class="streak-sub">Arka arkaya aktif gün</div></div></div>
+      <div class="weekly-card-title" style="margin-bottom:12px;">Bu Hafta</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
+        <div style="background:var(--bg3);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-size:1.4rem;font-weight:600;color:var(--accent2);font-family:'JetBrains Mono',monospace;">${cw.length}</div>
+          <div style="font-size:.56rem;color:var(--text3);margin-top:2px;">Görev</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-size:1.4rem;font-weight:600;color:var(--diary);font-family:'JetBrains Mono',monospace;">${dw.length}</div>
+          <div style="font-size:.56rem;color:var(--text3);margin-top:2px;">Günlük</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:10px;padding:10px;text-align:center;">
+          <div style="font-size:1.4rem;font-weight:600;color:var(--note);font-family:'JetBrains Mono',monospace;">${nw.length}</div>
+          <div style="font-size:.56rem;color:var(--text3);margin-top:2px;">Not</div>
+        </div>
+      </div>
+
+      <!-- Günlük bar chart -->
+      <div style="display:flex;align-items:flex-end;gap:4px;height:52px;margin-bottom:4px;">
+        ${barData.map(b=>`
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%;">
+            <div style="flex:1;width:100%;display:flex;align-items:flex-end;">
+              <div style="width:100%;height:${Math.max(3,(b.count/maxBar)*44)}px;background:${b.isToday?'var(--accent)':'var(--border2)'};border-radius:3px 3px 0 0;transition:height .4s;"></div>
+            </div>
+            ${b.count>0?`<div style="font-size:.42rem;font-family:'JetBrains Mono',monospace;color:var(--accent2);">${b.count}</div>`:''}
+          </div>`).join('')}
+      </div>
+      <div style="display:flex;gap:4px;">
+        ${barData.map(b=>`<div style="flex:1;text-align:center;font-size:.48rem;font-family:'JetBrains Mono',monospace;color:${b.isToday?'var(--accent2)':'var(--text3)'};">${b.day}</div>`).join('')}
+      </div>
     </div>
+
+    <!-- Öncelik dağılımı -->
+    ${cw.length?`<div class="weekly-card">
+      <div class="weekly-card-title" style="margin-bottom:10px;">Öncelik Dağılımı</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        ${[{k:'easy',lbl:'Kolay',clr:'var(--easy)'},{k:'mid',lbl:'Orta',clr:'var(--mid)'},{k:'hard',lbl:'Zor',clr:'var(--hard)'}].map(p=>`
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="font-size:.66rem;color:var(--text3);width:36px;">${p.lbl}</div>
+            <div style="flex:1;background:var(--bg3);border-radius:4px;height:7px;overflow:hidden;">
+              <div style="height:100%;width:${(byPrio[p.k]/prioTotal*100).toFixed(0)}%;background:${p.clr};border-radius:4px;transition:width .5s;"></div>
+            </div>
+            <div style="font-size:.62rem;font-family:'JetBrains Mono',monospace;color:${p.clr};width:16px;text-align:right;">${byPrio[p.k]}</div>
+          </div>`).join('')}
+      </div>
+    </div>`:''}
+
+    <!-- 4 haftalık trend -->
     <div class="weekly-card">
-      <div class="weekly-card-title">Tamamlananlar (Bu Hafta)</div>
-      ${cw.length?cw.map(t=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);"><svg viewBox="0 0 24 24" fill="none" stroke="var(--easy)" stroke-width="2.5" style="width:13px;height:13px;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size:.8rem;font-weight:300;color:var(--text2);">${escHtml(t.text)}</span></div>`).join(''):'<div style="color:var(--text3);font-size:.76rem;font-style:italic;padding:8px 0;">Bu hafta tamamlanan görev yok.</div>'}
+      <div class="weekly-card-title" style="margin-bottom:10px;">Son 4 Hafta</div>
+      <div style="display:flex;align-items:flex-end;gap:8px;height:44px;margin-bottom:4px;">
+        ${weeklyTrend.map((v,i)=>{const maxT=Math.max(...weeklyTrend,1);return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
+          <div style="font-size:.48rem;font-family:'JetBrains Mono',monospace;color:${i===3?'var(--accent2)':'var(--text3)'};">${v}</div>
+          <div style="width:100%;height:${Math.max(4,(v/maxT)*36)}px;background:${i===3?'var(--accent)':'var(--border2)'};border-radius:3px 3px 0 0;"></div>
+        </div>`;}).join('')}
+      </div>
+      <div style="display:flex;gap:8px;">
+        ${weeklyTrend.map((_,i)=>`<div style="flex:1;text-align:center;font-size:.48rem;color:${i===3?'var(--accent2)':'var(--text3)'};">${i===3?'Bu hafta':`-${3-i}h`}</div>`).join('')}
+      </div>
     </div>
+
+    <!-- Bu hafta tamamlananlar -->
+    <div class="weekly-card">
+      <div class="weekly-card-title" style="margin-bottom:8px;">Tamamlananlar</div>
+      ${cw.length?cw.slice(0,8).map(t=>`
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--easy)" stroke-width="2.5" style="width:12px;height:12px;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
+          <span style="flex:1;font-size:.76rem;font-weight:300;color:var(--text2);">${escHtml(t.text)}</span>
+          <span style="font-size:.52rem;font-family:'JetBrains Mono',monospace;color:var(--text3);">${t.completedAt?.split('T')[0]?.slice(5)||''}</span>
+        </div>`).join('')
+      :'<div style="color:var(--text3);font-size:.74rem;padding:8px 0;font-style:italic;">Bu hafta henüz tamamlanan görev yok.</div>'}
+      ${cw.length>8?`<div style="font-size:.62rem;color:var(--text3);padding:6px 0;">+${cw.length-8} görev daha</div>`:''}
+    </div>
+
     <div class="action-row">
-      <button class="action-btn a-pro" onclick="exportData()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Dışa Aktar</button>
+      <button class="action-btn a-pro" onclick="exportData()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Dışa Aktar
+      </button>
     </div>`;
 }
-function calcStreak(){let s=0;const now=new Date();now.setHours(0,0,0,0);for(let i=0;i<365;i++){const d=new Date(now);d.setDate(now.getDate()-i);const dk=d.toISOString().split('T')[0];const ok=D.completedTodos.some(t=>t.completedAt?.startsWith(dk))||D.diary.some(e=>e.createdAt?.startsWith(dk))||D.notes.some(n=>n.createdAt?.startsWith(dk));if(ok)s++;else if(i>0)break;}return s;}
+
+function calcStreak(){
+  let s=0;const now=new Date();now.setHours(0,0,0,0);
+  for(let i=0;i<365;i++){
+    const d=new Date(now);d.setDate(now.getDate()-i);
+    const dk=d.toISOString().split('T')[0];
+    const ok=D.completedTodos.some(t=>t.completedAt?.startsWith(dk))||D.diary.some(e=>e.createdAt?.startsWith(dk))||D.notes.some(n=>n.createdAt?.startsWith(dk));
+    if(ok)s++;else if(i>0)break;
+  }
+  return s;
+}
 
 // ─────────────────────────── READING ──────────────────────────────────────
 function openReadingAdd(){document.getElementById('readingTitleInput').value='';document.getElementById('readingAuthorInput').value='';document.getElementById('readingStatusInput').value='toread';openModal('readingAddModal');}
@@ -2919,11 +3129,140 @@ function saveReadingItem(){
 }
 function cycleReadingStatus(id){const item=D.reading.find(r=>r.id===id);if(!item)return;const cycle={toread:'reading',reading:'done',done:'toread'};item.status=cycle[item.status];saveData();renderReading();}
 function renderReading(){
-  const groups={reading:[],toread:[],done:[]};D.reading.forEach(r=>groups[r.status].push(r));
-  const labels={reading:'Okunuyor',toread:'Okunacak',done:'Tamamlandı'};
+  const groups={reading:[],toread:[],done:[]};
+  D.reading.forEach(r=>groups[r.status].push(r));
+  const labels={reading:'📖 Okunuyor',toread:'📌 Okunacak',done:'✅ Tamamlandı'};
+  const typeIco={book:'📚',article:'📄',paper:'🔬',other:'📎'};
   let html='';
-  ['reading','toread','done'].forEach(s=>{if(!groups[s].length)return;html+=`<div class="reading-group-title">${labels[s]}</div>`;groups[s].forEach(item=>html+=`<div class="reading-item" onclick="cycleReadingStatus(${item.id})"><div class="reading-dot ${item.status}"></div><div class="reading-info"><div class="reading-title">${escHtml(item.title)}</div>${item.author?`<div class="reading-author">${escHtml(item.author)}</div>`:''}</div><span class="reading-badge ${item.status}">${labels[item.status]}</span></div>`);});
+
+  // Okunuyor grubunu üstte göster - ilerleme çubuğuyla
+  if(groups.reading.length){
+    html+=`<div class="reading-group-title">${labels.reading}</div>`;
+    groups.reading.forEach(item=>{
+      const pct=item.pages?Math.min(100,Math.round((item.pagesRead||0)/item.pages*100)):0;
+      const ico=typeIco[item.type||'book']||'📚';
+      html+=`<div class="reading-item" style="flex-direction:column;align-items:stretch;gap:8px;" onclick="openReadingDetail(${item.id})">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="font-size:1.2rem;flex-shrink:0;">${ico}</div>
+          <div style="flex:1;min-width:0;">
+            <div class="reading-title">${escHtml(item.title)}</div>
+            ${item.author?`<div class="reading-author">${escHtml(item.author)}</div>`:''}
+          </div>
+          <button onclick="event.stopPropagation();openReadingPageUpdate(${item.id})" style="background:var(--accent);border:none;border-radius:7px;padding:4px 10px;font-size:.62rem;color:#fff;cursor:pointer;white-space:nowrap;">Sayfa gir</button>
+        </div>
+        ${item.pages?`
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+            <span style="font-size:.58rem;color:var(--text3);">${item.pagesRead||0} / ${item.pages} sayfa</span>
+            <span style="font-size:.58rem;font-family:'JetBrains Mono',monospace;color:var(--accent2);">${pct}%</span>
+          </div>
+          <div style="background:var(--bg3);border-radius:4px;height:5px;overflow:hidden;">
+            <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width .4s;"></div>
+          </div>
+          ${getReadingAIEstimate(item)}
+        </div>`:''}
+      </div>`;
+    });
+  }
+
+  ['toread','done'].forEach(s=>{
+    if(!groups[s].length)return;
+    html+=`<div class="reading-group-title">${labels[s]}</div>`;
+    groups[s].forEach(item=>{
+      const ico=typeIco[item.type||'book']||'📚';
+      const pct=item.pages?Math.min(100,Math.round((item.pagesRead||0)/item.pages*100)):0;
+      html+=`<div class="reading-item" onclick="openReadingDetail(${item.id})">
+        <div style="font-size:1.1rem;flex-shrink:0;">${ico}</div>
+        <div class="reading-info" style="flex:1;min-width:0;">
+          <div class="reading-title">${escHtml(item.title)}</div>
+          ${item.author?`<div class="reading-author">${escHtml(item.author)}</div>`:''}
+          ${item.pages&&s==='done'?`<div style="font-size:.56rem;color:var(--easy);margin-top:2px;">${item.pages} sayfa tamamlandı</div>`:''}
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <span class="reading-badge ${item.status}">${s==='done'?'✓':'📌'}</span>
+          ${item.goalDate?`<span style="font-size:.52rem;font-family:'JetBrains Mono',monospace;color:var(--text3);">${item.goalDate}</span>`:''}
+        </div>
+      </div>`;
+    });
+  });
+
   document.getElementById('readingList').innerHTML=html||'<div class="empty-state">Okuma listesi boş.<br>Üstten kitap ekle.</div>';
+  updateReadingTodayCard();
+}
+
+function getReadingAIEstimate(item){
+  if(!item.pages||!item.pagesRead||!item.startDate)return'';
+  const start=new Date(item.startDate);const now=new Date();
+  const daysPassed=Math.max(1,Math.ceil((now-start)/(1000*60*60*24)));
+  const rate=item.pagesRead/daysPassed; // sayfa/gün
+  if(rate<0.1)return'';
+  const remaining=item.pages-item.pagesRead;
+  const daysLeft=Math.ceil(remaining/rate);
+  const finishDate=new Date(now);finishDate.setDate(now.getDate()+daysLeft);
+  const finishStr=finishDate.toLocaleDateString('tr-TR',{day:'numeric',month:'short'});
+  const rateStr=rate>=1?`${rate.toFixed(1)} sayfa/gün`:`${Math.round(1/rate)} günde 1 sayfa`;
+  return`<div style="font-size:.6rem;color:var(--text3);margin-top:4px;font-style:italic;">🤖 Bu hızda (${rateStr}) ${finishStr}'de bitirirsin — ${daysLeft} gün kaldı</div>`;
+}
+
+function updateReadingTodayCard(){
+  const card=document.getElementById('readingTodayCard');
+  if(!card)return;
+  const active=D.reading.find(r=>r.status==='reading');
+  if(!active){card.style.display='none';return;}
+  card.style.display='block';
+  const titleEl=document.getElementById('readingActiveTitle');
+  const barEl=document.getElementById('readingProgressBar');
+  const pctEl=document.getElementById('readingProgressPct');
+  const estimateEl=document.getElementById('readingAIEstimate');
+  if(titleEl)titleEl.textContent=active.title;
+  const pct=active.pages?Math.min(100,Math.round((active.pagesRead||0)/active.pages*100)):0;
+  if(barEl)barEl.style.width=pct+'%';
+  if(pctEl)pctEl.textContent=pct+'%';
+  const inp=document.getElementById('readingPageInput');
+  if(inp)inp.placeholder=`Mevcut: sayfa ${active.pagesRead||0}${active.pages?' / '+active.pages:''}`;
+  if(estimateEl){
+    const est=getReadingAIEstimate(active);
+    estimateEl.innerHTML=est?est.replace('<div ','<span ').replace('</div>','</span>'):'';
+  }
+}
+
+function openReadingPageUpdate(id){
+  const item=D.reading.find(r=>r.id===id);if(!item)return;
+  const modal=document.createElement('div');
+  modal.id='readingPageModal';
+  modal.style.cssText='position:fixed;inset:0;z-index:3500;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:22px;width:100%;max-width:300px;">
+    <button onclick="document.getElementById('readingPageModal').remove()" style="float:right;background:none;border:none;cursor:pointer;color:var(--text3);font-size:1.1rem;">✕</button>
+    <div style="font-size:.84rem;font-weight:500;color:var(--text);margin-bottom:4px;">${escHtml(item.title)}</div>
+    <div style="font-size:.66rem;color:var(--text3);margin-bottom:14px;">${item.pages?`Toplam: ${item.pages} sayfa`:''}</div>
+    <div style="font-size:.72rem;color:var(--text2);margin-bottom:6px;">Şu anki sayfa:</div>
+    <input type="number" id="rpModalInput" min="0" max="${item.pages||9999}" value="${item.pagesRead||0}"
+      style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:1.1rem;font-family:'JetBrains Mono',monospace;color:var(--text);outline:none;text-align:center;margin-bottom:12px;box-sizing:border-box;">
+    <button onclick="saveReadingPage(${id})" style="width:100%;padding:11px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:10px;color:#fff;font-family:'Sora',sans-serif;font-size:.84rem;cursor:pointer;">Kaydet</button>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+  setTimeout(()=>document.getElementById('rpModalInput')?.focus(),100);
+}
+
+function saveReadingPage(id){
+  const item=D.reading.find(r=>r.id===id);if(!item)return;
+  const val=parseInt(document.getElementById('rpModalInput')?.value)||0;
+  item.pagesRead=val;
+  if(item.pages&&val>=item.pages){
+    item.status='done';
+    item.completedAt=new Date().toISOString();
+    addNotification(`🎉 "${item.title}" kitabını bitirdin! Tebrikler!`,'reading');
+    showToast('Kitap tamamlandı! 🎉');
+  } else {
+    showToast(`Sayfa güncellendi: ${val}${item.pages?' / '+item.pages:''}`);
+  }
+  document.getElementById('readingPageModal')?.remove();
+  saveData();renderReading();
+}
+
+function openReadingDetail(id){
+  openReadingPageUpdate(id);
 }
 
 
