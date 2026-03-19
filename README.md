@@ -3273,14 +3273,19 @@ function uploadSlides(e){
       };
       if(typeof pdfjsLib!=='undefined'){
         pdfjsLib.getDocument({data:arr}).promise.then(pdf=>{
+          const totalPages=pdf.numPages;
           pdf.getPage(1).then(page=>{
-            const vp=page.getViewport({scale:0.4});
+            // Daha yüksek scale ile net thumbnail
+            const vp0=page.getViewport({scale:1});
+            const targetW=320;
+            const scale=targetW/vp0.width;
+            const vp=page.getViewport({scale});
             const cv=document.createElement('canvas');
             cv.width=vp.width;cv.height=vp.height;
             page.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise
-              .then(()=>makeSlide(cv.toDataURL('image/jpeg',0.6),pdf.numPages))
-              .catch(()=>makeSlide('',pdf.numPages));
-          }).catch(()=>makeSlide('',pdf.numPages));
+              .then(()=>makeSlide(cv.toDataURL('image/jpeg',0.88),totalPages))
+              .catch(()=>makeSlide('',totalPages));
+          }).catch(()=>makeSlide('',totalPages));
         }).catch(()=>makeSlide('',0));
       } else makeSlide('',0);
     };
@@ -3330,7 +3335,7 @@ function renderSlides(){
       <div class="slide-info">
         <div class="slide-name">${escHtml(s.name)}</div>
         <div class="slide-meta">
-          <span>${s.pages} sayfa · ${(s.size/1024/1024).toFixed(1)}MB</span>
+          <span>${s.pages&&s.pages>0?s.pages+' sayfa':'? sayfa'} · ${s.size?(s.size/1024/1024).toFixed(1)+'MB':''}</span>
           <span class="slide-cat-tag">${escHtml(s.category||'Genel')}</span>
         </div>
       </div>
@@ -3381,6 +3386,16 @@ function openSlide(id){
     window._pdfPage=1;
     document.getElementById('pdfLoading').style.display='none';
     renderPdfPage();
+    // Sayfa sayısı 0 ise güncelle
+    if(s.pages===0||!s.pages){
+      s.pages=pdf.numPages;
+      localStorage.setItem('capsula_v4',JSON.stringify(D));
+      // Firestore'u da güncelle
+      if(currentUser&&db){
+        db.collection('userSlides').doc(currentUser.uid).collection('slides').doc(String(s.id))
+          .update({pages:pdf.numPages}).catch(()=>{});
+      }
+    }
   }).catch(err=>{
     document.getElementById('pdfLoading').innerHTML='<div style="color:#f87171;font-size:.8rem;padding:20px;">PDF açılamadı: '+err.message+'</div>';
   });
