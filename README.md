@@ -2693,39 +2693,34 @@ async function sendContactForm(){
   const btn=document.getElementById('contactSendBtn');
   const status=document.getElementById('contactStatus');
   btn.disabled=true;btn.textContent='Gönderiliyor...';btn.style.opacity='.6';
-  // EmailJS ile gönder (public key gerekmiyor - sadece template)
   try{
-    const res=await fetch('https://api.emailjs.com/api/v1.0/email/send',{
+    const res=await fetch('https://formspree.io/f/xzzbbkgv',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
       body:JSON.stringify({
-        service_id:'service_capsula',
-        template_id:'template_contact',
-        user_id:'YOUR_PUBLIC_KEY',
-        template_params:{
-          from_name:name||'Anonim',
-          from_email:email||'belirtilmedi',
-          message:msg,
-          app_version:'Capsula v4'
-        }
+        name:name||'Anonim',
+        email:email||'belirtilmedi',
+        message:msg,
+        _subject:'Capsula Uygulama Geri Bildirimi'
       })
     });
-    if(res.ok){
+    const data=await res.json();
+    if(res.ok&&!data.errors){
       btn.style.display='none';
       status.style.display='block';status.style.color='var(--easy)';
       status.textContent='✓ Mesajınız iletildi! Teşekkür ederiz.';
       showToast('Mesaj gönderildi ✓');
     } else {
-      throw new Error('API hatası');
+      throw new Error(data.errors?.[0]?.message||'Hata');
     }
   }catch(e){
-    // EmailJS kurulmamışsa mailto fallback
-    const subject=encodeURIComponent('Capsula Uygulama Geri Bildirimi');
-    const body=encodeURIComponent(`Ad: ${name||'-'}\nEmail: ${email||'-'}\n\n${msg}`);
-    window.location.href=`mailto:onurbozkan472@gmail.com?subject=${subject}&body=${body}`;
     btn.disabled=false;btn.textContent='Gönder';btn.style.opacity='1';
+    // Fallback: mailto
+    const subject=encodeURIComponent('Capsula Uygulama Geri Bildirimi');
+    const body=encodeURIComponent('Ad: '+(name||'-')+'\nEmail: '+(email||'-')+'\n\n'+msg);
+    window.open('mailto:onurbozkan472@gmail.com?subject='+subject+'&body='+body);
     status.style.display='block';status.style.color='var(--text3)';
-    status.textContent='Mail uygulamanız açıldı.';
+    status.textContent='Mail uygulamanız açıldı (yedek yöntem).';
   }
 }
 
