@@ -263,7 +263,7 @@ main{flex:1;overflow:hidden;position:relative;isolation:auto;}
 .completed-list.open{max-height:2000px;}
 
 /* ── NOTES ───────────────────────────────────────────────────────────────── */
-.notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;overflow:visible;padding:8px 4px;}
+.notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
 .note-card{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:14px;cursor:pointer;transition:all .22s;min-height:120px;display:flex;flex-direction:column;gap:7px;position:relative;overflow:visible;}
 .note-card::after{content:'';position:absolute;inset:0;border-radius:13px;background:linear-gradient(135deg,rgba(96,165,250,.07),transparent);opacity:0;transition:opacity .22s;}
 .note-card:hover{border-color:rgba(96,165,250,.3);transform:translateY(-2px);box-shadow:0 6px 22px rgba(0,0,0,.3);}
@@ -3025,26 +3025,35 @@ function tagColor(tag){const colors=['#60a5fa','#a78bfa','#f472b6','#4ade80','#f
 
 
 function renderNotes(){
-  const grid=document.getElementById('notes-grid');const empty=document.getElementById('notes-empty');
+  const grid=document.getElementById('notes-grid');
+  const empty=document.getElementById('notes-empty');
   if(!D.notes.length){grid.innerHTML='';empty.style.display='block';return;}
   empty.style.display='none';
-  grid.innerHTML=D.notes.map(n=>{
-    const media=(n.media||[]).map(m=>`<span class="note-media-tag">${m.type}</span>`).join('');
+  const items=D.notes.map(n=>{
     const tags=(n.tags||[]).map(t=>`<span class="note-tag-chip" style="color:${tagColor(t)};border-color:${tagColor(t)}44;">#${escHtml(t)}</span>`).join('');
-    return`<div class="note-card" style="overflow:hidden;cursor:pointer;padding:0;">
-      <div onclick="viewEntry('note',${n.id})" style="padding:14px 14px 10px;display:flex;flex-direction:column;gap:6px;">
-        <div class="note-card-title">${escHtml(n.title||'Başlıksız')}</div>
-        <div class="note-card-preview">${escHtml(n.content||'')}</div>
-        ${tags?`<div style="display:flex;gap:3px;flex-wrap:wrap;">${tags}</div>`:''}
-        <div style="display:flex;gap:3px;flex-wrap:wrap;">${media}</div>
-        <div class="note-card-date">${fmtDate(n.createdAt)}</div>
-      </div>
-      <div style="display:flex;border-top:1px solid var(--border);">
-        <button onclick="openNoteEdit(${n.id})" style="flex:1;background:none;border:none;border-right:1px solid var(--border);padding:7px 0;font-size:.62rem;color:var(--text3);cursor:pointer;font-family:'Sora',sans-serif;transition:background .15s;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">✏️ Düzenle</button>
-        <button onclick="deleteNoteConfirm(${n.id})" style="flex:1;background:none;border:none;padding:7px 0;font-size:.62rem;color:var(--text3);cursor:pointer;font-family:'Sora',sans-serif;transition:background .15s;" onmouseover="this.style.background='rgba(248,113,113,.08)';this.style.color='var(--hard)'" onmouseout="this.style.background='none';this.style.color='var(--text3)'">🗑 Sil</button>
-      </div>
-    </div>`;
-  }).join('');
+    const nid=n.id;
+    return '<div class="note-card">'
+      +'<div class="note-card-title">'+escHtml(n.title||'Başlıksız')+'</div>'
+      +'<div class="note-card-preview">'+escHtml((n.content||'').slice(0,80))+'</div>'
+      +(tags?'<div style="display:flex;gap:3px;flex-wrap:wrap;">'+tags+'</div>':'')
+      +'<div class="note-card-date">'+fmtDate(n.createdAt)+'</div>'
+      +'<div style="display:flex;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">'
+      +'<button style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:5px 0;font-size:.6rem;color:var(--text2);cursor:pointer;" onclick="event.stopPropagation();openNoteEdit('+nid+')">✏️ Düzenle</button>'
+      +'<button style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:5px 0;font-size:.6rem;color:var(--text2);cursor:pointer;" onclick="event.stopPropagation();deleteNoteConfirm('+nid+')">🗑 Sil</button>'
+      +'</div>'
+      +'</div>';
+  });
+  grid.innerHTML=items.join('');
+  // Tıklama event'lerini sonradan ekle - onclick attr sorunlarını önler
+  grid.querySelectorAll('.note-card').forEach((card,i)=>{
+    const n=D.notes[i];
+    if(!n)return;
+    card.style.cursor='pointer';
+    card.addEventListener('click',function(e){
+      if(e.target.tagName==='BUTTON')return;
+      viewEntry('note',n.id);
+    });
+  });
 }
 
 // ─────────────────────────── DIARY ────────────────────────────────────────
