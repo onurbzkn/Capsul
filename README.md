@@ -2694,33 +2694,30 @@ async function sendContactForm(){
   const status=document.getElementById('contactStatus');
   btn.disabled=true;btn.textContent='Gönderiliyor...';btn.style.opacity='.6';
   try{
-    const res=await fetch('https://formspree.io/f/xzzbbkgv',{
+    const formData=new FormData();
+    formData.append('name',name||'Anonim');
+    formData.append('email',email||'belirtilmedi');
+    formData.append('message',msg);
+    formData.append('_subject','Capsula Geri Bildirimi');
+    const res=await fetch('https://formspree.io/f/mpqybwjw',{
       method:'POST',
-      headers:{'Content-Type':'application/json','Accept':'application/json'},
-      body:JSON.stringify({
-        name:name||'Anonim',
-        email:email||'belirtilmedi',
-        message:msg,
-        _subject:'Capsula Uygulama Geri Bildirimi'
-      })
+      body:formData,
+      headers:{'Accept':'application/json'}
     });
     const data=await res.json();
-    if(res.ok&&!data.errors){
+    if(res.ok){
       btn.style.display='none';
       status.style.display='block';status.style.color='var(--easy)';
-      status.textContent='✓ Mesajınız iletildi! Teşekkür ederiz.';
+      status.innerHTML='✓ Mesajınız iletildi! Teşekkür ederiz 🙏';
       showToast('Mesaj gönderildi ✓');
     } else {
-      throw new Error(data.errors?.[0]?.message||'Hata');
+      throw new Error(JSON.stringify(data.errors));
     }
   }catch(e){
+    console.error('Form hatası:',e);
     btn.disabled=false;btn.textContent='Gönder';btn.style.opacity='1';
-    // Fallback: mailto
-    const subject=encodeURIComponent('Capsula Uygulama Geri Bildirimi');
-    const body=encodeURIComponent('Ad: '+(name||'-')+'\nEmail: '+(email||'-')+'\n\n'+msg);
-    window.open('mailto:onurbozkan472@gmail.com?subject='+subject+'&body='+body);
-    status.style.display='block';status.style.color='var(--text3)';
-    status.textContent='Mail uygulamanız açıldı (yedek yöntem).';
+    status.style.display='block';status.style.color='var(--hard)';
+    status.innerHTML='Hata oluştu. <a href="mailto:onurbozkan472@gmail.com" style="color:var(--accent2)">Doğrudan mail gönder</a>';
   }
 }
 
