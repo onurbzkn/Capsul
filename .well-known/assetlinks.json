@@ -2,7 +2,9 @@
   "relation": ["delegate_permission/common.handle_all_urls"],
   "target": {
     "namespace": "android_app",
-    "package_name": "com.capsulaapp.twa",
-    "sha256_cert_fingerprints": ["16:36:DD:8F:5A:F4:C1:4A:0F:BC:54:BF:A2:08:0D:1D:8A:08:76:4E:E7:D8:CA:BE:91:3F:B1:C3:BE:B0:4C:3A"]
+    "package_name": "com.capsulaapp.app",
+    "sha256_cert_fingerprints": [
+      "DF:C5:44:82:C0:3E:DC:AF:F4:A3:84:B4:52:73:EC:01:B6:BA:32:1E:AC:F7:D3:09:D1:19:EA:06:88:64:55:ED"
+    ]
   }
 }]
