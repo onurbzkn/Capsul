@@ -5,14 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Capsula</title>
 <link rel="manifest" href="/app/manifest.json">
+<link rel="apple-touch-icon" sizes="192x192" href="/app/.icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="/app/.icons/icon-512.png">
 <meta name="theme-color" content="#7c6ff7">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Capsula">
 <meta name="description" content="Her şeyin kişisel alanı. Notlar, görevler, pomodoro ve daha fazlası.">
+<!-- Fonts: preconnect → render-blocking @import yerine non-blocking -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap"></noscript>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://formspree.io; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'self';">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap');
 :root{
   --bg:#0d0d12;--bg2:#14141d;--bg3:#1c1c28;
   --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
@@ -1977,22 +1985,60 @@ function getDayQuote(y,m,d){const seed=y*366+m*31+d;return QUOTES[((seed%QUOTES.
 
 // ─────────────────────────── DATA ─────────────────────────────────────────
 // ─────────────────────────── ENCRYPTION (AES-256-GCM) ─────────────────────
-// Kullanıcı hiçbir şey fark etmez — tüm veriler şeffaf şifrelenir
-const CRYPTO_KEY_NAME='capsula_ck_v1';
+// Anahtar IndexedDB'de extractable:false olarak saklanır — localStorage'a asla yazılmaz
+// Şifrelenmiş veri hâlâ localStorage'da durur ama anahtarsız işe yaramaz
+const CRYPTO_KEY_NAME='capsula_ck_v1'; // IndexedDB record adı (eski localStorage key'i ile çakışmasın diye temizlenir)
 const DATA_KEY='capsula_v4';
+const IDB_NAME='capsula_keystore';
+const IDB_STORE='keys';
 let _cryptoKey=null;
+
+// ── IndexedDB yardımcıları ──
+function _openKeyDB(){
+  return new Promise((res,rej)=>{
+    const req=indexedDB.open(IDB_NAME,1);
+    req.onupgradeneeded=e=>e.target.result.createObjectStore(IDB_STORE);
+    req.onsuccess=e=>res(e.target.result);
+    req.onerror=e=>rej(e.target.error);
+  });
+}
+async function _idbGet(key){
+  const db=await _openKeyDB();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction(IDB_STORE,'readonly');
+    const req=tx.objectStore(IDB_STORE).get(key);
+    req.onsuccess=e=>res(e.target.result);
+    req.onerror=e=>rej(e.target.error);
+  });
+}
+async function _idbSet(key,val){
+  const db=await _openKeyDB();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction(IDB_STORE,'readwrite');
+    const req=tx.objectStore(IDB_STORE).put(val,key);
+    req.onsuccess=()=>res();
+    req.onerror=e=>rej(e.target.error);
+  });
+}
 
 async function getCryptoKey(){
   if(_cryptoKey)return _cryptoKey;
-  // Mevcut anahtarı al veya yeni üret
-  const stored=localStorage.getItem(CRYPTO_KEY_NAME);
-  if(stored){
-    const raw=Uint8Array.from(atob(stored),c=>c.charCodeAt(0));
-    _cryptoKey=await crypto.subtle.importKey('raw',raw,{name:'AES-GCM'},false,['encrypt','decrypt']);
-  } else {
-    _cryptoKey=await crypto.subtle.generateKey({name:'AES-GCM',length:256},true,['encrypt','decrypt']);
-    const exported=await crypto.subtle.exportKey('raw',_cryptoKey);
-    localStorage.setItem(CRYPTO_KEY_NAME,btoa(String.fromCharCode(...new Uint8Array(exported))));
+  // Eski localStorage anahtarını temizle (tek seferlik migrasyon)
+  localStorage.removeItem(CRYPTO_KEY_NAME);
+  try{
+    // IndexedDB'den non-extractable key'i yükle
+    const stored=await _idbGet(CRYPTO_KEY_NAME);
+    if(stored){
+      _cryptoKey=stored; // zaten CryptoKey nesnesi, export edilemez
+    } else {
+      // İlk kez: üret ve IndexedDB'ye göm — raw bytes asla dışarı çıkmaz
+      _cryptoKey=await crypto.subtle.generateKey({name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+      await _idbSet(CRYPTO_KEY_NAME,_cryptoKey);
+    }
+  }catch(e){
+    // IndexedDB erişilemiyorsa (private mode vb.) session-only key üret
+    if(!_cryptoKey)
+      _cryptoKey=await crypto.subtle.generateKey({name:'AES-GCM',length:256},false,['encrypt','decrypt']);
   }
   return _cryptoKey;
 }
@@ -2006,7 +2052,10 @@ async function encryptData(obj){
     const combined=new Uint8Array(iv.length+cipher.byteLength);
     combined.set(iv);combined.set(new Uint8Array(cipher),iv.length);
     return btoa(String.fromCharCode(...combined));
-  }catch(e){return JSON.stringify(obj);}
+  }catch(e){
+    // Şifreleme başarısız — plaintext yazmak yerine hatayı yukarı fırlat
+    throw new Error('capsula_encrypt_failed: '+e.message);
+  }
 }
 
 async function decryptData(str){
@@ -2048,11 +2097,16 @@ let D={
   profile:{name:'Kullanıcı',email:'ornek@eposta.com',avatar:'',theme:'default'},
 };
 
-// saveData artık async şifreli kayıt
+// saveData — şifreleme başarısız olursa veri hiç yazılmaz, kullanıcı bilgilendirilir
+let _saveErrorShown=false;
 function saveData(){
-  saveDataEncrypted().catch(()=>{
-    // Fallback: şifresiz kayıt
-    localStorage.setItem(DATA_KEY,JSON.stringify(D));
+  saveDataEncrypted().catch(err=>{
+    console.error('Capsula kayıt hatası:',err);
+    if(!_saveErrorShown){
+      _saveErrorShown=true;
+      showToast('⚠️ Veri kaydedilemedi — tarayıcı şifrelemeyi desteklemiyor olabilir');
+      setTimeout(()=>{_saveErrorShown=false;},10000);
+    }
   });
 }
 
@@ -2163,18 +2217,39 @@ function initTheme(){
 
 // ─────────────────────────── PIN ──────────────────────────────────────────
 let pinBuffer='';
+
+// PIN'i SHA-256 ile hash'leyip sakla — plaintext asla localStorage'a yazılmaz
+async function hashPin(pin){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('capsula_pin_salt:'+pin));
+  return btoa(String.fromCharCode(...new Uint8Array(buf)));
+}
+async function verifyPin(input,storedHash){
+  // Migrasyon: eski plaintext PIN (4 karakter) → hash'e otomatik yükselt
+  // SHA-256 base64 her zaman 44 karakterdir; 4 karakter ise eski plaintext demektir
+  if(storedHash&&storedHash.length===4){
+    if(input!==storedHash)return false;
+    // Eşleşti — sessizce hash'e çevir, kullanıcı fark etmez
+    const hashed=await hashPin(input);
+    localStorage.setItem('capsula_pin',hashed);
+    return true;
+  }
+  return await hashPin(input)===storedHash;
+}
+
 function showPinScreen(){const ps=document.getElementById('pinScreen');ps.style.display='flex';pinBuffer='';updatePinDots();}
 function hidePinScreen(){const ps=document.getElementById('pinScreen');ps.classList.add('hiding');setTimeout(()=>{ps.style.display='none';ps.classList.remove('hiding');const firstVisit=!localStorage.getItem('capsula_toured');if(firstVisit)setTimeout(showWelcomeCard,400);},420);}
-function pinKey(k){if(pinBuffer.length>=4)return;pinBuffer+=k;updatePinDots();if(pinBuffer.length===4){setTimeout(()=>{if(pinBuffer===localStorage.getItem('capsula_pin'))hidePinScreen();else{document.querySelectorAll('#pinDots .pin-dot').forEach(d=>d.classList.add('error'));setTimeout(()=>{document.querySelectorAll('#pinDots .pin-dot').forEach(d=>d.classList.remove('error'));pinBuffer='';updatePinDots();},500);}},80);}}
+function pinKey(k){if(pinBuffer.length>=4)return;pinBuffer+=k;updatePinDots();if(pinBuffer.length===4){setTimeout(async()=>{const stored=localStorage.getItem('capsula_pin');const ok=await verifyPin(pinBuffer,stored);if(ok)hidePinScreen();else{document.querySelectorAll('#pinDots .pin-dot').forEach(d=>d.classList.add('error'));setTimeout(()=>{document.querySelectorAll('#pinDots .pin-dot').forEach(d=>d.classList.remove('error'));pinBuffer='';updatePinDots();},500);}},80);}}
 function pinDel(){if(pinBuffer.length>0){pinBuffer=pinBuffer.slice(0,-1);updatePinDots();}}
 function updatePinDots(){for(let i=0;i<4;i++){const d=document.getElementById('pd'+i);if(d){d.classList.toggle('filled',i<pinBuffer.length);d.classList.remove('error');}}}
-function pinForgot(){if(confirm('PIN sıfırlanacak?')){localStorage.removeItem('capsula_pin');D.profile.pinEnabled=false;saveData();hidePinScreen();showToast('PIN kaldırıldı');}}
+function pinForgot(){showConfirm('PIN sıfırlanacak? Bu işlem geri alınamaz.',()=>{localStorage.removeItem('capsula_pin');D.profile.pinEnabled=false;saveData();hidePinScreen();showToast('PIN kaldırıldı');});}
 function togglePinSetting(){const tog=document.getElementById('pinToggle');if(tog.classList.contains('on'))showPinDisablePrompt();else{tog.classList.add('on');document.getElementById('pinSetupArea').style.display='block';}}
-function showPinDisablePrompt(){window._pinDisableBuf='';for(let i=0;i<4;i++){const d=document.getElementById('dd'+i);if(d)d.classList.remove('filled','error');}openModal('pinDisableModal');}
-function pinDisableKey(k){if((window._pinDisableBuf||'').length>=4)return;window._pinDisableBuf=(window._pinDisableBuf||'')+k;for(let i=0;i<4;i++){const d=document.getElementById('dd'+i);if(d)d.classList.toggle('filled',i<window._pinDisableBuf.length);}if(window._pinDisableBuf.length===4){setTimeout(()=>{if(window._pinDisableBuf===localStorage.getItem('capsula_pin')){closeModal('pinDisableModal');removePinCode();document.getElementById('pinToggle').classList.remove('on');document.getElementById('pinSetupArea').style.display='none';showToast('PIN kilidi kaldırıldı');}else{document.querySelectorAll('#pinDisableDots .pin-dot').forEach(d=>d.classList.add('error'));setTimeout(()=>{document.querySelectorAll('#pinDisableDots .pin-dot').forEach(d=>{d.classList.remove('error','filled');});window._pinDisableBuf='';},600);}},80);}}
-function pinDisableDel(){const b=window._pinDisableBuf||'';window._pinDisableBuf=b.slice(0,-1);for(let i=0;i<4;i++){const d=document.getElementById('dd'+i);if(d)d.classList.toggle('filled',i<window._pinDisableBuf.length);}}
-function pinDisableCancel(){closeModal('pinDisableModal');window._pinDisableBuf='';}
-function savePinCode(){const val=document.getElementById('newPinInput').value;if(!/^\d{4}$/.test(val)){showToast('4 haneli rakam gir');return;}localStorage.setItem('capsula_pin',val);D.profile.pinEnabled=true;saveData();document.getElementById('newPinInput').value='';document.getElementById('pinSetupArea').style.display='none';document.getElementById('pinToggle').classList.add('on');showToast('PIN kaydedildi 🔒');}
+// _pinDisableBuf modül kapsamında — window'a asla yazılmaz
+let _pinDisableBuf='';
+function showPinDisablePrompt(){_pinDisableBuf='';for(let i=0;i<4;i++){const d=document.getElementById('dd'+i);if(d)d.classList.remove('filled','error');}openModal('pinDisableModal');}
+function pinDisableKey(k){if(_pinDisableBuf.length>=4)return;_pinDisableBuf+=k;for(let i=0;i<4;i++){const d=document.getElementById('dd'+i);if(d)d.classList.toggle('filled',i<_pinDisableBuf.length);}if(_pinDisableBuf.length===4){setTimeout(async()=>{const stored=localStorage.getItem('capsula_pin');const ok=await verifyPin(_pinDisableBuf,stored);if(ok){closeModal('pinDisableModal');removePinCode();document.getElementById('pinToggle').classList.remove('on');document.getElementById('pinSetupArea').style.display='none';showToast('PIN kilidi kaldırıldı');}else{document.querySelectorAll('#pinDisableDots .pin-dot').forEach(d=>d.classList.add('error'));setTimeout(()=>{document.querySelectorAll('#pinDisableDots .pin-dot').forEach(d=>{d.classList.remove('error','filled');});_pinDisableBuf='';},600);}},80);}}
+function pinDisableDel(){_pinDisableBuf=_pinDisableBuf.slice(0,-1);for(let i=0;i<4;i++){const d=document.getElementById('dd'+i);if(d)d.classList.toggle('filled',i<_pinDisableBuf.length);}}
+function pinDisableCancel(){closeModal('pinDisableModal');_pinDisableBuf='';}
+async function savePinCode(){const val=document.getElementById('newPinInput').value;if(!/^\d{4}$/.test(val)){showToast('4 haneli rakam gir');return;}const hashed=await hashPin(val);localStorage.setItem('capsula_pin',hashed);D.profile.pinEnabled=true;saveData();document.getElementById('newPinInput').value='';document.getElementById('pinSetupArea').style.display='none';document.getElementById('pinToggle').classList.add('on');showToast('PIN kaydedildi 🔒');}
 function removePinCode(){localStorage.removeItem('capsula_pin');D.profile.pinEnabled=false;saveData();}
 function initPinToggle(){document.getElementById('pinToggle').classList.toggle('on',!!localStorage.getItem('capsula_pin'));}
 
@@ -2285,7 +2360,7 @@ function selectSystemAvatar(id){
   if(!av)return;
   D.profile.avatarId=id;
   D.profile.avatar=''; // özel fotoğraf varsa temizle
-  localStorage.setItem('capsula_v4',JSON.stringify(D));
+  saveData();
   // Avatar görselini güncelle - emoji+gradient
   const initials=D.profile.name.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase()||'KY';
   ['avatarInitials','drawerAvatarInitials','profileAvatarInitials'].forEach(el=>{
@@ -2485,7 +2560,7 @@ function handleAvatarUpload(e){
       ctx.drawImage(img2,sx,sy,size,size,0,0,80,80);
       const thumb=canvas.toDataURL('image/jpeg',0.7);
       D.profile.avatar=thumb;
-      localStorage.setItem('capsula_v4',JSON.stringify(D));
+      saveData();
       updateProfileUI();
       const imgEl=document.getElementById('profileAvatarImg');
       imgEl.src=thumb;imgEl.style.display='block';
@@ -2499,7 +2574,7 @@ function handleAvatarUpload(e){
 
 function removeAvatar(){
   D.profile.avatar='';
-  localStorage.setItem('capsula_v4',JSON.stringify(D));
+  saveData();
   updateProfileUI();
   const img=document.getElementById('profileAvatarImg');
   img.src='';img.style.display='none';
@@ -4088,7 +4163,7 @@ function renderNotebook(){
 
 // ─────────────────────────── PRO PAGE ─────────────────────────────────────
 function saveQuickCapture(){const text=document.getElementById('qcInput').value.trim();if(!text)return;D.notes.unshift({id:Date.now(),title:'Hızlı Not',content:text,media:[],tags:['hızlı'],createdAt:new Date().toISOString()});saveData();document.getElementById('qcInput').value='';showToast('Notlara kaydedildi ✦');renderNotes();}
-function exportData(){const d=JSON.parse(JSON.stringify(D));delete d.profile.avatar;const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`capsula_yedek_${new Date().toISOString().split('T')[0]}.json`;a.click();showToast('Dışa aktarıldı 📁');}
+function exportData(){const d=JSON.parse(JSON.stringify(D));delete d.profile.avatar;const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const a=document.createElement('a');const _u1=URL.createObjectURL(blob);a.href=_u1;a.download=`capsula_yedek_${new Date().toISOString().split('T')[0]}.json`;a.click();URL.revokeObjectURL(_u1);showToast('Dışa aktarıldı 📁');}
 function requestNotif(){if('Notification' in window)Notification.requestPermission().then(p=>showToast(p==='granted'?'Bildirimler aktif ✓':'İzin reddedildi'));else showToast('Tarayıcı desteklemiyor');}
 function renderPro(){
   const tk=new Date().toISOString().split('T')[0];
@@ -4474,14 +4549,14 @@ function exportBackup(format){
     const d=JSON.parse(JSON.stringify(D));delete d.profile.avatar;
     const meta={exportedAt:new Date().toISOString(),version:'capsula-v4',counts:{todos:D.todos.length,notes:D.notes.length,diary:D.diary.length,reading:D.reading.length}};
     const blob=new Blob([JSON.stringify({meta,...d},null,2)],{type:'application/json'});
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`capsula_yedek_${new Date().toISOString().split('T')[0]}.json`;a.click();
+    const a=document.createElement('a');const _u2=URL.createObjectURL(blob);a.href=_u2;a.download=`capsula_yedek_${new Date().toISOString().split('T')[0]}.json`;a.click();URL.revokeObjectURL(_u2);
   } else {
     let txt=`CAPSULA YEDEĞİ — ${new Date().toLocaleDateString('tr-TR',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}\n${'='.repeat(60)}\n\n`;
     if(D.notes.length){txt+=`NOTLAR (${D.notes.length})\n${'-'.repeat(40)}\n`;D.notes.forEach(n=>{txt+=`\n📝 ${n.title}\nEtiket: ${(n.tags||[]).join(', ')||'—'}\nTarih: ${fmtDate(n.createdAt)}\n\n${n.content||''}\n\n${'·'.repeat(30)}\n`;});}
     if(D.diary.length){txt+=`\nGÜNLÜK GİRİŞLERİ (${D.diary.length})\n${'-'.repeat(40)}\n`;D.diary.forEach(e=>{txt+=`\n${e.mood||'📖'} ${e.title}\nTarih: ${fmtDate(e.createdAt)}\n\n${e.content||''}\n\n${'·'.repeat(30)}\n`;});}
     if(D.todos.length){txt+=`\nAKTİF GÖREVLER (${D.todos.length})\n${'-'.repeat(40)}\n`;D.todos.forEach(t=>txt+=`• [${t.priority.toUpperCase()}] ${t.text}${t.dueDate?' ('+t.dueDate+')':''}\n`);}
     const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`capsula_notlar_${new Date().toISOString().split('T')[0]}.txt`;a.click();
+    const a=document.createElement('a');const _u3=URL.createObjectURL(blob);a.href=_u3;a.download=`capsula_notlar_${new Date().toISOString().split('T')[0]}.txt`;a.click();URL.revokeObjectURL(_u3);
   }
   localStorage.setItem('capsula_last_backup',new Date().toISOString());
   updateLastBackupUI();showToast('Dışa aktarıldı 📁');
@@ -4500,7 +4575,7 @@ function importBackup(input){
       const tarih=meta?.exportedAt?new Date(meta.exportedAt).toLocaleString('tr-TR'):'Bilinmiyor';
       showConfirm(`Yedek geri yüklenecek — mevcut veriler silinecek.\n\nYedek tarihi: ${tarih}\n\nEmin misin?`,()=>{
         const profile=D.profile;Object.assign(D,data);
-        if(!D.profile)D.profile=profile;
+        D.profile=profile; // import edilen JSON'da ne olursa olsun mevcut profil korunur
         if(!D.calPlans)D.calPlans={};if(!D.kanban)D.kanban={todo:[],doing:[],done:[]};
         if(!D.reading)D.reading=[];if(!D.completedTodos)D.completedTodos=[];
         if(!D.trash)D.trash=[];if(!D.contentTrash)D.contentTrash=[];
@@ -4874,6 +4949,14 @@ window.addEventListener('load',async ()=>{
 });
 
 
+
+// ── SERVICE WORKER KAYDI ─────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/app/service-worker.js')
+      .catch(err => console.warn('SW kayıt hatası:', err));
+  });
+}
 </script>
 </body>
 </html>
