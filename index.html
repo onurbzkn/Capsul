@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Capsula — Kişisel Alan</title>
 <meta name="description" content="Notlar, görevler, okuma, pomodoro. Her şey tek yerde. Hesap gerekmez.">
+<link rel="manifest" href="/app/manifest.json">
+<meta name="theme-color" content="#7c6ff7">
+<link rel="apple-touch-icon" sizes="192x192" href="/app/.icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="/app/.icons/icon-512.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
@@ -530,12 +534,12 @@ footer{
   <div class="footer-logo">Capsula.</div>
   <div class="footer-links">
     <a href="app/index.html" data-tr="Uygulama" data-en="App">Uygulama</a>
-    <a href="mailto:onurbozkan472@gmail.com" data-tr="İletişim" data-en="Contact">İletişim</a>
+    <a href="/cdn-cgi/l/email-protection#630c0d1611010c1908020d57545123040e020a0f4d000c0e" data-tr="İletişim" data-en="Contact">İletişim</a>
   </div>
   <div class="footer-copy">© 2026 Capsula</div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ── DİL SİSTEMİ ──
 let currentLang='tr';
 function setLang(lang){
@@ -559,9 +563,15 @@ const observer=new IntersectionObserver(entries=>{
 document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 
 // ── SECTION TITLE İÇİNDEKİ <em> ──
-document.querySelectorAll('.section-title[data-tr], .privacy-title[data-tr]').forEach(el=>{
-  el.removeAttribute('data-tr');el.removeAttribute('data-en');
-});
+document.querySelectorAll('.sec
+
+// ── SERVICE WORKER KAYDI ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/app/service-worker.js')
+      .catch(err => console.warn('SW kayıt hatası:', err));
+  });
+}
 </script>
 </body>
 </html>
