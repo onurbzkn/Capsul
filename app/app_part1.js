@@ -387,11 +387,7 @@ function openFromDrawer(t){toggleDrawer();setTimeout(()=>{
   else if(t==='trash')openTrash();
   else if(t==='privacy')showInfoModal('Gizlilik Politikası','Tüm verileriniz yalnızca cihazınızda saklanır. Hiçbir veri sunuculara gönderilmez.');
   else if(t==='terms')showInfoModal('Kullanım Koşulları','Bu uygulama kişisel kullanım için tasarlanmıştır. Verilerinizi düzenli yedeklemeniz önerilir.');
-  else if(t==='help')showInfoModal('Yardım','Üstte mod değiştirici: Profesyonel / Ana Ekran / Öğrenci.
-Her mod farklı araçlar gösterir.
-
-Silinen içerikler 30 gün çöpte kalır.
-Tema değişikliği Ayarlar'dan yapılır.');
+  else if(t==='help')showInfoModal('Yardım','Üstte mod değiştirici: Profesyonel / Ana Ekran / Öğrenci. Her mod farklı araçlar gösterir. Silinen içerikler 30 gün çöpte kalır. Tema değişikliği Ayarlardan yapılır.');
 },300);}
 function showInfoModal(t,b){document.getElementById('infoModalTitle').textContent=t;document.getElementById('infoModalBody').textContent=b;openModal('infoModal');}
 function updateWordCount(){
@@ -1580,5 +1576,3 @@ function renderStudentDashboard(now){
   `;
 }
 
-
-// ─────────────────────────── POMODORO ─────────────────────────────────────
