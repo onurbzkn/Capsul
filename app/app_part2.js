@@ -1,3 +1,4 @@
+// ─────────────────────────── POMODORO ─────────────────────────────────────
 function setPomoMode(m){
   pomoMode=m;clearInterval(pomoInterval);pomoRunning=false;pomoSecs=POMO_DUR[m];
   ['work','short','long'].forEach(k=>document.getElementById('pomoBtn'+k.charAt(0).toUpperCase()+k.slice(1))?.classList.toggle('active',k===m));
@@ -62,15 +63,15 @@ function openPomoDurEdit(){
     <div style="font-size:.86rem;font-weight:500;color:var(--text);margin-bottom:16px;">⏱ Süre Ayarla</div>
     <div style="display:flex;flex-direction:column;gap:14px;">
       <div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:.74rem;color:var(--text2);">\ud83c\udf45 Çalışma</span><span id="pdr-work-val" style="font-size:.8rem;font-family:'JetBrains Mono',monospace;color:var(--accent2);">${w} dk</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:.74rem;color:var(--text2);">\ud83c\udf45 Çalışma</span><span id="pdr-work-val" style="font-size:.8rem;font-family:JetBrains Mono,monospace;color:var(--accent2);">${w} dk</span></div>
         <input type="range" min="5" max="90" value="${w}" id="pdr-work" style="width:100%;" oninput="document.getElementById('pdr-work-val').textContent=this.value+' dk'">
       </div>
       <div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:.74rem;color:var(--text2);">☕ Kısa Mola</span><span id="pdr-short-val" style="font-size:.8rem;font-family:'JetBrains Mono',monospace;color:var(--easy);">${sh} dk</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:.74rem;color:var(--text2);">☕ Kısa Mola</span><span id="pdr-short-val" style="font-size:.8rem;font-family:JetBrains Mono,monospace;color:var(--easy);">${sh} dk</span></div>
         <input type="range" min="1" max="30" value="${sh}" id="pdr-short" style="width:100%;" oninput="document.getElementById('pdr-short-val').textContent=this.value+' dk'">
       </div>
       <div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:.74rem;color:var(--text2);">\ud83c\udf3f Uzun Mola</span><span id="pdr-long-val" style="font-size:.8rem;font-family:'JetBrains Mono',monospace;color:var(--note);">${lo} dk</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:.74rem;color:var(--text2);">\ud83c\udf3f Uzun Mola</span><span id="pdr-long-val" style="font-size:.8rem;font-family:JetBrains Mono,monospace;color:var(--note);">${lo} dk</span></div>
         <input type="range" min="5" max="45" value="${lo}" id="pdr-long" style="width:100%;" oninput="document.getElementById('pdr-long-val').textContent=this.value+' dk'">
       </div>
     </div>
@@ -178,7 +179,7 @@ function renderKanban(){
           <div class="kanban-move-btns">${col.id!=='todo'?`<button class="kmb" onclick="moveKanbanCard(${card.id},'${col.id}',-1)">← Geri</button>`:''} ${col.id!=='done'?`<button class="kmb" onclick="moveKanbanCard(${card.id},'${col.id}',1)">İleri →</button>`:''}</div>
         </div>`).join('')}
       </div>
-      ${col.id==='done'?`<div style="font-size:.55rem;font-family:'JetBrains Mono',monospace;color:var(--text3);padding:6px 4px;line-height:1.5;opacity:.7;">⏱ Tamamlananlar 30 gün sonra otomatik silinir.<br>Ayarlar → Kanban'dan kapatabilirsiniz.</div>`:''}
+      ${col.id==='done'?`<div style="font-size:.55rem;font-family:JetBrains Mono,monospace;color:var(--text3);padding:6px 4px;line-height:1.5;opacity:.7;">⏱ Tamamlananlar 30 gün sonra otomatik silinir.<br>Ayarlar → Kanban'dan kapatabilirsiniz.</div>`:''}
       <button class="kanban-add-btn" onclick="openKanbanAdd()">+ Kart Ekle</button>
     </div>`).join('');
 }
@@ -236,12 +237,12 @@ function renderWeekly(){
       <div style="display:flex;align-items:center;gap:16px;">
         <div style="font-size:2.4rem;line-height:1;">${streak>=7?'\ud83d\udd25':streak>=3?'⚡':'✨'}</div>
         <div style="flex:1;">
-          <div style="font-size:1.8rem;font-weight:600;color:var(--accent2);font-family:'JetBrains Mono',monospace;line-height:1;">${streak}</div>
+          <div style="font-size:1.8rem;font-weight:600;color:var(--accent2);font-family:JetBrains Mono,monospace;line-height:1;">${streak}</div>
           <div style="font-size:.72rem;color:var(--text2);margin-top:2px;">günlük seri \ud83d\udd25</div>
           <div style="font-size:.6rem;color:var(--text3);margin-top:1px;">${streak>=7?'Harika gidiyorsun! Devam et \ud83d\udcaa':streak>=3?'İyi momentum, devam!':'Her gün bir adım at'}</div>
         </div>
         <div style="text-align:center;">
-          <div style="font-size:1.2rem;font-weight:600;color:var(--easy);font-family:'JetBrains Mono',monospace;">${todayDone.length}</div>
+          <div style="font-size:1.2rem;font-weight:600;color:var(--easy);font-family:JetBrains Mono,monospace;">${todayDone.length}</div>
           <div style="font-size:.56rem;color:var(--text3);">bugün</div>
         </div>
       </div>
@@ -252,15 +253,15 @@ function renderWeekly(){
       <div class="weekly-card-title" style="margin-bottom:12px;">Bu Hafta</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
         <div style="background:var(--bg3);border-radius:10px;padding:10px;text-align:center;">
-          <div style="font-size:1.4rem;font-weight:600;color:var(--accent2);font-family:'JetBrains Mono',monospace;">${cw.length}</div>
+          <div style="font-size:1.4rem;font-weight:600;color:var(--accent2);font-family:JetBrains Mono,monospace;">${cw.length}</div>
           <div style="font-size:.56rem;color:var(--text3);margin-top:2px;">Görev</div>
         </div>
         <div style="background:var(--bg3);border-radius:10px;padding:10px;text-align:center;">
-          <div style="font-size:1.4rem;font-weight:600;color:var(--diary);font-family:'JetBrains Mono',monospace;">${dw.length}</div>
+          <div style="font-size:1.4rem;font-weight:600;color:var(--diary);font-family:JetBrains Mono,monospace;">${dw.length}</div>
           <div style="font-size:.56rem;color:var(--text3);margin-top:2px;">Günlük</div>
         </div>
         <div style="background:var(--bg3);border-radius:10px;padding:10px;text-align:center;">
-          <div style="font-size:1.4rem;font-weight:600;color:var(--note);font-family:'JetBrains Mono',monospace;">${nw.length}</div>
+          <div style="font-size:1.4rem;font-weight:600;color:var(--note);font-family:JetBrains Mono,monospace;">${nw.length}</div>
           <div style="font-size:.56rem;color:var(--text3);margin-top:2px;">Not</div>
         </div>
       </div>
@@ -272,11 +273,11 @@ function renderWeekly(){
             <div style="flex:1;width:100%;display:flex;align-items:flex-end;">
               <div style="width:100%;height:${Math.max(3,(b.count/maxBar)*44)}px;background:${b.isToday?'var(--accent)':'var(--border2)'};border-radius:3px 3px 0 0;transition:height .4s;"></div>
             </div>
-            ${b.count>0?`<div style="font-size:.42rem;font-family:'JetBrains Mono',monospace;color:var(--accent2);">${b.count}</div>`:''}
+            ${b.count>0?`<div style="font-size:.42rem;font-family:JetBrains Mono,monospace;color:var(--accent2);">${b.count}</div>`:''}
           </div>`).join('')}
       </div>
       <div style="display:flex;gap:4px;">
-        ${barData.map(b=>`<div style="flex:1;text-align:center;font-size:.48rem;font-family:'JetBrains Mono',monospace;color:${b.isToday?'var(--accent2)':'var(--text3)'};">${b.day}</div>`).join('')}
+        ${barData.map(b=>`<div style="flex:1;text-align:center;font-size:.48rem;font-family:JetBrains Mono,monospace;color:${b.isToday?'var(--accent2)':'var(--text3)'};">${b.day}</div>`).join('')}
       </div>
     </div>
 
@@ -290,7 +291,7 @@ function renderWeekly(){
             <div style="flex:1;background:var(--bg3);border-radius:4px;height:7px;overflow:hidden;">
               <div style="height:100%;width:${(byPrio[p.k]/prioTotal*100).toFixed(0)}%;background:${p.clr};border-radius:4px;transition:width .5s;"></div>
             </div>
-            <div style="font-size:.62rem;font-family:'JetBrains Mono',monospace;color:${p.clr};width:16px;text-align:right;">${byPrio[p.k]}</div>
+            <div style="font-size:.62rem;font-family:JetBrains Mono,monospace;color:${p.clr};width:16px;text-align:right;">${byPrio[p.k]}</div>
           </div>`).join('')}
       </div>
     </div>`:''}
@@ -300,7 +301,7 @@ function renderWeekly(){
       <div class="weekly-card-title" style="margin-bottom:10px;">Son 4 Hafta</div>
       <div style="display:flex;align-items:flex-end;gap:8px;height:44px;margin-bottom:4px;">
         ${weeklyTrend.map((v,i)=>{const maxT=Math.max(...weeklyTrend,1);return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
-          <div style="font-size:.48rem;font-family:'JetBrains Mono',monospace;color:${i===3?'var(--accent2)':'var(--text3)'};">${v}</div>
+          <div style="font-size:.48rem;font-family:JetBrains Mono,monospace;color:${i===3?'var(--accent2)':'var(--text3)'};">${v}</div>
           <div style="width:100%;height:${Math.max(4,(v/maxT)*36)}px;background:${i===3?'var(--accent)':'var(--border2)'};border-radius:3px 3px 0 0;"></div>
         </div>`;}).join('')}
       </div>
@@ -316,7 +317,7 @@ function renderWeekly(){
         <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">
           <svg viewBox="0 0 24 24" fill="none" stroke="var(--easy)" stroke-width="2.5" style="width:12px;height:12px;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
           <span style="flex:1;font-size:.76rem;font-weight:300;color:var(--text2);">${escHtml(t.text)}</span>
-          <span style="font-size:.52rem;font-family:'JetBrains Mono',monospace;color:var(--text3);">${t.completedAt?.split('T')[0]?.slice(5)||''}</span>
+          <span style="font-size:.52rem;font-family:JetBrains Mono,monospace;color:var(--text3);">${t.completedAt?.split('T')[0]?.slice(5)||''}</span>
         </div>`).join('')
       :'<div style="color:var(--text3);font-size:.74rem;padding:8px 0;font-style:italic;">Bu hafta henüz tamamlanan görev yok.</div>'}
       ${cw.length>8?`<div style="font-size:.62rem;color:var(--text3);padding:6px 0;">+${cw.length-8} görev daha</div>`:''}
@@ -375,7 +376,7 @@ function renderReading(){
     html+=`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
       <div style="padding:9px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:5px;">
         <span style="font-size:.68rem;font-weight:500;color:${col.clr};">${col.lbl}</span>
-        <span style="font-size:.58rem;font-family:'JetBrains Mono',monospace;color:var(--text3);margin-left:auto;">${items.length}</span>
+        <span style="font-size:.58rem;font-family:JetBrains Mono,monospace;color:var(--text3);margin-left:auto;">${items.length}</span>
       </div>
       <div style="padding:8px;display:flex;flex-direction:column;gap:6px;min-height:60px;">`;
     items.forEach(item=>{
@@ -396,7 +397,7 @@ function renderReading(){
             <button onclick="deleteReadingItem(${item.id})" title="Sil" style="background:none;border:1px solid var(--border);border-radius:5px;cursor:pointer;color:var(--text3);width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:.7rem;transition:all .15s;" onmouseover="this.style.color='var(--hard)'" onmouseout="this.style.color='var(--text3)'">✕</button>
           </div>
         </div>
-        ${item.pages&&col.key==='reading'?`<div style="background:var(--bg2);border-radius:3px;height:3px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;"></div></div><div style="font-size:.5rem;color:var(--accent2);font-family:'JetBrains Mono',monospace;margin-top:2px;">${pct}%</div>`:''}
+        ${item.pages&&col.key==='reading'?`<div style="background:var(--bg2);border-radius:3px;height:3px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;"></div></div><div style="font-size:.5rem;color:var(--accent2);font-family:JetBrains Mono,monospace;margin-top:2px;">${pct}%</div>`:''}
         ${item.goalDate&&col.key!=='done'?`<div style="font-size:.5rem;color:var(--text3);margin-top:2px;">\ud83c\udfaf ${item.goalDate}</div>`:''}
       </div>`;
     });
@@ -516,7 +517,7 @@ function openReadingPageUpdate(id){
     <div style="font-size:.66rem;color:var(--text3);margin-bottom:14px;">${item.pages?`Toplam: ${item.pages} sayfa`:''}</div>
     <div style="font-size:.72rem;color:var(--text2);margin-bottom:6px;">Şu anki sayfa:</div>
     <input type="number" id="rpModalInput" min="0" max="${item.pages||9999}" value="${item.pagesRead||0}"
-      style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:1.1rem;font-family:'JetBrains Mono',monospace;color:var(--text);outline:none;text-align:center;margin-bottom:12px;box-sizing:border-box;">
+      style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:1.1rem;font-family:JetBrains Mono,monospace;color:var(--text);outline:none;text-align:center;margin-bottom:12px;box-sizing:border-box;">
     <button onclick="saveReadingPage(${id})" style="width:100%;padding:11px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:10px;color:#fff;font-family:'Sora',sans-serif;font-size:.84rem;cursor:pointer;">Kaydet</button>
   </div>`;
   document.body.appendChild(modal);
@@ -682,7 +683,7 @@ function deleteNotebookItem(id){D.notebook=D.notebook.filter(n=>n.id!==id);saveD
 function openNotebookDetail(id){
   const item=D.notebook.find(n=>n.id===id);if(!item)return;
   const ov=document.createElement('div');ov.className='notebook-detail-overlay';
-  ov.innerHTML=`<div class="notebook-detail-header"><button onclick="this.closest('.notebook-detail-overlay').remove()" style="background:none;border:none;color:var(--text2);font-size:1.1rem;cursor:pointer;padding:2px 6px;">←</button><div style="flex:1"><div style="font-size:.82rem;font-weight:500;color:var(--text);">${escHtml(item.title)}</div>${item.course?`<div style="font-size:.6rem;font-family:'JetBrains Mono',monospace;color:var(--text3);margin-top:1px;">${escHtml(item.course)}</div>`:''}</div><button onclick="deleteNotebookItem(${id});this.closest('.notebook-detail-overlay').remove();" style="background:none;border:none;color:var(--text3);font-size:.72rem;cursor:pointer;padding:4px 8px;">Sil</button></div><div class="notebook-detail-body">${escHtml(item.content)||'<em style="color:var(--text3)">İçerik yok</em>'}</div>`;
+  ov.innerHTML=`<div class="notebook-detail-header"><button onclick="this.closest('.notebook-detail-overlay').remove()" style="background:none;border:none;color:var(--text2);font-size:1.1rem;cursor:pointer;padding:2px 6px;">←</button><div style="flex:1"><div style="font-size:.82rem;font-weight:500;color:var(--text);">${escHtml(item.title)}</div>${item.course?`<div style="font-size:.6rem;font-family:JetBrains Mono,monospace;color:var(--text3);margin-top:1px;">${escHtml(item.course)}</div>`:''}</div><button onclick="deleteNotebookItem(${id});this.closest('.notebook-detail-overlay').remove();" style="background:none;border:none;color:var(--text3);font-size:.72rem;cursor:pointer;padding:4px 8px;">Sil</button></div><div class="notebook-detail-body">${escHtml(item.content)||'<em style="color:var(--text3)">İçerik yok</em>'}</div>`;
   document.body.appendChild(ov);
 }
 function renderNotebook(){
@@ -850,7 +851,7 @@ function runSplash(onDone){
 
 // ─────────────────────────── TOUR ─────────────────────────────────────────
 const TOUR_STEPS=[
-  {selector:'.mode-pill',title:'3 Farklı Mod',desc:'Üstteki pill'den Profesyonel, Ana Ekran veya Öğrenci modunu seç. Her mod farklı araçlar sunar.',side:'bottom',round:false},
+  {selector:'.mode-pill',title:'3 Farklı Mod',desc:'Üstteki pill ile Profesyonel, Ana Ekran veya Öğrenci modunu seç. Her mod farklı araçlar sunar.',side:'bottom',round:false},
   {selector:'#hamBtn',title:'Yan Menü',desc:'Profil, tema değiştirme ve uygulama ayarlarına buradan ulaşırsın.',side:'bottom',round:false},
   {selector:'#navGlass',title:'Alt Navigasyon',desc:'Sayfalar arasında geçiş yap. Ortadaki büyük buton aktif modun ana eylemine kısayol.',side:'top',round:false},
   {selector:'#avatarBtn',title:'Profil & Ayarlar',desc:'İsmini, avatarını ve PIN korumasını buradan düzenleyebilirsin.',side:'bottom',round:true},
@@ -1580,11 +1581,7 @@ window.addEventListener('load',async ()=>{
       {id:2,text:"Profil fotoğrafını veya avatarını ayarla",priority:'easy',dueDate:null,createdAt:new Date().toISOString()},
       {id:3,text:"Bir görev ekle ve takvimde gün üzerine sürükle",priority:'mid',dueDate:tmr.toISOString().split('T')[0],createdAt:new Date().toISOString()},
     ];
-    D.notes=[{id:101,title:'Capsula Rehberi',content:"Hoş geldin! \ud83c\udf89
-
-Notlar, görevler, pomodoro, takvim ve daha fazlası burada.
-
-Sol üstteki ≡ menüden tüm özelliklere ulaşabilirsin.",media:[],tags:['rehber'],createdAt:new Date().toISOString()}];
+    D.notes=[{id:101,title:'Capsula Rehberi',content:'Hoş geldin! 🎉\n\nNotlar, görevler, pomodoro, takvim ve daha fazlası burada.\n\nSol üstteki ≡ menüden tüm özelliklere ulaşabilirsin.',media:[],tags:['rehber'],createdAt:new Date().toISOString()}];
     D.diary=[{id:201,title:'İlk gün',content:'Capsula yolculuğum başlıyor. Bugün neler öğrenecek, neler yapacağım?',mood:'\ud83d\udcab',media:[],tags:[],createdAt:new Date().toISOString()}];
     saveData();
   }
@@ -1604,7 +1601,6 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.warn('SW kayıt hatası:', err));
   });
 }
-
 
 // ═══════════════════════════════════════════════════════════
 // PROFILE PAGE — Instagram style
@@ -1862,8 +1858,8 @@ function renderTimeCapsules() {
       + '</div>'
       + '<button onclick="event.stopPropagation();deleteCapsuleConfirm(' + cap.id + ')" '
       + 'style="background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;border-radius:6px;flex-shrink:0;opacity:0;transition:all .18s;" '
-      + 'onmouseover="this.style.color='var(--hard)';this.style.opacity='1'" '
-      + 'onmouseout="this.style.color='var(--text3)';this.style.opacity='0'" '
+      + 'onmouseover="this.style.color=var(--hard);this.style.opacity=1" '
+      + 'onmouseout="this.style.color=var(--text3);this.style.opacity=0" '
       + 'class="cap-del-btn">✕</button>'
       + '</div>'
       + '</div>';
@@ -1896,29 +1892,28 @@ function viewCapsule(id) {
   var isUnlocked = openDate <= today;
 
   if (!isUnlocked) {
-    // Show locked state
     var daysLeft = Math.ceil((openDate - today) / (1000 * 60 * 60 * 24));
     var modal = document.createElement('div');
     modal.className = 'capsule-open-overlay open';
-    modal.innerHTML = '<div class="capsule-open-card">'
+    var lockedHtml = '<div class="capsule-open-card">'
       + '<div style="font-size:3rem;margin-bottom:12px;">🔒</div>'
       + '<div style="font-size:1rem;font-weight:500;color:var(--text);margin-bottom:8px;">' + escHtml(cap.title) + '</div>'
       + '<div style="font-size:.78rem;color:var(--text3);margin-bottom:16px;line-height:1.6;">'
       + 'Bu kapsül henüz açılmadı.<br>'
-      + '<span style="color:var(--accent2);font-family:'JetBrains Mono',monospace;font-weight:500;">' + daysLeft + ' gün</span> sonra açılacak.'
+      + '<span style="color:var(--accent2);font-weight:500;">' + daysLeft + ' gün</span> sonra açılacak.'
       + '</div>'
-      + '<div style="font-size:.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:20px;">'
-      + fmtDate(cap.openDate) + ' · ' + fmtDate(cap.createdAt) + ''de mühürlendi'
+      + '<div style="font-size:.7rem;color:var(--text3);margin-bottom:20px;">'
+      + fmtDate(cap.openDate) + ' - ' + fmtDate(cap.createdAt) + 'de mühürlendi'
       + '</div>'
-      + '<button onclick="this.closest('.capsule-open-overlay').remove()" '
-      + 'style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 24px;cursor:pointer;font-family:'Sora',sans-serif;font-size:.8rem;color:var(--text2);">Kapat</button>'
+      + '<button id="closeLocked" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 24px;cursor:pointer;font-family:Sora,sans-serif;font-size:.8rem;color:var(--text2);">Kapat</button>'
       + '</div>';
+    modal.innerHTML = lockedHtml;
+    modal.querySelector('#closeLocked').onclick = function() { modal.remove(); };
     modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
     document.body.appendChild(modal);
     return;
   }
 
-  // Unlocked! Show with animation
   var isFirstOpen = !cap.opened;
   if (isFirstOpen) {
     cap.opened = true;
@@ -1928,31 +1923,31 @@ function viewCapsule(id) {
 
   var overlay = document.createElement('div');
   overlay.className = 'capsule-open-overlay';
+  var contentHtml = cap.content
+    ? '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:left;font-size:.84rem;color:var(--text2);line-height:1.8;white-space:pre-wrap;max-height:240px;overflow-y:auto;margin-bottom:18px;">' + escHtml(cap.content) + '</div>'
+    : '<div style="color:var(--text3);font-style:italic;margin-bottom:18px;font-size:.8rem;">Bu kapsülde içerik yok.</div>';
+
+  var daysSince = Math.ceil((new Date() - new Date(cap.createdAt)) / (1000 * 60 * 60 * 24));
   overlay.innerHTML = '<div class="capsule-open-card' + (isFirstOpen ? ' capsule-open-anim' : '') + '">'
     + '<div style="font-size:3.5rem;margin-bottom:10px;">' + cap.emoji + '</div>'
-    + (isFirstOpen ? '<div style="font-size:.6rem;letter-spacing:.2em;color:var(--accent2);font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-bottom:10px;">✨ Kapsül Açıldı!</div>' : '')
+    + (isFirstOpen ? '<div style="font-size:.6rem;letter-spacing:.2em;color:var(--accent2);text-transform:uppercase;margin-bottom:10px;">✨ Kapsül Açıldı!</div>' : '')
     + '<div style="font-size:1.05rem;font-weight:500;color:var(--text);margin-bottom:6px;">' + escHtml(cap.title) + '</div>'
-    + '<div style="font-size:.62rem;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:16px;">'
-    + fmtDate(cap.createdAt) + ''den · ' + Math.ceil((new Date() - new Date(cap.createdAt)) / (1000 * 60 * 60 * 24)) + ' gün önce yazıldı'
+    + '<div style="font-size:.62rem;color:var(--text3);margin-bottom:16px;">'
+    + fmtDate(cap.createdAt) + 'den · ' + daysSince + ' gün önce yazıldı'
     + '</div>'
-    + (cap.content
-      ? '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:left;font-size:.84rem;color:var(--text2);line-height:1.8;white-space:pre-wrap;max-height:240px;overflow-y:auto;margin-bottom:18px;">' + escHtml(cap.content) + '</div>'
-      : '<div style="color:var(--text3);font-style:italic;margin-bottom:18px;font-size:.8rem;">Bu kapsülde içerik yok.</div>')
-    + '<button onclick="this.closest('.capsule-open-overlay').remove()" '
-    + 'style="background:linear-gradient(135deg,var(--accent),var(--diary));border:none;border-radius:10px;padding:11px 28px;cursor:pointer;font-family:'Sora',sans-serif;font-size:.82rem;color:#fff;font-weight:500;transition:opacity .2s;" '
-    + 'onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">Kapat ✓</button>'
+    + contentHtml
+    + '<button id="closeCapsule" style="background:linear-gradient(135deg,var(--accent),var(--diary));border:none;border-radius:10px;padding:11px 28px;cursor:pointer;font-family:Sora,sans-serif;font-size:.82rem;color:#fff;font-weight:500;">Kapat ✓</button>'
     + '</div>';
 
+  overlay.querySelector('#closeCapsule').onclick = function() { overlay.remove(); };
   overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
   document.body.appendChild(overlay);
-  // Animate in
   requestAnimationFrame(function() { overlay.classList.add('open'); });
 
   if (isFirstOpen) {
-    addNotification('🎉 "' + cap.title + '" zaman kapsülünü açtın! ' + Math.ceil((new Date() - new Date(cap.createdAt)) / (1000*60*60*24)) + ' gün önce yazmıştın.', 'capsule');
+    addNotification('🎉 "' + cap.title + '" zaman kapsülünü açtın! ' + daysSince + ' gün önce yazmıştın.', 'capsule');
   }
 }
-
 function deleteCapsuleConfirm(id) {
   initTimeCapsule();
   var cap = D.timeCapsules.find(function(c) { return c.id === id; });
