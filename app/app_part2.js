@@ -1,3 +1,4 @@
+
 // ─────────────────────────── POMODORO ─────────────────────────────────────
 function setPomoMode(m){
   pomoMode=m;clearInterval(pomoInterval);pomoRunning=false;pomoSecs=POMO_DUR[m];
@@ -1983,3 +1984,291 @@ function checkCapsuleNotifications() {
     }
   });
 }
+
+
+// ═══════════════════════════════════════════════════════
+// FIXES & NEW FEATURES
+// ═══════════════════════════════════════════════════════
+
+// FIX: Avatar upload in profile page
+function handleIgAvatarClick() {
+  var inp = document.getElementById('avatarUpload');
+  if (!inp) {
+    inp = document.createElement('input');
+    inp.type = 'file';
+    inp.accept = 'image/*';
+    inp.id = 'avatarUpload';
+    inp.style.display = 'none';
+    inp.onchange = function(e) { handleAvatarUpload(e); };
+    document.body.appendChild(inp);
+  }
+  inp.click();
+}
+
+// ═══════════════════════════════════════════════════════
+// MÜHÜRLÜ NOT & GÜNLÜK (Sealed Notes/Diary)
+// ═══════════════════════════════════════════════════════
+function sealEntry(type, id) {
+  var arr = type === 'note' ? D.notes : D.diary;
+  var entry = arr.find(function(e) { return e.id === id; });
+  if (!entry) return;
+  if (entry.sealed) {
+    // Mühürü kaldır
+    showConfirm('Mühürü kaldırmak istiyor musun?', function() {
+      delete entry.sealed;
+      saveData();
+      if (type === 'note') renderNotes(); else renderDiary();
+      showToast('Mühür kaldırıldı');
+    });
+    return;
+  }
+  // PIN varsa PIN ile mühürle, yoksa direkt mühürle
+  var hasPIN = !!localStorage.getItem('capsula_pin');
+  if (hasPIN) {
+    openSealPinModal(type, id);
+  } else {
+    entry.sealed = true;
+    saveData();
+    if (type === 'note') renderNotes(); else renderDiary();
+    showToast('Mühürlendi 🔒 — Tekrar basmak için PIN gerekir');
+  }
+}
+
+function openSealPinModal(type, id) {
+  document.getElementById('sealPinModal') && document.getElementById('sealPinModal').remove();
+  var modal = document.createElement('div');
+  modal.id = 'sealPinModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:3500;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);';
+  modal.innerHTML = '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:28px 24px;text-align:center;width:min(320px,90vw);">'
+    + '<div style="font-size:1.8rem;margin-bottom:10px;">🔒</div>'
+    + '<div style="font-size:.9rem;font-weight:500;color:var(--text);margin-bottom:6px;">PIN ile Mühürle</div>'
+    + '<div style="font-size:.74rem;color:var(--text3);margin-bottom:20px;line-height:1.6;">Bu içerik PIN girilmeden görüntülenemez.</div>'
+    + '<div style="display:flex;gap:8px;justify-content:center;">'
+    + '<button id="sealCancel" style="flex:1;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-family:Sora,sans-serif;font-size:.8rem;color:var(--text2);">Vazgeç</button>'
+    + '<button id="sealConfirm" style="flex:1;padding:10px;background:linear-gradient(135deg,var(--accent),var(--diary));border:none;border-radius:10px;cursor:pointer;font-family:Sora,sans-serif;font-size:.8rem;color:#fff;font-weight:500;">Mühürle</button>'
+    + '</div></div>';
+  document.body.appendChild(modal);
+  modal.querySelector('#sealCancel').onclick = function() { modal.remove(); };
+  modal.querySelector('#sealConfirm').onclick = function() {
+    var arr = type === 'note' ? D.notes : D.diary;
+    var entry = arr.find(function(e) { return e.id === id; });
+    if (entry) {
+      entry.sealed = true;
+      saveData();
+      if (type === 'note') renderNotes(); else renderDiary();
+      showToast('Mühürlendi 🔒');
+    }
+    modal.remove();
+  };
+  modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
+}
+
+function viewSealedEntry(type, id) {
+  var hasPIN = !!localStorage.getItem('capsula_pin');
+  if (!hasPIN) {
+    // PIN yok, direkt aç
+    viewEntry(type, id);
+    return;
+  }
+  // PIN iste
+  var pinBuf = '';
+  var modal = document.createElement('div');
+  modal.id = 'sealViewModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:3500;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);';
+  modal.innerHTML = '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:28px 24px;text-align:center;width:min(300px,90vw);">'
+    + '<div style="font-size:1.8rem;margin-bottom:8px;">🔒</div>'
+    + '<div style="font-size:.88rem;font-weight:500;color:var(--text);margin-bottom:16px;">PIN Gir</div>'
+    + '<div style="display:flex;gap:10px;justify-content:center;margin-bottom:16px;" id="svDots">'
+    + '<div class="pin-dot" id="sv0"></div><div class="pin-dot" id="sv1"></div><div class="pin-dot" id="sv2"></div><div class="pin-dot" id="sv3"></div>'
+    + '</div>'
+    + '<div class="pin-pad" style="max-width:200px;margin:0 auto 12px;">'
+    + [1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(function(k,i) {
+        if (k === '') return '<div class="pin-key empty"></div>';
+        if (k === '⌫') return '<div class="pin-key del" id="svDel">⌫</div>';
+        return '<div class="pin-key" data-k="' + k + '">' + k + '</div>';
+      }).join('')
+    + '</div>'
+    + '<button id="svCancel" style="background:none;border:none;cursor:pointer;font-size:.64rem;color:var(--text3);font-family:JetBrains Mono,monospace;text-decoration:underline;">İptal</button>'
+    + '</div>';
+  document.body.appendChild(modal);
+
+  function updateDots() {
+    for (var i = 0; i < 4; i++) {
+      var d = document.getElementById('sv' + i);
+      if (d) d.classList.toggle('filled', i < pinBuf.length);
+    }
+  }
+  modal.querySelectorAll('.pin-key[data-k]').forEach(function(el) {
+    el.addEventListener('click', function() {
+      if (pinBuf.length >= 4) return;
+      pinBuf += el.dataset.k;
+      updateDots();
+      if (pinBuf.length === 4) {
+        setTimeout(async function() {
+          var stored = localStorage.getItem('capsula_pin');
+          var ok = await verifyPin(pinBuf, stored);
+          if (ok) {
+            modal.remove();
+            viewEntry(type, id);
+          } else {
+            document.querySelectorAll('#svDots .pin-dot').forEach(function(d) { d.classList.add('error'); });
+            setTimeout(function() {
+              document.querySelectorAll('#svDots .pin-dot').forEach(function(d) { d.classList.remove('error', 'filled'); });
+              pinBuf = '';
+            }, 500);
+          }
+        }, 80);
+      }
+    });
+  });
+  document.getElementById('svDel').addEventListener('click', function() {
+    pinBuf = pinBuf.slice(0, -1);
+    updateDots();
+  });
+  document.getElementById('svCancel').addEventListener('click', function() { modal.remove(); });
+}
+
+
+// ── SEALED NOTES & DIARY — renderNotes/renderDiary override ──────────────
+(function() {
+  var _origRenderNotes = window.renderNotes || renderNotes;
+  
+  // renderNotes'u sealed note desteğiyle güncelle
+  window.renderNotes = function() {
+    var grid = document.getElementById('notes-grid');
+    var empty = document.getElementById('notes-empty');
+    if (!D.notes.length) {
+      if (grid) grid.innerHTML = '';
+      if (empty) empty.style.display = 'block';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+    
+    if (grid) {
+      grid.innerHTML = D.notes.map(function(n) {
+        var tags = (n.tags || []).map(function(t) {
+          return '<span class="note-tag-chip" style="color:' + tagColor(t) + ';border-color:' + tagColor(t) + '44;">#' + escHtml(t) + '</span>';
+        }).join('');
+        
+        if (n.sealed) {
+          return '<div class="note-card" data-nid="' + n.id + '" style="justify-content:center;align-items:center;background:linear-gradient(135deg,var(--bg2),var(--bg3));">'
+            + '<div style="text-align:center;">'
+            + '<div style="font-size:2rem;margin-bottom:8px;">🔒</div>'
+            + '<div style="font-size:.76rem;font-weight:500;color:var(--text2);">' + escHtml(n.title || 'Mühürlü Not') + '</div>'
+            + '<div style="font-size:.58rem;color:var(--text3);margin-top:4px;">Görüntülemek için dokun</div>'
+            + '</div>'
+            + '<button data-seal="' + n.id + '" data-type="note" style="position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;font-size:.7rem;color:var(--accent2);padding:3px 6px;border-radius:6px;border:1px solid rgba(124,111,247,.25);">🔒</button>'
+            + '</div>';
+        }
+        
+        return '<div class="note-card" data-nid="' + n.id + '">'
+          + '<div class="note-card-title">' + escHtml(n.title || 'Başlıksız') + '</div>'
+          + '<div class="note-card-preview">' + escHtml((n.content || '').slice(0, 80)) + '</div>'
+          + (tags ? '<div style="display:flex;gap:3px;flex-wrap:wrap;">' + tags + '</div>' : '')
+          + '<div class="note-card-date">' + fmtDate(n.createdAt) + '</div>'
+          + '<button data-seal="' + n.id + '" data-type="note" style="position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;font-size:.7rem;color:var(--text3);padding:3px 6px;border-radius:6px;border:1px solid var(--border);opacity:0;transition:opacity .18s;" class="seal-btn">🔓</button>'
+          + '</div>';
+      }).join('');
+      
+      // Event listeners
+      grid.querySelectorAll('.note-card').forEach(function(card) {
+        var nid = parseInt(card.dataset.nid);
+        var n = D.notes.find(function(x) { return x.id === nid; });
+        if (!n) return;
+        
+        card.style.position = 'relative';
+        
+        // Show seal button on hover
+        var sealBtn = card.querySelector('.seal-btn');
+        if (sealBtn) {
+          card.addEventListener('mouseenter', function() { sealBtn.style.opacity = '1'; });
+          card.addEventListener('mouseleave', function() { sealBtn.style.opacity = '0'; });
+          card.addEventListener('touchstart', function() { sealBtn.style.opacity = '1'; }, {passive:true});
+        }
+        
+        // Seal button click
+        card.querySelectorAll('[data-seal]').forEach(function(btn) {
+          btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            sealEntry('note', nid);
+          });
+        });
+        
+        // Card click — sealed = PIN, normal = view
+        card.addEventListener('click', function(e) {
+          if (e.target.closest('[data-seal]')) return;
+          if (n.sealed) {
+            viewSealedEntry('note', nid);
+          } else {
+            viewEntry('note', nid);
+          }
+        });
+      });
+    }
+  };
+
+  // renderDiary'yi sealed diary desteğiyle güncelle  
+  window.renderDiary = function() {
+    if (typeof renderDiaryAIPrompt === 'function') renderDiaryAIPrompt();
+    var list = document.getElementById('diary-list');
+    var empty = document.getElementById('diary-empty');
+    if (!D.diary.length) {
+      if (list) list.innerHTML = '';
+      if (empty) empty.style.display = 'block';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+    
+    if (list) {
+      list.innerHTML = D.diary.map(function(e) {
+        if (e.sealed) {
+          return '<div class="diary-entry" data-eid="' + e.id + '" style="justify-content:center;align-items:center;">'
+            + '<div style="display:flex;align-items:center;gap:12px;">'
+            + '<div style="font-size:1.8rem;">🔒</div>'
+            + '<div>'
+            + '<div class="diary-entry-title">' + escHtml(e.title || 'Mühürlü Günlük') + '</div>'
+            + '<div class="diary-entry-date">' + fmtDate(e.createdAt) + ' · Görüntülemek için dokun</div>'
+            + '</div>'
+            + '</div>'
+            + '<button data-seal="' + e.id + '" data-type="diary" style="position:absolute;top:10px;right:12px;background:none;border:1px solid rgba(124,111,247,.25);border-radius:6px;cursor:pointer;font-size:.7rem;color:var(--accent2);padding:3px 7px;">🔒</button>'
+            + '</div>';
+        }
+        return '<div class="diary-entry" data-eid="' + e.id + '" style="position:relative;">'
+          + '<div class="diary-entry-header"><span class="diary-entry-date">' + fmtDateFull(e.createdAt) + '</span><span class="diary-mood-icon">' + (e.mood || '😊') + '</span></div>'
+          + '<div class="diary-entry-title">' + escHtml(e.title || 'Günlük Girişi') + '</div>'
+          + '<div class="diary-entry-preview">' + escHtml(e.content || '') + '</div>'
+          + '<button data-seal="' + e.id + '" data-type="diary" style="position:absolute;top:10px;right:12px;background:none;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.7rem;color:var(--text3);padding:3px 7px;opacity:0;transition:opacity .18s;" class="seal-btn">🔓</button>'
+          + '</div>';
+      }).join('');
+      
+      list.querySelectorAll('.diary-entry').forEach(function(card) {
+        var eid = parseInt(card.dataset.eid);
+        var e = D.diary.find(function(x) { return x.id === eid; });
+        if (!e) return;
+        
+        var sealBtn = card.querySelector('.seal-btn');
+        if (sealBtn) {
+          card.addEventListener('mouseenter', function() { sealBtn.style.opacity = '1'; });
+          card.addEventListener('mouseleave', function() { sealBtn.style.opacity = '0'; });
+          card.addEventListener('touchstart', function() { sealBtn.style.opacity = '1'; }, {passive:true});
+        }
+        
+        card.querySelectorAll('[data-seal]').forEach(function(btn) {
+          btn.addEventListener('click', function(ev) {
+            ev.stopPropagation();
+            sealEntry('diary', eid);
+          });
+        });
+        
+        card.addEventListener('click', function(ev) {
+          if (ev.target.closest('[data-seal]')) return;
+          if (e.sealed) {
+            viewSealedEntry('diary', eid);
+          } else {
+            viewEntry('diary', eid);
+          }
+        });
+      });
+    }
+  };
+})();
