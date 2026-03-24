@@ -859,7 +859,7 @@
 </div>
 
 <!-- YENİ KAPSÜl SHEET -->
-<div class="editor-overlay" id="newCapsuleSheet">
+<div class="editor-overlay" id="newCapsuleSheet" style="z-index:450;">
   <div class="editor-sheet" style="max-height:88vh;">
     <div class="editor-handle"></div>
     <div class="editor-header">
@@ -928,7 +928,7 @@
 </div>
 
 <!-- PROFILE EDIT SHEET -->
-<div id="profileEditSheet" style="position:fixed;inset:0;z-index:500;background:var(--bg);transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;">
+<div id="profileEditSheet">
   <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0;">
     <button onclick="closeProfileEditSheet()" style="background:none;border:none;color:var(--text2);cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><polyline points="15 18 9 12 15 6"/></svg>
@@ -980,7 +980,7 @@
       <h3 style="font-size:.9rem;font-weight:500;color:var(--text);margin:0 0 8px;">Üçüncü Taraf Hizmetler</h3>
       <p style="margin-bottom:14px;">Herhangi bir üçüncü taraf analitik, reklam veya izleme servisi kullanılmaz.</p>
       <h3 style="font-size:.9rem;font-weight:500;color:var(--text);margin:0 0 8px;">İletişim</h3>
-      <p>Sorularınız için: <a href="mailto:onurbozkan472@gmail.com" style="color:var(--accent2);">onurbozkan472@gmail.com</a></p>
+      <p>Sorularınız için: <a href="/cdn-cgi/l/email-protection#2d4243585f4f4257464c43191a1f6d4a404c4441034e4240" style="color:var(--accent2);"><span class="__cf_email__" data-cfemail="e18e8f9493838e9b8a808fd5d6d3a1868c80888dcf828e8c">[email&#160;protected]</span></a></p>
     </div>
   </div>
 </div>
@@ -1058,12 +1058,4 @@
         <div><div class="settings-row-label">Bitenleri otomatik arşivle</div><div style="font-size:.62rem;color:var(--text3);margin-top:2px;">30 gün sonra arşive taşır</div></div>
         <div class="toggle" id="readingAutoArchive" onclick="toggleReadingAutoArchive()"></div>
       </div>
-      <button onclick="confirmReset('reading')" style="width:100%;margin-top:12px;padding:8px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:8px;color:var(--hard);font-family:'Sora',sans-serif;font-size:.72rem;cursor:pointer;">🗑 Okuma Listesini Sıfırla</button>
-    </div></div>
-  </div>
-</div>
-
-<script src="/app/app_part1.js"></script>
-<script src="/app/app_part2.js"></script>
-</body>
-</html>
+      <button onclick="confirmReset('reading')" style="width:100%;margin-top:12px;padding:8px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:8px;color:var(--hard);font-family:'Sora',sans-serif;font-size:.72rem;cursor:pointer;">🗑 Okuma Listesini Sıfırla
