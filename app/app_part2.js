@@ -1730,6 +1730,15 @@ function openPrivacyModal(){openModal('privacyModal');}
 function openSettingsPage(){initSettingsToggles();initTheme();document.getElementById('settingsPage').classList.add('open');}
 function closeSettingsPage(){document.getElementById('settingsPage').classList.remove('open');}
 
+// ── FIX 2: handleIgAvatarClick — profil resmine tıklayınca fotoğraf değiştir ──
+function handleIgAvatarClick(){
+  openProfileEditSheet();
+  setTimeout(function(){
+    var upload=document.getElementById('avatarUpload2');
+    if(upload)upload.click();
+  },420);
+}
+
 
 // ═══════════════════════════════════════════════════════════════
 // ZAMAN KAPSÜLü — Time Capsule Feature
