@@ -844,7 +844,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><polyline points="15 18 9 12 15 6"/></svg>
     </button>
     <span class="fullpage-title">Zaman Kapsülü</span>
-    <button onclick="openNewCapsuleSheet()" style="background:linear-gradient(135deg,var(--accent),var(--diary));border:none;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:.72rem;color:#fff;font-family:'Sora',sans-serif;">+ Yeni</button>
+    <button onclick="openNewCapsuleSheet()" style="background:linear-gradient(135deg,var(--accent),var(--diary));border:none;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:.76rem;color:#fff;font-family:'Sora',sans-serif;font-weight:500;min-height:34px;box-shadow:0 2px 12px rgba(124,111,247,.4);">+ Yeni</button>
   </div>
   <div class="fullpage-body">
     <div style="padding:16px;">
@@ -894,12 +894,12 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><polyline points="15 18 9 12 15 6"/></svg>
     </button>
     <span class="fullpage-title" id="profilePageTitle">Profil</span>
-    <button onclick="openProfileEditSheet()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 12px;cursor:pointer;font-size:.72rem;color:var(--text2);font-family:'Sora',sans-serif;">Düzenle</button>
+    <button onclick="openProfileEditSheet()" style="background:rgba(124,111,247,.15);border:1px solid rgba(124,111,247,.4);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:.76rem;color:var(--accent2);font-family:'Sora',sans-serif;font-weight:500;min-height:34px;min-width:64px;">Düzenle</button>
   </div>
   <div class="fullpage-body">
     <div style="padding:24px 20px 0;">
       <div style="display:flex;align-items:flex-start;gap:20px;margin-bottom:16px;">
-        <div style="position:relative;flex-shrink:0;" onclick="document.getElementById('avatarUpload').click()">
+        <div style="position:relative;flex-shrink:0;" onclick="handleIgAvatarClick()">
           <div id="igAvatar" style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--diary));display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:#fff;overflow:hidden;box-shadow:0 0 0 3px rgba(124,111,247,.35);cursor:pointer;">
             <img id="igAvatarImg" src="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;">
             <span id="igAvatarInitials">KY</span>
@@ -986,7 +986,7 @@
 </div>
 
 <!-- SETTINGS PAGE -->
-<div id="settingsPage" style="position:fixed;inset:0;z-index:400;background:var(--bg);transform:translateY(100%);transition:transform .38s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;">
+<div id="settingsPage" style="position:fixed;inset:0;z-index:450;background:var(--bg);transform:translateY(100%);transition:transform .38s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;">
   <div class="sp-header">
     <button onclick="closeSettingsPage()" style="background:none;border:none;color:var(--text2);cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><polyline points="15 18 9 12 15 6"/></svg>
