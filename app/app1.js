@@ -784,6 +784,48 @@ n.tags=tagsRaw.split(',').map(t=>t.trim()).filter(Boolean);
 n.updatedAt=new Date().toISOString();
 saveData();renderNotes();document.getElementById('noteEditModal')?.remove();showToast('Not güncellendi ✓');
 }
+function openDiaryEdit(id){
+const e=D.diary.find(x=>x.id===id);if(!e)return;
+const modal=document.createElement('div');
+modal.id='diaryEditModal';
+modal.style.cssText='position:fixed;inset:0;z-index:3500;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+const moods=['😊','😔','😤','😌','🤔','💫','🌧','🔥'];
+const moodHtml=moods.map(m=>`<button onclick="document.getElementById('deMood').value='${m}';document.querySelectorAll('.de-mood').forEach(b=>b.style.opacity='.4');this.style.opacity='1';" class="de-mood" style="font-size:1.2rem;background:none;border:none;cursor:pointer;padding:4px;opacity:${e.mood===m?'1':'.4'};transition:opacity .15s;">${m}</button>`).join('');
+modal.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:22px;width:100%;max-width:380px;max-height:85vh;overflow-y:auto;position:relative;">
+<button onclick="document.getElementById('diaryEditModal').remove()" style="position:absolute;top:10px;right:12px;background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--text3);">✕</button>
+<div style="font-size:.86rem;font-weight:500;color:var(--text);margin-bottom:14px;">✏️ Günlüğü Düzenle</div>
+<div style="font-size:.66rem;color:var(--text3);margin-bottom:4px;">Ruh Hali</div>
+<div style="display:flex;gap:4px;margin-bottom:10px;">${moodHtml}</div>
+<input type="hidden" id="deMood" value="${e.mood||'😊'}">
+<div style="font-size:.66rem;color:var(--text3);margin-bottom:4px;">Başlık</div>
+<input type="text" id="deTitle" value="${escHtml(e.title||'')}" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:'Sora',sans-serif;font-size:.84rem;color:var(--text);outline:none;margin-bottom:10px;box-sizing:border-box;">
+<div style="font-size:.66rem;color:var(--text3);margin-bottom:4px;">İçerik</div>
+<textarea id="deContent" rows="6" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:'Sora',sans-serif;font-size:.82rem;color:var(--text);outline:none;resize:none;margin-bottom:14px;box-sizing:border-box;line-height:1.6;">${escHtml(e.content||'')}</textarea>
+<div style="display:flex;gap:8px;">
+<button onclick="saveDiaryEdit(${id})" style="flex:1;padding:11px;background:linear-gradient(135deg,var(--diary),rgba(244,114,182,.8));border:none;border-radius:10px;color:#fff;font-family:'Sora',sans-serif;font-size:.84rem;cursor:pointer;">Kaydet</button>
+<button onclick="deleteDiaryConfirm(${id})" style="padding:11px 14px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);border-radius:10px;color:var(--hard);font-family:'Sora',sans-serif;font-size:.84rem;cursor:pointer;">Sil</button>
+</div>
+</div>`;
+document.body.appendChild(modal);
+modal.addEventListener('click',ev=>{if(ev.target===modal)modal.remove();});
+}
+function saveDiaryEdit(id){
+const e=D.diary.find(x=>x.id===id);if(!e)return;
+e.title=document.getElementById('deTitle')?.value.trim()||e.title;
+e.content=document.getElementById('deContent')?.value||'';
+e.mood=document.getElementById('deMood')?.value||e.mood;
+e.updatedAt=new Date().toISOString();
+saveData();renderDiary();document.getElementById('diaryEditModal')?.remove();showToast('Günlük güncellendi ✓');
+}
+function deleteDiaryConfirm(id){
+document.getElementById('diaryEditModal')?.remove();
+showConfirm('Bu günlük girişini silmek istiyor musun?',()=>{
+const e=D.diary.find(x=>x.id===id);
+if(e){if(!D.contentTrash)D.contentTrash=[];D.contentTrash.push({...e,_trashType:'diary',_trashedAt:new Date().toISOString()});}
+D.diary=D.diary.filter(x=>x.id!==id);
+saveData();renderDiary();updTrashBadge();showToast('Günlük silindi');
+});
+}
 function deleteNoteConfirm(id){
 document.getElementById('noteEditModal')?.remove();
 showConfirm('Bu notu silmek istiyor musun?',()=>{
@@ -1256,7 +1298,7 @@ document.body.appendChild(overlay);
 }
 const badge=document.getElementById('viewBadge');badge.textContent=type==='note'?'Not':'Günlük Girişi';badge.className='etb '+type;
 const editBtn=document.getElementById('viewEditBtn');
-if(editBtn)editBtn.style.display=type==='note'?'inline-flex':'none';
+if(editBtn)editBtn.style.display='inline-flex';
 let mH='';
 if(entry.media?.length){const imgs=entry.media.filter(m=>m.type==='image').map(m=>`<img src="${m.data}">`).join('');const vids=entry.media.filter(m=>m.type==='video').map(m=>`<video src="${m.data}" controls style="width:100%;border-radius:9px;margin-top:7px"></video>`).join('');const auds=entry.media.filter(m=>m.type==='audio').map(m=>`<audio src="${m.data}" controls style="width:100%;margin-top:7px"></audio>`).join('');mH=`<div class="view-media-grid">${imgs}${vids}</div>${auds}`;}
 const tagsH=(entry.tags||[]).length?`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;">${(entry.tags||[]).map(t=>`<span class="tag-chip" style="color:${tagColor(t)};border-color:${tagColor(t)}44;">#${escHtml(t)}</span>`).join('')}</div>`:'';
@@ -1267,7 +1309,8 @@ overlay.classList.add('open');
 function openCurrentEntryEdit(){
 if(!viewingEntry)return;
 closeView();
-setTimeout(()=>openNoteEdit(viewingEntry.id),200);
+if(viewingEntry.type==='diary'){setTimeout(()=>openDiaryEdit(viewingEntry.id),200);}
+else{setTimeout(()=>openNoteEdit(viewingEntry.id),200);}
 }
 function closeView(){document.getElementById('viewOverlay').classList.remove('open');}
 document.getElementById('viewOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('viewOverlay'))closeView();});
