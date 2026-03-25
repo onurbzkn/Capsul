@@ -223,7 +223,7 @@ uni:[
 {id:'search',lbl:'Ara',ico:ICO_SEARCH},
 ],
 };
-const PAGE_TITLES={home:'Ana Ekran',stats:'İstatistikler',slides:'Slaytlar',todo:'Görevler',notes:'Notlar',diary:'Günlük',search:'Arama',calendar:'Takvim',pomodoro:'Pomodoro',kanban:'Kanban',weekly:'Haftalık Özet',reading:'Okuma Listesi',pro:'Profesyonel',schedule:'Ders Programı',exams:'Sınav Takvimi',notebook:'Not Defteri',chat:'Sohbet'};
+const PAGE_TITLES={home:'Ana Ekran',stats:'İstatistikler',slides:'Slaytlar',todo:'Görevler',notes:'Notlar',diary:'Günlük',search:'Arama',calendar:'Takvim',pomodoro:'Pomodoro',kanban:'Kanban',weekly:'Haftalık Özet',reading:'Okuma Listesi',pro:'Profesyonel',schedule:'Ders Programı',exams:'Sınav Takvimi',notebook:'Not Defteri',chat:'Sohbet',habits:'Alışkanlıklar'};
 function setMode(mode){
 curMode=mode;
 buildNav();
@@ -266,8 +266,9 @@ if(page==='notebook')renderNotebook();
 if(page==='stats')renderStats();
 if(page==='search'){document.getElementById('search-results').innerHTML='';setTimeout(()=>{const inp=document.getElementById('searchInput');if(inp){inp.value='';inp.focus();}},200);}
 if(page==='pro')renderPro();
+if(page==='habits')renderHabits();
 }
-const THEMES=['default','midnight','forest','sunset','ocean','sand'];
+const THEMES=['default','midnight','forest','sunset','ocean','sand','light','light-warm'];
 function applyTheme(name,el){
 setTimeout(updateThemeLabel, 50);
 document.body.style.transition='background .4s,color .4s';
