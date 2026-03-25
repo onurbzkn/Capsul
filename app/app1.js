@@ -313,7 +313,7 @@ function showPinDisablePrompt(){_pinDisableBuf='';for(let i=0;i<4;i++){const d=d
 function pinDisableKey(k){if(_pinDisableBuf.length>=4)return;_pinDisableBuf+=k;for(let i=0;i<4;i++){const d=document.getElementById('dd'+i);if(d)d.classList.toggle('filled',i<_pinDisableBuf.length);}if(_pinDisableBuf.length===4){setTimeout(async()=>{const stored=localStorage.getItem('capsula_pin');const ok=await verifyPin(_pinDisableBuf,stored);if(ok){closeModal('pinDisableModal');removePinCode();document.getElementById('pinToggle').classList.remove('on');document.getElementById('pinSetupArea').style.display='none';showToast('PIN kilidi kaldırıldı');}else{document.querySelectorAll('#pinDisableDots .pin-dot').forEach(d=>d.classList.add('error'));setTimeout(()=>{document.querySelectorAll('#pinDisableDots .pin-dot').forEach(d=>{d.classList.remove('error','filled');});_pinDisableBuf='';},600);}},80);}}
 function pinDisableDel(){_pinDisableBuf=_pinDisableBuf.slice(0,-1);for(let i=0;i<4;i++){const d=document.getElementById('dd'+i);if(d)d.classList.toggle('filled',i<_pinDisableBuf.length);}}
 function pinDisableCancel(){closeModal('pinDisableModal');_pinDisableBuf='';}
-async function savePinCode(){const val=document.getElementById('newPinInput').value;if(!/^\\d{4}$/.test(val)){showToast('4 haneli rakam gir');return;}const hashed=await hashPin(val);localStorage.setItem('capsula_pin',hashed);D.profile.pinEnabled=true;saveData();document.getElementById('newPinInput').value='';document.getElementById('pinSetupArea').style.display='none';document.getElementById('pinToggle').classList.add('on');showToast('PIN kaydedildi \ud83d\udd12');}
+async function savePinCode(){const val=document.getElementById('newPinInput').value;if(!/^\d{4}$/.test(val)){showToast('4 haneli rakam gir');return;}const hashed=await hashPin(val);localStorage.setItem('capsula_pin',hashed);D.profile.pinEnabled=true;saveData();document.getElementById('newPinInput').value='';document.getElementById('pinSetupArea').style.display='none';document.getElementById('pinToggle').classList.add('on');showToast('PIN kaydedildi \ud83d\udd12');}
 function removePinCode(){localStorage.removeItem('capsula_pin');D.profile.pinEnabled=false;saveData();}
 function initPinToggle(){document.getElementById('pinToggle').classList.toggle('on',!!localStorage.getItem('capsula_pin'));}
 function toggleDrawer(){document.getElementById('drawer').classList.toggle('open');document.getElementById('drawerOverlay').classList.toggle('open');document.getElementById('hamBtn').classList.toggle('open');}
@@ -331,7 +331,7 @@ const el=document.getElementById('editorContent');
 const wc=document.getElementById('editorWordCount');
 if(!el||!wc)return;
 const text=el.value;
-const words=text.trim()?text.trim().split(/\\s+/).length:0;
+const words=text.trim()?text.trim().split(/\s+/).length:0;
 const chars=text.length;
 wc.textContent=`${words} kelime · ${chars} karakter`;
 }
@@ -392,7 +392,7 @@ const SYSTEM_AVATARS=[
 {id:'av20',emoji:'\ud83c\udf3a',bg:'linear-gradient(135deg,#f43f5e,#e11d48)'},
 ];
 function renderAvatarPicker(){
-const grid=document.getElementById('avatarPickerGrid');
+const grid=document.getElementById('editAvatarPickerGrid');
 if(!grid)return;
 const cur=D.profile.avatarId||'';
 grid.innerHTML=SYSTEM_AVATARS.map(av=>`
@@ -755,7 +755,7 @@ function deleteNoteConfirm(id){
 document.getElementById('noteEditModal')?.remove();
 showConfirm('Bu notu silmek istiyor musun?',()=>{
 const n=D.notes.find(x=>x.id===id);
-if(n){D.contentTrash.push({...n,type:'note',deletedAt:new Date().toISOString()});}
+if(n){D.contentTrash.push({...n,_trashType:'note',_trashedAt:new Date().toISOString()});}
 D.notes=D.notes.filter(x=>x.id!==id);
 saveData();renderNotes();showToast('Not silindi');
 });
@@ -1169,7 +1169,7 @@ viewEntry('note',n.id);
 function renderDiary(){
 renderDiaryAIPrompt();
 const list=document.getElementById('diary-list');const empty=document.getElementById('diary-empty');
-if(!D.diary.length){list.innerHTML='';empty.style.display='block';
+if(!D.diary.length){list.innerHTML='';empty.style.display='block';return;}
 empty.style.display='none';
 list.innerHTML=D.diary.map(e=>`<div class="diary-entry" onclick="viewEntry('diary',${e.id})"><div class="diary-entry-header"><span class="diary-entry-date">${fmtDateFull(e.createdAt)}</span><span class="diary-mood-icon">${e.mood||'\ud83d\ude0a'}</span></div><div class="diary-entry-title">${escHtml(e.title||'Günlük Girişi')}</div><div class="diary-entry-preview">${escHtml(e.content||'')}</div></div>`).join('');
 }
@@ -1261,7 +1261,7 @@ D.completedTodos.forEach(t=>{if(t.text.toLowerCase().includes(q))found.push({typ
 D.reading.forEach(r=>{if((r.title+' '+(r.author||'')).toLowerCase().includes(q))found.push({type:'reading',entry:r,section:'Kitap'});});
 D.schedule.forEach(s=>{if((s.name+' '+(s.room||'')).toLowerCase().includes(q))found.push({type:'schedule',entry:s,section:'Ders'});});
 if(!found.length){results.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3);font-size:.76rem;">Sonuç bulunamadı.</div>';return;}
-function hl(text,q){if(!text)return'';const re=new RegExp('('+q.replace(/[.*+?^${}()|[\\]\\\\]/g,'\\\\$&')+')','gi');return escHtml(text).replace(re,'<mark style="background:rgba(124,111,247,.25);color:var(--accent2);border-radius:3px;padding:0 2px;">$1</mark>');}
+function hl(text,q){if(!text)return'';const re=new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');return escHtml(text).replace(re,'<mark style="background:rgba(124,111,247,.25);color:var(--accent2);border-radius:3px;padding:0 2px;">$1</mark>');}
 const sectionClr={not:'var(--accent)',günlük:'var(--diary)',görev:'var(--easy)','görev ✓':'var(--text3)',kanban:'var(--mid)',kitap:'var(--note)',ders:'var(--easy)'};
 results.innerHTML=found.map(r=>{
 const title=r.entry.text||r.entry.title||r.entry.name||'';
@@ -1333,5 +1333,4 @@ extra.innerHTML=`
 <div class="sdash-section"><div class="sdash-section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>Yaklaşan Sınavlar<button onclick="switchPage('exams')" class="sdash-more-btn">Tümü →</button></div><div class="sdash-exams">${examsHtml}</div></div>
 <div class="dash-quote" style="margin-top:12px"><div class="dash-quote-text">"${escHtml(q.text)}"</div><div class="dash-quote-author">— ${escHtml(q.author)}</div></div>
 `;
-}
 }

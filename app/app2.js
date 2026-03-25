@@ -798,7 +798,7 @@ bar.style.width=pct+'%';
 },600);
 }
 const TOUR_STEPS=[
-{selector:'.mode-pill',title:'3 Farklı Mod',desc:'Üstteki pill ile Profesyonel, Ana Ekran veya Öğrenci modunu seç. Her mod farklı araçlar sunar.',side:'bottom',round:false},
+{selector:'#navGlass',title:'3 Farklı Mod',desc:'Alt menüden sayfalar arasında geçiş yap. Drawer menüden modu değiştirebilirsin.',side:'top',round:false},
 {selector:'#hamBtn',title:'Yan Menü',desc:'Profil, tema değiştirme ve uygulama ayarlarına buradan ulaşırsın.',side:'bottom',round:false},
 {selector:'#navGlass',title:'Alt Navigasyon',desc:'Sayfalar arasında geçiş yap. Ortadaki büyük buton aktif modun ana eylemine kısayol.',side:'top',round:false},
 {selector:'#avatarBtn',title:'Profil & Ayarlar',desc:'İsmini, avatarını ve PIN korumasını buradan düzenleyebilirsin.',side:'bottom',round:true},
@@ -1569,8 +1569,8 @@ return '<div class="capsule-card ' + (isUnlocked ? 'unlocked' : 'locked') + '" o
 + '</div>'
 + '<button onclick="event.stopPropagation();deleteCapsuleConfirm(' + cap.id + ')" '
 + 'style="background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;border-radius:6px;flex-shrink:0;opacity:0;transition:all .18s;" '
-+ 'onmouseover="this.style.color=var(--hard);this.style.opacity=1" '
-+ 'onmouseout="this.style.color=var(--text3);this.style.opacity=0" '
++ "onmouseover=\"this.style.color='var(--hard)';this.style.opacity=1\" "
++ "onmouseout=\"this.style.color='var(--text3)';this.style.opacity=0\" "
 + 'class="cap-del-btn">✕</button>'
 + '</div>'
 + '</div>';
@@ -1679,19 +1679,6 @@ addNotification('⏳ "' + cap.title + '" kapsülü yarın açılıyor!', 'capsul
 localStorage.setItem(notifKey + '_1d', '1');
 }
 });
-}
-function handleIgAvatarClick() {
-var inp = document.getElementById('avatarUpload');
-if (!inp) {
-inp = document.createElement('input');
-inp.type = 'file';
-inp.accept = 'image/*';
-inp.id = 'avatarUpload';
-inp.style.display = 'none';
-inp.onchange = function(e) { handleAvatarUpload(e); };
-document.body.appendChild(inp);
-}
-inp.click();
 }
 function sealEntry(type, id) {
 var arr = type === 'note' ? D.notes : D.diary;
