@@ -180,10 +180,9 @@ header{
 /* ── MAIN ────────────────────────────────────────────────────────────────── */
 main{flex:1;overflow:hidden;position:relative;isolation:auto;}
 .page{position:absolute;inset:0;overflow-y:auto;opacity:0;pointer-events:none;
-  transition:opacity .28s cubic-bezier(.4,0,.2,1),transform .32s cubic-bezier(.4,0,.2,1);
-  transform:translateY(32px);
+  transition:opacity .3s ease;
   padding:18px 18px calc(var(--nav-h) + 22px);}
-.page.active{opacity:1;pointer-events:all;transform:translateY(0);}
+.page.active{opacity:1;pointer-events:all;}
 /* NOT: opacity/transform olan elementler stacking context yaratır.
    viewOverlay gibi fixed elementler bundan etkilenmesin diye z-index yüksek tutuldu. */
 #page-chat{overflow:hidden;padding:0;display:flex;flex-direction:column;}
@@ -327,54 +326,54 @@ main{flex:1;overflow:hidden;position:relative;isolation:auto;}
 @keyframes pd{0%,80%,100%{opacity:.2;transform:scale(.8);}40%{opacity:1;transform:scale(1.1);}}
 
 /* ── CALENDAR ────────────────────────────────────────────────────────────── */
-.calendar-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.cal-nav-btn{background:none;border:none;cursor:pointer;color:var(--text2);width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:7px;transition:background .2s;}
+
+
 .cal-nav-btn:hover{background:var(--bg3);}
-.cal-grid-head{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:4px;}
+
 .cal-dh{font-size:.56rem;color:var(--text3);font-family:'JetBrains Mono',monospace;padding:3px 0;}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
-.cal-day{height:42px;min-width:0;display:flex;align-items:center;justify-content:center;border-radius:7px;cursor:pointer;font-size:.78rem;color:var(--text2);position:relative;transition:all .14s;font-family:'JetBrains Mono',monospace;}
-.cal-day:hover{background:var(--bg3);color:var(--text);}
-.cal-day.other{color:var(--text3);}
-.cal-day.today{color:var(--accent2);font-weight:600;}
-.cal-day.today::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--accent);}
-.cal-day.has-entry::before{content:'';position:absolute;top:3px;right:4px;width:4px;height:4px;border-radius:50%;background:var(--diary);opacity:.8;}
-.cal-day.has-plan::after{content:'';position:absolute;bottom:3px;right:4px;width:4px;height:4px;border-radius:50%;background:var(--accent);opacity:.7;}
-.cal-day.selected{background:var(--accent)!important;color:#fff!important;}
-.quote-card{margin-top:14px;background:linear-gradient(135deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;}
+
+
+
+
+
+
+
+
+
+
 .quote-card::before{content:'\201C';position:absolute;top:-8px;left:12px;font-size:4.5rem;color:rgba(124,111,247,.1);font-family:Georgia,serif;line-height:1;}
-.quote-text{font-size:.84rem;font-weight:300;font-style:italic;color:var(--text2);line-height:1.7;margin-bottom:8px;position:relative;z-index:1;}
-.quote-author{font-family:'JetBrains Mono',monospace;font-size:.56rem;color:var(--accent2);letter-spacing:.1em;text-transform:uppercase;}
-.quote-tag{display:inline-block;margin-left:7px;font-size:.46rem;padding:2px 6px;border-radius:7px;background:rgba(124,111,247,.1);color:var(--accent2);border:1px solid rgba(124,111,247,.15);letter-spacing:.08em;text-transform:uppercase;vertical-align:middle;}
-.cal-day-panel{margin-top:14px;}
-.cal-plan-textarea{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:9px 11px;font-family:'Sora',sans-serif;font-size:.8rem;font-weight:300;color:var(--text2);line-height:1.6;resize:none;min-height:72px;outline:none;transition:border-color .2s;}
+
+
+
+
+
 .cal-plan-textarea:focus{border-color:rgba(124,111,247,.35);}
 .cal-plan-textarea::placeholder{color:var(--text3);}
-.cal-plan-display{font-size:.82rem;font-weight:300;color:var(--text2);line-height:1.6;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:4px;white-space:pre-wrap;}
-.cal-event-item{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;}
-.cal-event-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px;background:var(--diary);}
-.cal-event-text{font-size:.78rem;font-weight:300;color:var(--text2);}
-.cal-event-time{font-size:.56rem;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:1px;}
-.cal-panel-section-title{font-size:.52rem;letter-spacing:.2em;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-bottom:7px;}
-.cal-view-btn{width:28px;height:28px;border-radius:7px;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text3);transition:all .18s;}
-.cal-view-btn:hover{background:var(--bg3);color:var(--text2);}
-.cal-view-btn.active{background:rgba(124,111,247,.15);border-color:rgba(124,111,247,.35);color:var(--accent2);}
-.cal-week-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px;}
-.cal-week-day{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 4px;border-radius:10px;cursor:pointer;transition:all .15s;border:1px solid transparent;}
-.cal-week-day:hover{background:var(--bg3);}
-.cal-week-day.today{background:rgba(124,111,247,.1);border-color:rgba(124,111,247,.2);}
-.cal-week-day.selected{background:var(--accent)!important;border-color:var(--accent)!important;}
-.cal-week-day-name{font-size:.52rem;font-family:'JetBrains Mono',monospace;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;}
-.cal-week-day-num{font-size:.88rem;font-family:'JetBrains Mono',monospace;color:var(--text2);font-weight:500;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .cal-week-day.today .cal-week-day-num{color:var(--accent2);}
 .cal-week-day.selected .cal-week-day-name,.cal-week-day.selected .cal-week-day-num{color:#fff;}
-.cal-week-dot-row{display:flex;gap:2px;}
-.cal-week-dot{width:4px;height:4px;border-radius:50%;}
-.cal-agenda-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--bg2);border-radius:10px;border:1px solid var(--border);margin-bottom:7px;cursor:pointer;transition:border-color .18s;}
-.cal-agenda-item:hover{border-color:var(--border2);}
-.cal-agenda-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
-.cal-agenda-title{font-size:.8rem;font-weight:400;color:var(--text);}
-.cal-agenda-meta{font-size:.6rem;font-family:'JetBrains Mono',monospace;color:var(--text3);margin-top:2px;}
+
+
+
+
+
+
+
 .cal-day.has-todo::before{content:'';position:absolute;top:3px;left:4px;width:4px;height:4px;border-radius:50%;background:var(--note);opacity:.8;}
 .cal-day.overdue-dot::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--hard);animation:reminderPulse 1.8s ease-in-out infinite;}
 @keyframes reminderPulse{0%,100%{opacity:.5;}50%{opacity:1;}}
@@ -689,7 +688,7 @@ main{flex:1;overflow:hidden;position:relative;isolation:auto;}
 
 
 /* ── MODALS ──────────────────────────────────────────────────────────────── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .28s;backdrop-filter:blur(8px);}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .28s;backdrop-filter:blur(8px);}
 .modal-overlay.open{opacity:1;pointer-events:all;}
 .modal-box{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:26px;width:min(380px,92vw);transform:scale(.94) translateY(10px);transition:transform .32s cubic-bezier(.4,0,.2,1);position:relative;max-height:88vh;overflow-y:auto;}
 .modal-overlay.open .modal-box{transform:scale(1) translateY(0);}
@@ -781,7 +780,7 @@ select.pf option{background:var(--bg2);color:var(--text);}
 .trash-empty-all:hover{background:rgba(248,113,113,.06);color:var(--hard);}
 
 /* ── EDITOR ──────────────────────────────────────────────────────────────── */
-.editor-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .28s;backdrop-filter:blur(6px);}
+.editor-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:520;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .28s;backdrop-filter:blur(6px);}
 .editor-overlay.open{opacity:1;pointer-events:all;}
 .editor-sheet{width:100%;max-width:680px;background:var(--bg2);border-radius:20px 20px 0 0;border:1px solid var(--border);border-bottom:none;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;transform:translateY(100%);transition:transform .38s cubic-bezier(.4,0,.2,1);}
 .editor-overlay.open .editor-sheet{transform:translateY(0);}
@@ -856,28 +855,28 @@ select.pf option{background:var(--bg2);color:var(--text);}
 .template-card-desc{font-size:.62rem;font-weight:300;color:var(--text3);line-height:1.4;}
 
 /* ── CAL DAY MODAL ───────────────────────────────────────────────────────── */
-.cdm-box{padding:24px 22px 20px;}
-.cdm-date-title{font-size:1rem;font-weight:500;color:var(--text);margin-bottom:16px;letter-spacing:.02em;}
-.cdm-priority-row{display:flex;gap:8px;margin-bottom:14px;}
-.cdm-priority-opt{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;cursor:pointer;font-size:.62rem;font-weight:500;font-family:'JetBrains Mono',monospace;letter-spacing:.08em;border:1px solid;transition:all .2s;text-transform:uppercase;}
-.cdm-priority-opt input{display:none;}
-.cdm-priority-opt.easy{color:var(--easy);border-color:rgba(74,222,128,.2);}
-.cdm-priority-opt.easy:has(input:checked),.cdm-priority-opt.easy:hover{background:rgba(74,222,128,.1);border-color:var(--easy);}
-.cdm-priority-opt.mid{color:var(--mid);border-color:rgba(251,146,60,.2);}
-.cdm-priority-opt.mid:has(input:checked),.cdm-priority-opt.mid:hover{background:rgba(251,146,60,.1);border-color:var(--mid);}
-.cdm-priority-opt.hard{color:var(--hard);border-color:rgba(248,113,113,.2);}
-.cdm-priority-opt.hard:has(input:checked),.cdm-priority-opt.hard:hover{background:rgba(248,113,113,.1);border-color:var(--hard);}
-.cdm-btn-row{display:flex;gap:8px;margin-top:16px;}
-.cdm-btn-secondary{flex:1;padding:10px 8px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;cursor:pointer;font-family:'Sora',sans-serif;font-size:.72rem;color:var(--text2);display:flex;align-items:center;justify-content:center;gap:5px;transition:all .2s;}
-.cdm-btn-secondary:hover{background:rgba(255,255,255,.06);color:var(--text);}
-.cdm-btn-primary{flex:1;padding:10px 8px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:10px;cursor:pointer;font-family:'Sora',sans-serif;font-size:.72rem;color:#fff;display:flex;align-items:center;justify-content:center;gap:5px;transition:opacity .2s;}
-.cdm-btn-primary:hover{opacity:.88;}
-.cdm-exist-section{border-top:1px solid var(--border);padding-top:12px;margin-top:4px;}
-.cdm-exist-label{font-size:.52rem;letter-spacing:.18em;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-bottom:6px;}
-.cdm-exist-item{display:flex;align-items:center;gap:8px;padding:5px 0;}
-.cdm-exist-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-.cdm-exist-text{font-size:.78rem;font-weight:300;color:var(--text2);flex:1;}
-.cdm-exist-badge{font-size:.48rem;font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* ── TOAST ───────────────────────────────────────────────────────────────── */
 .toast{position:fixed;bottom:calc(var(--nav-h) + 14px);left:50%;transform:translateX(-50%) translateY(10px);background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:8px 18px;font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--text2);letter-spacing:.1em;z-index:500;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;}
@@ -907,13 +906,11 @@ select.pf option{background:var(--bg2);color:var(--text);}
   display:flex;flex-direction:column;overflow:hidden;
 }
 #settingsPage.open{transform:translateY(0) !important;}
-.sp-header{display:flex;align-items:center;gap:12px;padding:14px 16px;
-  background:rgba(13,13,18,0.9);backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--border);flex-shrink:0;}
-.sp-body{flex:1;overflow-y:auto;padding:16px;}
-.sp-section-label{font-size:.5rem;letter-spacing:.2em;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;padding:0 0 8px;display:block;}
-.sp-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;}
-.sp-card-inner{padding:14px 16px;}
+
+
+
+
+
 
 /* ── ZAMAN KAPSÜLü ───────────────────────────────────────────────────────── */
 .capsule-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden;}
@@ -948,6 +945,48 @@ select.pf option{background:var(--bg2);color:var(--text);}
 .diary-ai-prompt{transition:border-color .2s;}
 .diary-ai-prompt:hover{border-color:rgba(124,111,247,.38)!important;}
 #profilePage .fullpage-header>button:last-child:hover{background:rgba(124,111,247,.28)!important;border-color:rgba(124,111,247,.6)!important;}
+
+
+/* ── SAMSUNG STYLE SETTINGS ──────────────────────────────────────────────── */
+#settingsPage{
+  position:fixed;inset:0;z-index:450;background:var(--bg);
+  transform:translateY(100%);transition:transform .38s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+#settingsPage.open{transform:translateY(0);}
+.sp-header{display:flex;align-items:center;gap:12px;padding:16px 16px;
+  background:var(--bg);border-bottom:1px solid var(--border);flex-shrink:0;}
+.sp-body{flex:1;overflow-y:auto;padding:8px 0 40px;}
+
+.stt-section-label{
+  font-size:.72rem;font-weight:500;color:var(--text3);
+  padding:20px 20px 8px;letter-spacing:.04em;
+  text-transform:uppercase;font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.14em;
+}
+.stt-group{
+  background:var(--bg2);border-radius:16px;margin:0 12px 8px;
+  overflow:hidden;border:1px solid var(--border);
+}
+.stt-item{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 16px;cursor:pointer;
+  transition:background .18s;position:relative;
+}
+.stt-item::after{
+  content:'';position:absolute;bottom:0;left:62px;right:0;
+  height:1px;background:var(--border);
+}
+.stt-item:last-child::after{display:none;}
+.stt-item:active{background:rgba(255,255,255,.04);}
+.stt-danger:active{background:rgba(248,113,113,.06);}
+.stt-icon{
+  width:38px;height:38px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.stt-icon svg{color:#fff;}
+.stt-text{flex:1;min-width:0;}
+.stt-title{font-size:.9rem;font-weight:400;color:var(--text);margin-bottom:2px;}
+.stt-sub{font-size:.72rem;color:var(--text3);line-height:1.3;}
 
 </style>
 </head>
@@ -1070,40 +1109,6 @@ select.pf option{background:var(--bg2);color:var(--text);}
     </div>
 
     <!-- CALENDAR (shared) -->
-    <div class="page" id="page-calendar">
-      <div class="calendar-header">
-        <button class="cal-nav-btn" onclick="calNav(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <button class="cal-month-label" id="calMonthLabel" onclick="openCalPicker()" style="background:none;border:none;cursor:pointer;color:var(--text);font-size:.88rem;font-weight:500;letter-spacing:.04em;padding:4px 8px;border-radius:8px;transition:background .2s;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'"></button>
-          <button onclick="goToday()" style="background:rgba(124,111,247,.12);border:1px solid rgba(124,111,247,.25);border-radius:8px;padding:3px 10px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--accent2);letter-spacing:.1em;transition:all .2s;" onmouseover="this.style.background='rgba(124,111,247,.2)'" onmouseout="this.style.background='rgba(124,111,247,.12)'" style="text-transform:uppercase;">BUGÜN</button>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;">
-          <button id="calViewMonthBtn" class="cal-view-btn active" onclick="setCalView('month')" title="Ay görünümü">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          </button>
-          <button id="calViewWeekBtn" class="cal-view-btn" onclick="setCalView('week')" title="Hafta görünümü">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          </button>
-          <button class="cal-nav-btn" onclick="calNav(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
-        </div>
-      </div>
-      <!-- AY görünümü -->
-      <div id="calMonthView">
-        <div class="cal-grid-head"><div class="cal-dh">Pt</div><div class="cal-dh">Sa</div><div class="cal-dh">Ça</div><div class="cal-dh">Pe</div><div class="cal-dh">Cu</div><div class="cal-dh">Ct</div><div class="cal-dh">Pz</div></div>
-        <div class="cal-grid" id="calGrid"></div>
-      </div>
-      <!-- HAFTA görünümü -->
-      <div id="calWeekView" style="display:none;">
-        <div class="cal-week-strip" id="calWeekStrip"></div>
-        <div id="calWeekAgenda"></div>
-      </div>
-      <div id="calQuote"></div>
-      <div id="calEvents"></div>
-    </div>
-
-
-
-    <!-- POMODORO (Uni + shared) -->
     <div class="page" id="page-pomodoro">
       <div class="pomo-card">
         <div class="pomo-modes">
@@ -1305,7 +1310,7 @@ select.pf option{background:var(--bg2);color:var(--text);}
   </div>
   <div class="drawer-menu">
     <button class="drawer-item" onclick="openProfilePage();toggleDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profilim</button>
-    <button class="drawer-item" onclick="openCalendarFromDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Takvim</button>
+    
     <button class="drawer-item" onclick="toggleDrawer();switchPage('stats')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>İstatistikler</button>
     <button class="drawer-item" onclick="toggleDrawer();switchPage('kanban')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="10" rx="1"/><rect x="14" y="17" width="7" height="4" rx="1"/></svg>Kanban</button>
     <button class="drawer-item" onclick="toggleDrawer();switchPage('reading')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Okuma Listesi</button>
@@ -1423,7 +1428,7 @@ select.pf option{background:var(--bg2);color:var(--text);}
 </div>
 
 <!-- PIN DISABLE MODAL -->
-<div class="modal-overlay" id="pinDisableModal">
+<div class="modal-overlay" id="pinDisableModal" style="z-index:600;">
   <div class="modal-box" style="text-align:center;padding:26px 22px;">
     <div id="pinDisableMsg" style="font-size:.8rem;font-weight:300;color:var(--text2);margin-bottom:14px;">Mevcut PIN'ini gir:</div>
     <div style="display:flex;gap:12px;justify-content:center;margin-bottom:18px;" id="pinDisableDots">
@@ -1646,7 +1651,7 @@ select.pf option{background:var(--bg2);color:var(--text);}
 </div>
 
 <!-- YEDEKLEME MODALI -->
-<div class="modal-overlay" id="backupModal">
+<div class="modal-overlay" id="backupModal" style="z-index:520;">
   <div class="modal-box" style="padding:24px 22px;">
     <button class="modal-close-btn" onclick="closeModal('backupModal')">✕</button>
     <div class="plabel" style="margin-bottom:4px;font-size:.9rem;">Veri Yönetimi</div>
@@ -1920,72 +1925,231 @@ select.pf option{background:var(--bg2);color:var(--text);}
 <!-- SETTINGS PAGE -->
 <div id="settingsPage">
   <div class="sp-header">
-    <button onclick="closeSettingsPage()" style="background:none;border:none;color:var(--text2);cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><polyline points="15 18 9 12 15 6"/></svg>
+    <button onclick="closeSettingsPage()" style="background:none;border:none;color:var(--text2);cursor:pointer;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .18s;" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='none'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:22px;height:22px;"><polyline points="15 18 9 12 15 6"/></svg>
     </button>
-    <span style="font-size:.88rem;font-weight:500;color:var(--text);flex:1;">Ayarlar</span>
+    <span style="font-size:1.1rem;font-weight:600;color:var(--text);flex:1;">Ayarlar</span>
   </div>
   <div class="sp-body">
-    <span class="sp-section-label">Görünüm</span>
-    <div class="sp-card"><div class="sp-card-inner">
-      <div style="font-size:.78rem;font-weight:500;color:var(--text);margin-bottom:10px;">Tema</div>
-      <div class="theme-grid">
-        <div class="theme-swatch active" data-theme="default" data-label="Varsayılan" style="background:linear-gradient(135deg,#0d0d12,#7c6ff7)" onclick="applyTheme('default',this)"></div>
-        <div class="theme-swatch" data-theme="midnight" data-label="Gece" style="background:linear-gradient(135deg,#050508,#818cf8)" onclick="applyTheme('midnight',this)"></div>
-        <div class="theme-swatch" data-theme="forest" data-label="Orman" style="background:linear-gradient(135deg,#060e08,#4ade80)" onclick="applyTheme('forest',this)"></div>
-        <div class="theme-swatch" data-theme="sunset" data-label="Batım" style="background:linear-gradient(135deg,#12080a,#f472b6)" onclick="applyTheme('sunset',this)"></div>
-        <div class="theme-swatch" data-theme="ocean" data-label="Okyanus" style="background:linear-gradient(135deg,#030d14,#38bdf8)" onclick="applyTheme('ocean',this)"></div>
-        <div class="theme-swatch" data-theme="sand" data-label="Kum" style="background:linear-gradient(135deg,#0f0d08,#fbbf24)" onclick="applyTheme('sand',this)"></div>
-      </div>
 
-    </div></div>
-    <span class="sp-section-label">Pomodoro Saat Stili</span>
-    <div class="sp-card"><div class="sp-card-inner">
-      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;" id="pomoStyleGrid">
-        <div onclick="setPomoStyle('ring')" class="pomo-style-opt active" id="ps-ring"><svg viewBox="0 0 40 40" style="width:36px;height:36px;"><circle cx="20" cy="20" r="15" fill="none" stroke="var(--border2)" stroke-width="4"/><circle cx="20" cy="20" r="15" fill="none" stroke="var(--accent)" stroke-width="4" stroke-dasharray="70 24" stroke-linecap="round" transform="rotate(-90 20 20)"/></svg><span>Halka</span></div>
-        <div onclick="setPomoStyle('digital')" class="pomo-style-opt" id="ps-digital"><div style="font-family:'JetBrains Mono',monospace;font-size:.9rem;color:var(--accent);">25:00</div><span>Dijital</span></div>
-        <div onclick="setPomoStyle('clock')" class="pomo-style-opt" id="ps-clock"><svg viewBox="0 0 40 40" style="width:36px;height:36px;"><circle cx="20" cy="20" r="16" fill="none" stroke="var(--border2)" stroke-width="2"/><line x1="20" y1="20" x2="20" y2="7" stroke="var(--text)" stroke-width="2" stroke-linecap="round"/><line x1="20" y1="20" x2="28" y2="20" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/></svg><span>Analog</span></div>
-        <div onclick="setPomoStyle('flip')" class="pomo-style-opt" id="ps-flip"><div style="background:var(--bg3);border-radius:5px;padding:3px 6px;font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--text);border:1px solid var(--border2);">25</div><span>Flip</span></div>
-        <div onclick="setPomoStyle('minimal')" class="pomo-style-opt" id="ps-minimal"><div style="width:28px;height:28px;border-radius:50%;background:conic-gradient(var(--accent) 70%,var(--bg3) 0);display:flex;align-items:center;justify-content:center;"><div style="width:18px;height:18px;border-radius:50%;background:var(--bg2);"></div></div><span>Minimal</span></div>
+    <!-- GÖRÜNÜM -->
+    <div class="stt-section-label">Görünüm</div>
+    <div class="stt-group">
+      <div class="stt-item" onclick="document.getElementById('themeExpandArea').style.display=document.getElementById('themeExpandArea').style.display==='none'?'block':'none'">
+        <div class="stt-icon" style="background:linear-gradient(135deg,#7c6ff7,#f472b6);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/></svg>
+        </div>
+        <div class="stt-text">
+          <div class="stt-title">Tema</div>
+          <div class="stt-sub" id="currentThemeLabel">Varsayılan</div>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--text3);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
-    </div></div>
-    <span class="sp-section-label">Güvenlik</span>
-    <div class="sp-card"><div class="sp-card-inner">
-      <div class="settings-row"><span class="settings-row-label">PIN Kilidi</span><div class="toggle" id="pinToggle" onclick="togglePinSetting()"></div></div>
-      <div id="pinSetupArea" style="display:none;margin-top:10px;">
-        <div class="plabel" style="margin-bottom:4px">Yeni PIN (4 hane)</div>
-        <div style="display:flex;gap:7px;align-items:center;">
-          <input type="password" id="newPinInput" maxlength="4" inputmode="numeric" class="pf" style="letter-spacing:.3em;font-size:1rem;width:110px;margin-bottom:0;text-align:center;" placeholder="····">
-          <button onclick="savePinCode()" style="background:var(--accent);border:none;border-radius:7px;padding:8px 13px;cursor:pointer;font-family:'Sora',sans-serif;font-size:.72rem;color:#fff;">Kaydet</button>
+      <div id="themeExpandArea" style="display:none;padding:12px 16px 16px;border-top:1px solid var(--border);">
+        <div class="theme-grid" style="margin-top:0;">
+          <div class="theme-swatch active" data-theme="default" data-label="Varsayılan" style="background:linear-gradient(135deg,#0d0d12,#7c6ff7)" onclick="applyTheme('default',this);updateThemeLabel()"></div>
+          <div class="theme-swatch" data-theme="midnight" data-label="Gece" style="background:linear-gradient(135deg,#050508,#818cf8)" onclick="applyTheme('midnight',this);updateThemeLabel()"></div>
+          <div class="theme-swatch" data-theme="forest" data-label="Orman" style="background:linear-gradient(135deg,#060e08,#4ade80)" onclick="applyTheme('forest',this);updateThemeLabel()"></div>
+          <div class="theme-swatch" data-theme="sunset" data-label="Batım" style="background:linear-gradient(135deg,#12080a,#f472b6)" onclick="applyTheme('sunset',this);updateThemeLabel()"></div>
+          <div class="theme-swatch" data-theme="ocean" data-label="Okyanus" style="background:linear-gradient(135deg,#030d14,#38bdf8)" onclick="applyTheme('ocean',this);updateThemeLabel()"></div>
+          <div class="theme-swatch" data-theme="sand" data-label="Kum" style="background:linear-gradient(135deg,#0f0d08,#fbbf24)" onclick="applyTheme('sand',this);updateThemeLabel()"></div>
         </div>
       </div>
-    </div></div>
-    <span class="sp-section-label">Kanban</span>
-    <div class="sp-card"><div class="sp-card-inner">
-      <div class="settings-row">
-        <div><div class="settings-row-label">Tamamlananları otomatik sil</div><div style="font-size:.62rem;color:var(--text3);margin-top:2px;">30 gün sonra çöpe taşır</div></div>
+    </div>
+
+    <!-- GÜVENLİK -->
+    <div class="stt-section-label">Güvenlik</div>
+    <div class="stt-group">
+      <div class="stt-item" onclick="togglePinSetting()">
+        <div class="stt-icon" style="background:linear-gradient(135deg,#f87171,#ef4444);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div class="stt-text">
+          <div class="stt-title">PIN Kilidi</div>
+          <div class="stt-sub">Uygulamayı PIN ile kilitle</div>
+        </div>
+        <div class="toggle" id="pinToggle"></div>
+      </div>
+      <div id="pinSetupArea" style="display:none;padding:12px 16px 16px;border-top:1px solid var(--border);">
+        <div style="font-size:.78rem;color:var(--text3);margin-bottom:8px;">Yeni PIN (4 hane)</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="password" id="newPinInput" maxlength="4" inputmode="numeric" class="pf" style="letter-spacing:.3em;font-size:1rem;width:120px;margin-bottom:0;text-align:center;" placeholder="····">
+          <button onclick="savePinCode()" style="background:var(--accent);border:none;border-radius:9px;padding:10px 16px;cursor:pointer;font-family:'Sora',sans-serif;font-size:.8rem;color:#fff;white-space:nowrap;">Kaydet</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- POMODORO -->
+    <div class="stt-section-label">Pomodoro</div>
+    <div class="stt-group">
+      <div class="stt-item" onclick="document.getElementById('pomoStyleExpand').style.display=document.getElementById('pomoStyleExpand').style.display==='none'?'block':'none'">
+        <div class="stt-icon" style="background:linear-gradient(135deg,#fb923c,#f97316);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="stt-text">
+          <div class="stt-title">Saat Stili</div>
+          <div class="stt-sub">Zamanlayıcı görünümünü seç</div>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--text3);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div id="pomoStyleExpand" style="display:none;padding:12px 16px 16px;border-top:1px solid var(--border);">
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;" id="pomoStyleGrid">
+          <div onclick="setPomoStyle('ring')" class="pomo-style-opt active" id="ps-ring"><svg viewBox="0 0 40 40" style="width:32px;height:32px;"><circle cx="20" cy="20" r="15" fill="none" stroke="var(--border2)" stroke-width="4"/><circle cx="20" cy="20" r="15" fill="none" stroke="var(--accent)" stroke-width="4" stroke-dasharray="70 24" stroke-linecap="round" transform="rotate(-90 20 20)"/></svg><span>Halka</span></div>
+          <div onclick="setPomoStyle('digital')" class="pomo-style-opt" id="ps-digital"><div style="font-family:'JetBrains Mono',monospace;font-size:.9rem;color:var(--accent);">25:00</div><span>Dijital</span></div>
+          <div onclick="setPomoStyle('clock')" class="pomo-style-opt" id="ps-clock"><svg viewBox="0 0 40 40" style="width:32px;height:32px;"><circle cx="20" cy="20" r="16" fill="none" stroke="var(--border2)" stroke-width="2"/><line x1="20" y1="20" x2="20" y2="7" stroke="var(--text)" stroke-width="2" stroke-linecap="round"/><line x1="20" y1="20" x2="28" y2="20" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/></svg><span>Analog</span></div>
+          <div onclick="setPomoStyle('flip')" class="pomo-style-opt" id="ps-flip"><div style="background:var(--bg3);border-radius:5px;padding:3px 6px;font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--text);border:1px solid var(--border2);">25</div><span>Flip</span></div>
+          <div onclick="setPomoStyle('minimal')" class="pomo-style-opt" id="ps-minimal"><div style="width:28px;height:28px;border-radius:50%;background:conic-gradient(var(--accent) 70%,var(--bg3) 0);display:flex;align-items:center;justify-content:center;"><div style="width:18px;height:18px;border-radius:50%;background:var(--bg2);"></div></div><span>Minimal</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KANBAN -->
+    <div class="stt-section-label">Kanban</div>
+    <div class="stt-group">
+      <div class="stt-item">
+        <div class="stt-icon" style="background:linear-gradient(135deg,#60a5fa,#3b82f6);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="10" rx="1"/></svg>
+        </div>
+        <div class="stt-text">
+          <div class="stt-title">Tamamlananları otomatik sil</div>
+          <div class="stt-sub">30 gün sonra çöpe taşır</div>
+        </div>
         <div class="toggle" id="kanbanAutoDelete" onclick="toggleKanbanAutoDelete()"></div>
       </div>
-      <button onclick="confirmReset('kanban')" style="width:100%;margin-top:12px;padding:8px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:8px;color:var(--hard);font-family:'Sora',sans-serif;font-size:.72rem;cursor:pointer;">🗑 Kanban'ı Sıfırla</button>
-    </div></div>
-    <span class="sp-section-label">Program</span>
-    <div class="sp-card"><div class="sp-card-inner">
-      <div class="settings-row">
-        <div><div class="settings-row-label">Her hafta değişken</div><div style="font-size:.62rem;color:var(--text3);margin-top:2px;line-height:1.5;">Açık: haftalık · Kapalı: sabit</div></div>
+      <div class="stt-item stt-danger" onclick="confirmReset('kanban')">
+        <div class="stt-icon" style="background:linear-gradient(135deg,#f87171,#dc2626);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+        </div>
+        <div class="stt-text">
+          <div class="stt-title" style="color:var(--hard);">Kanban'ı Sıfırla</div>
+          <div class="stt-sub">Tüm kartlar silinir</div>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--text3);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+
+    <!-- PROGRAM -->
+    <div class="stt-section-label">Ders Programı</div>
+    <div class="stt-group">
+      <div class="stt-item">
+        <div class="stt-icon" style="background:linear-gradient(135deg,#f472b6,#ec4899);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="stt-text">
+          <div class="stt-title">Her hafta değişken</div>
+          <div class="stt-sub">Açık: haftalık · Kapalı: sabit</div>
+        </div>
         <div class="toggle" id="schedWeeklyToggle" onclick="toggleSchedWeekly()"></div>
       </div>
-      <button onclick="confirmReset('schedule')" style="width:100%;margin-top:12px;padding:8px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:8px;color:var(--hard);font-family:'Sora',sans-serif;font-size:.72rem;cursor:pointer;">🗑 Programı Sıfırla</button>
-    </div></div>
-    <span class="sp-section-label">Okuma Listesi</span>
-    <div class="sp-card" style="margin-bottom:40px;"><div class="sp-card-inner">
-      <div class="settings-row">
-        <div><div class="settings-row-label">Bitenleri otomatik arşivle</div><div style="font-size:.62rem;color:var(--text3);margin-top:2px;">30 gün sonra arşive taşır</div></div>
+      <div class="stt-item stt-danger" onclick="confirmReset('schedule')">
+        <div class="stt-icon" style="background:linear-gradient(135deg,#f87171,#dc2626);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+        </div>
+        <div class="stt-text">
+          <div class="stt-title" style="color:var(--hard);">Programı Sıfırla</div>
+          <div class="stt-sub">Tüm dersler silinir</div>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--text3);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+
+    <!-- OKUMA LİSTESİ -->
+    <div class="stt-section-label">Okuma Listesi</div>
+    <div class="stt-group">
+      <div class="stt-item">
+        <div class="stt-icon" style="background:linear-gradient(135deg,#4ade80,#22c55e);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15z"/></svg>
+        </div>
+        <div class="stt-text">
+          <div class="stt-title">Bitenleri otomatik arşivle</div>
+          <div class="stt-sub">30 gün sonra arşive taşır</div>
+        </div>
         <div class="toggle" id="readingAutoArchive" onclick="toggleReadingAutoArchive()"></div>
       </div>
-      <button onclick="confirmReset('reading')" style="width:100%;margin-top:12px;padding:8px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:8px;color:var(--hard);font-family:'Sora',sans-serif;font-size:.72rem;cursor:pointer;">🗑 Okuma Listesini Sıfırla">🗑 Okuma Listesini Sıfırla</button>
-    </div></div>
-  </div><!-- sp-body -->
-</div><!-- settingsPage -->
+      <div class="stt-item stt-danger" onclick="confirmReset('reading')">
+        <div class="stt-icon" style="background:linear-gradient(135deg,#f87171,#dc2626);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+        </div>
+        <div class="stt-text">
+          <div class="stt-title" style="color:var(--hard);">Okuma Listesini Sıfırla</div>
+          <div class="stt-sub">Tüm kitaplar silinir</div>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--text3);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+
+    <!-- VERİ -->
+    <div class="stt-section-label">Veri</div>
+    <div class="stt-group">
+      <div class="stt-item" onclick="closeSettingsPage();setTimeout(openBackupModal,320);">
+        <div class="stt-icon" style="background:linear-gradient(135deg,#a78bfa,#7c3aed);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </div>
+        <div class="stt-text">
+          <div class="stt-title">Yedekle & Geri Yükle</div>
+          <div class="stt-sub">Verilerini dışa/içe aktar</div>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--text3);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="stt-item" onclick="closeSettingsPage();setTimeout(openTrash,320);">
+        <div class="stt-icon" style="background:linear-gradient(135deg,#94a3b8,#64748b);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+        </div>
+        <div class="stt-text">
+          <div class="stt-title">Çöp Kutusu</div>
+          <div class="stt-sub" id="trashCountSub">Silinmiş öğeler</div>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--text3);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="stt-item stt-danger" onclick="closeSettingsPage();setTimeout(clearAllData,320);">
+        <div class="stt-icon" style="background:linear-gradient(135deg,#f87171,#dc2626);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+        </div>
+        <div class="stt-text">
+          <div class="stt-title" style="color:var(--hard);">Tüm Verileri Sil</div>
+          <div class="stt-sub">Bu işlem geri alınamaz</div>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--text3);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+
+    <!-- HAKKINDA -->
+    <div class="stt-section-label">Hakkında</div>
+    <div class="stt-group">
+      <div class="stt-item" onclick="closeSettingsPage();setTimeout(function(){openModal('privacyModal');},320);">
+        <div class="stt-icon" style="background:linear-gradient(135deg,#38bdf8,#0284c7);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="stt-text">
+          <div class="stt-title">Gizlilik Politikası</div>
+          <div class="stt-sub">Verileriniz yalnızca cihazınızda</div>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--text3);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="stt-item" onclick="closeSettingsPage();setTimeout(openContactModal,320);">
+        <div class="stt-icon" style="background:linear-gradient(135deg,#fbbf24,#d97706);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div class="stt-text">
+          <div class="stt-title">Bize Ulaşın</div>
+          <div class="stt-sub">Öneri ve hata bildirimi</div>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--text3);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="stt-item">
+        <div class="stt-icon" style="background:linear-gradient(135deg,#7c6ff7,#a89ffe);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="stt-text">
+          <div class="stt-title">Capsula</div>
+          <div class="stt-sub">Versiyon 4.0 · Made with ✦</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:40px;"></div>
+  </div>
+</div></div><!-- settingsPage -->
 
 
 
@@ -2011,7 +2175,7 @@ function initApp(){
   checkRecurringTodos();
   renderDiaryAIPrompt();
   setMode(curMode);
-  renderTodos();renderNotes();renderDiary();renderDashboard();renderCalendar();
+  renderTodos();renderNotes();renderDiary();renderDashboard();
   renderKanban();renderReading();renderSchedule();renderExams();renderNotebook();renderPro();
 }
 
@@ -2223,7 +2387,7 @@ function saveData(){
 // ─────────────────────────── MODE + NAV ───────────────────────────────────
 let curMode='home', curPage='notes', curPriority='easy', kanbanPriority='mid';
 let editorType='note', editorMediaFiles=[], editorTags=[], selMoodVal='\ud83d\ude0a';
-let calYear=new Date().getFullYear(), calMonth=new Date().getMonth(), selCalDay=new Date().getDate();
+
 let viewingEntry=null, completedOpen=false, _confirmCb=null;
 let pomoMode='work', pomoRunning=false, pomoSecs=25*60, pomoInterval=null, pomoSessions=0, pomoTaskId=null;
 let pomoStyle=localStorage.getItem('capsula_pomo_style')||'ring';
@@ -2290,10 +2454,7 @@ function switchPage(page){
   if(page==='todo')renderTodos();
   if(page==='notes')renderNotes();
   if(page==='diary')renderDiary();
-  if(page==='calendar'){
-    if(!calYear){calYear=new Date().getFullYear();calMonth=new Date().getMonth();selCalDay=new Date().getDate();}
-    renderCalendar();
-  }
+
   if(page==='pomodoro'){renderPomoTodos();updatePomoDisplay();}
   if(page==='kanban')renderKanban();
   if(page==='weekly')renderWeekly();
@@ -2309,6 +2470,8 @@ function switchPage(page){
 // ─────────────────────────── THEME ────────────────────────────────────────
 const THEMES=['default','midnight','forest','sunset','ocean','sand'];
 function applyTheme(name,el){
+  // Ayarlar içinde tema label'ını hemen güncelle
+  setTimeout(updateThemeLabel, 50);
   // Akıcı geçiş
   document.body.style.transition='background .4s,color .4s';
   document.documentElement.style.transition='--bg .4s,--bg2 .4s,--bg3 .4s';
@@ -2368,10 +2531,6 @@ function initPinToggle(){document.getElementById('pinToggle').classList.toggle('
 
 // ─────────────────────────── DRAWER / MODALS ──────────────────────────────
 function toggleDrawer(){document.getElementById('drawer').classList.toggle('open');document.getElementById('drawerOverlay').classList.toggle('open');document.getElementById('hamBtn').classList.toggle('open');}
-function openCalendarFromDrawer(){
-  toggleDrawer();
-  setTimeout(()=>{switchPage('calendar');},300);
-}
 function openFromDrawer(t){toggleDrawer();setTimeout(()=>{
   if(t==='profile')openProfilePage();
   else if(t==='settings')openSettingsPage();
@@ -3204,15 +3363,6 @@ function generateLocalAnalysis(d){
 }
 
 function dragTodo(e,id){e.dataTransfer.setData('todoId',String(id));e.dataTransfer.effectAllowed='move';}
-function dropTodoOnDay(e,dateKey){
-  e.preventDefault();
-  const id=parseInt(e.dataTransfer.getData('todoId'));
-  const todo=D.todos.find(t=>t.id===id);
-  if(!todo)return;
-  todo.dueDate=dateKey;
-  saveData();renderTodos();renderCalendar();
-  showToast(`Görev taşındı → ${dateKey}`);
-}
 function renderTodos(){
   const labels={hard:'Zor',mid:'Orta',easy:'Kolay'};
   const clr={easy:'var(--easy)',mid:'var(--mid)',hard:'var(--hard)'};
@@ -3423,116 +3573,6 @@ function doSearch(query){
 }
 
 // ─────────────────────────── CALENDAR ─────────────────────────────────────
-function calDayKey(y,m,d){return`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
-function calNav(dir){
-  if(calView==='week'){
-    const cur=new Date(calYear,calMonth,selCalDay||1);
-    cur.setDate(cur.getDate()+dir*7);
-    calYear=cur.getFullYear();calMonth=cur.getMonth();selCalDay=cur.getDate();
-  } else {
-    calMonth+=dir;if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;}
-  }
-  renderCalendar();
-}
-function goToday(){const n=new Date();calYear=n.getFullYear();calMonth=n.getMonth();selCalDay=n.getDate();renderCalendar();}
-function openCalPicker(){document.getElementById('calPickerMonth').value=calMonth;document.getElementById('calPickerYear').value=calYear;openModal('calPickerModal');}
-function applyCalPicker(){const m=parseInt(document.getElementById('calPickerMonth').value);const y=parseInt(document.getElementById('calPickerYear').value);if(!isNaN(m)&&!isNaN(y)&&y>=0&&y<=2500){calMonth=m;calYear=y;}closeModal('calPickerModal');renderCalendar();}
-function renderCalendar(){
-  var months=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
-  var ml=document.getElementById('calMonthLabel');
-  if(ml)ml.textContent=months[calMonth]+' '+calYear;
-
-  // Ay/Hafta görünüm geçişi
-  var cmv=document.getElementById('calMonthView');
-  var cwv=document.getElementById('calWeekView');
-  if(calView==='week'){
-    if(cmv)cmv.style.display='none';
-    if(cwv)cwv.style.display='';
-    var cq=document.getElementById('calQuote');if(cq)cq.innerHTML='';
-    renderWeekView();renderCalDayPanel();return;
-  }
-  if(cmv)cmv.style.display='';
-  if(cwv)cwv.style.display='none';
-
-  var today=new Date();
-  var firstDay=new Date(calYear,calMonth,1);
-  var sd=firstDay.getDay();if(sd===0)sd=7;sd--;
-  var dim=new Date(calYear,calMonth+1,0).getDate();
-  var dip=new Date(calYear,calMonth,0).getDate();
-  var todayMs=new Date().setHours(0,0,0,0);
-
-  if(!D.calPlans)D.calPlans={};
-  var diaryDays=new Set(D.diary.map(function(e){var d=new Date(e.createdAt);if(d.getFullYear()===calYear&&d.getMonth()===calMonth)return d.getDate();}).filter(Boolean));
-  var todoDays=new Set(D.todos.filter(function(t){return t.dueDate;}).map(function(t){var p=t.dueDate.split('-');if(parseInt(p[0])===calYear&&parseInt(p[1])-1===calMonth)return parseInt(p[2]);}).filter(Boolean));
-  var overdueDays=new Set(D.todos.filter(function(t){return t.dueDate;}).map(function(t){var d=new Date(t.dueDate);d.setHours(0,0,0,0);if(d.getFullYear()===calYear&&d.getMonth()===calMonth&&d<todayMs)return d.getDate();}).filter(Boolean));
-
-  var html='';
-  // Önceki ay günleri
-  for(var i=0;i<sd;i++)html+='<div class="cal-day other">'+(dip-sd+1+i)+'</div>';
-  // Bu ay günleri
-  for(var d=1;d<=dim;d++){
-    var isToday=(d===today.getDate()&&calMonth===today.getMonth()&&calYear===today.getFullYear());
-    var dk=calDayKey(calYear,calMonth,d);
-    var cls='cal-day'+(isToday?' today':'')+(d===selCalDay?' selected':'')+(diaryDays.has(d)?' has-entry':'')+(D.calPlans[dk]?' has-plan':'')+(todoDays.has(d)?' has-todo':'')+(overdueDays.has(d)?' overdue-dot':'');
-    html+='<div class="'+cls+'" onclick="selectDay('+d+')">'+d+'</div>';
-  }
-  // Sonraki ay günleri
-  var rem=42-sd-dim;for(var d2=1;d2<=rem;d2++)html+='<div class="cal-day other">'+d2+'</div>';
-
-  // calMonthView'i doğrudan yeniden yaz — innerHTML ile DOM'u zorla
-  if(cmv){
-    cmv.innerHTML='<div class="cal-grid-head"><div class="cal-dh">Pt</div><div class="cal-dh">Sa</div><div class="cal-dh">Ça</div><div class="cal-dh">Pe</div><div class="cal-dh">Cu</div><div class="cal-dh">Ct</div><div class="cal-dh">Pz</div></div><div class="cal-grid" id="calGrid">'+html+'</div>';
-  }
-
-  var q=getDayQuote(calYear,calMonth,selCalDay);
-  var cqEl=document.getElementById('calQuote');
-  if(cqEl)cqEl.innerHTML='<div class="quote-card"><div class="quote-text">"'+escHtml(q.text)+'"</div><div class="quote-author">— '+escHtml(q.author)+' <span class="quote-tag">'+escHtml(q.tag)+'</span></div></div>';
-  renderCalDayPanel();
-}
-
-function selectDay(d){selCalDay=d;renderCalendar();openCalDayModal(calYear,calMonth,d);}
-function openCalDayModal(y,m,d){
-  const key=calDayKey(y,m,d);if(!D.calPlans)D.calPlans={};
-  const plan=D.calPlans[key]||'';
-  const months=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
-  const wdays=['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
-  document.getElementById('calDayModalTitle').textContent=`${wdays[new Date(y,m,d).getDay()]}, ${d} ${months[m]} ${y}`;
-  document.getElementById('calDayModalInput').value=plan;
-  document.getElementById('calDayPrio').value='mid';
-  const todos=D.todos.filter(t=>t.dueDate===key);
-  const diaryE=D.diary.filter(e=>{const dt=new Date(e.createdAt);return dt.getFullYear()===y&&dt.getMonth()===m&&dt.getDate()===d;});
-  const clr={easy:'var(--easy)',mid:'var(--mid)',hard:'var(--hard)'};
-  let ex='';
-  if(todos.length||diaryE.length){ex+='<div class="cdm-exist-section">';if(todos.length){ex+=`<div class="cdm-exist-label">Görevler</div>`;todos.forEach(t=>ex+=`<div class="cdm-exist-item"><span class="cdm-exist-dot" style="background:${clr[t.priority]}"></span><span class="cdm-exist-text">${escHtml(t.text)}</span></div>`);}if(diaryE.length){ex+=`<div class="cdm-exist-label" style="margin-top:6px;">Günlük</div>`;diaryE.forEach(e=>ex+=`<div class="cdm-exist-item"><span class="cdm-exist-dot" style="background:var(--diary)"></span><span class="cdm-exist-text">${escHtml(e.title)} ${e.mood||''}</span></div>`);}ex+='</div>';}
-  document.getElementById('calDayModalExisting').innerHTML=ex;
-  openModal('calDayModal');setTimeout(()=>document.getElementById('calDayModalInput').focus(),200);
-}
-function saveCalDayEntry(addToTodos){
-  const key=calDayKey(calYear,calMonth,selCalDay);
-  const text=document.getElementById('calDayModalInput').value.trim();
-  const priority=document.getElementById('calDayPrio').value;
-  if(!D.calPlans)D.calPlans={};
-  if(text)D.calPlans[key]=text;else delete D.calPlans[key];
-  saveData();
-  if(addToTodos&&text){D.todos.push({id:Date.now(),text,priority,dueDate:key,createdAt:new Date().toISOString()});saveData();showToast('Takvime & göreve eklendi ✓');}
-  else if(text)showToast('Takvime kaydedildi ✦');
-  closeModal('calDayModal');renderCalendar();if(addToTodos)renderTodos();
-}
-function renderCalDayPanel(){
-  if(!D.calPlans)D.calPlans={};
-  const key=calDayKey(calYear,calMonth,selCalDay);
-  const todosForDay=D.todos.filter(t=>t.dueDate===key);
-  const dayEntries=D.diary.filter(e=>{const d=new Date(e.createdAt);return d.getFullYear()===calYear&&d.getMonth()===calMonth&&d.getDate()===selCalDay;});
-  const months=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
-  let html='<div class="cal-day-panel">';
-  if(D.calPlans[key])html+=`<div class="cal-panel-section-title">${selCalDay} ${months[calMonth]} ${calYear} — Plan</div><div class="cal-plan-display">${escHtml(D.calPlans[key])}</div>`;
-  if(todosForDay.length){const lbl={easy:'Kolay',mid:'Orta',hard:'Zor'};const clr={easy:'var(--easy)',mid:'var(--mid)',hard:'var(--hard)'};html+=`<div class="cal-panel-section-title" style="margin-top:${D.calPlans[key]?'12px':'0'};">Görevler</div>`;todosForDay.forEach(t=>html+=`<div style="display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--border);"><div style="width:6px;height:6px;border-radius:50%;background:${clr[t.priority]};flex-shrink:0;"></div><span style="font-size:.8rem;font-weight:300;color:var(--text2);flex:1;">${escHtml(t.text)}</span></div>`);}
-  if(dayEntries.length){html+=`<div class="cal-panel-section-title" style="margin-top:12px;">Günlük</div>`;dayEntries.forEach(e=>html+=`<div class="cal-event-item" onclick="viewEntry('diary',${e.id})"><div class="cal-event-dot"></div><div><div class="cal-event-text">${escHtml(e.title)} ${e.mood||''}</div><div class="cal-event-time">${fmtTime(e.createdAt)}</div></div></div>`);}
-  if(!D.calPlans[key]&&!todosForDay.length&&!dayEntries.length)html+=`<div style="color:var(--text3);font-size:.72rem;font-weight:300;font-style:italic;padding-top:5px;">Bu gün için içerik yok. Tıklayarak ekle.</div>`;
-  html+='</div>';
-  document.getElementById('calEvents').innerHTML=html;
-}
-
 // ─────────────────────────── DASHBOARD ────────────────────────────────────
 function renderDashboard(){
   const now=new Date();
@@ -4603,59 +4643,7 @@ function showWelcomeCard(){
 // ─────────────────────────── DİL SİSTEMİ ─────────────────────────────────
 
 
-let calView='month';
 
-function setCalView(v){
-  calView=v;
-  document.getElementById('calViewMonthBtn').classList.toggle('active',v==='month');
-  document.getElementById('calViewWeekBtn').classList.toggle('active',v==='week');
-  document.getElementById('calMonthView').style.display=v==='month'?'':'none';
-  document.getElementById('calWeekView').style.display=v==='week'?'':'none';
-  renderCalendar();
-}
-
-function renderWeekView(){
-  const today=new Date();
-  const cur=new Date(calYear,calMonth,selCalDay||today.getDate());
-  const dow=cur.getDay();
-  const diff=dow===0?-6:1-dow;
-  const weekStart=new Date(cur);weekStart.setDate(cur.getDate()+diff);
-  const dayNames=['Pt','Sa','Ça','Pe','Cu','Ct','Pz'];
-  let stripHtml='';
-  for(let i=0;i<7;i++){
-    const d=new Date(weekStart);d.setDate(weekStart.getDate()+i);
-    const isToday=d.toDateString()===today.toDateString();
-    const isSel=d.getDate()===selCalDay&&d.getMonth()===calMonth&&d.getFullYear()===calYear;
-    const dk=calDayKey(d.getFullYear(),d.getMonth(),d.getDate());
-    const hasTodo=D.todos.some(t=>t.dueDate===dk);
-    const hasDiary=D.diary.some(e=>{const ed=new Date(e.createdAt);return ed.toDateString()===d.toDateString();});
-    let dots='';
-    if(hasTodo)dots+=`<div class="cal-week-dot" style="background:var(--note)"></div>`;
-    if(hasDiary)dots+=`<div class="cal-week-dot" style="background:var(--diary)"></div>`;
-    stripHtml+=`<div class="cal-week-day${isToday?' today':''}${isSel?' selected':''}" onclick="selWeekDay(${d.getFullYear()},${d.getMonth()},${d.getDate()})"><div class="cal-week-day-name">${dayNames[i]}</div><div class="cal-week-day-num">${d.getDate()}</div><div class="cal-week-dot-row">${dots}</div></div>`;
-  }
-  document.getElementById('calWeekStrip').innerHTML=stripHtml;
-  renderWeekAgenda(calYear,calMonth,selCalDay||today.getDate());
-}
-
-function selWeekDay(y,m,d){calYear=y;calMonth=m;selCalDay=d;renderWeekView();renderCalDayPanel();}
-
-function renderWeekAgenda(y,m,d){
-  const dk=calDayKey(y,m,d);
-  const todosForDay=D.todos.filter(t=>t.dueDate===dk);
-  const diaryForDay=D.diary.filter(e=>{const ed=new Date(e.createdAt);return ed.getFullYear()===y&&ed.getMonth()===m&&ed.getDate()===d;});
-  const plan=D.calPlans&&D.calPlans[dk];
-  const wdays=['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
-  const months2=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
-  const clr={easy:'var(--easy)',mid:'var(--mid)',hard:'var(--hard)'};
-  let html=`<div style="font-size:.7rem;font-weight:500;color:var(--text);margin-bottom:10px;">${wdays[new Date(y,m,d).getDay()]}, ${d} ${months2[m]}</div>`;
-  if(plan)html+=`<div class="cal-agenda-item" onclick="openCalDayModal(${y},${m},${d})"><div class="cal-agenda-dot" style="background:var(--accent)"></div><div><div class="cal-agenda-title">${escHtml(plan)}</div><div class="cal-agenda-meta">PLAN</div></div></div>`;
-  todosForDay.forEach(t=>html+=`<div class="cal-agenda-item"><div class="cal-agenda-dot" style="background:${clr[t.priority]}"></div><div><div class="cal-agenda-title">${escHtml(t.text)}</div><div class="cal-agenda-meta">GÖREV</div></div></div>`);
-  diaryForDay.forEach(e=>html+=`<div class="cal-agenda-item" onclick="viewEntry('diary',${e.id})"><div class="cal-agenda-dot" style="background:var(--diary)"></div><div><div class="cal-agenda-title">${escHtml(e.title)} ${e.mood||''}</div><div class="cal-agenda-meta">GÜNLÜK · ${fmtTime(e.createdAt)}</div></div></div>`);
-  if(!plan&&!todosForDay.length&&!diaryForDay.length)html+=`<div style="color:var(--text3);font-size:.72rem;font-style:italic;padding:12px 0;text-align:center;">Bu gün için içerik yok.<br><span style="cursor:pointer;color:var(--accent2);text-decoration:underline;text-underline-offset:3px;" onclick="openCalDayModal(${y},${m},${d})">Ekle →</span></div>`;
-  html+=`<div style="margin-top:10px;"><button onclick="openCalDayModal(${y},${m},${d})" style="width:100%;padding:9px;background:rgba(124,111,247,.08);border:1px dashed rgba(124,111,247,.25);border-radius:10px;color:var(--accent2);font-size:.72rem;font-family:Sora,sans-serif;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='rgba(124,111,247,.14)'" onmouseout="this.style.background='rgba(124,111,247,.08)'">+ Bu güne ekle</button></div>`;
-  document.getElementById('calWeekAgenda').innerHTML=html;
-}
 
 // ─────────────────────────── YEDEKLEME ────────────────────────────────────
 function openBackupModal(){
@@ -4739,7 +4727,7 @@ Emin misin?`,()=>{
         if(!D.calPlans)D.calPlans={};if(!D.kanban)D.kanban={todo:[],doing:[],done:[]};
         if(!D.reading)D.reading=[];if(!D.completedTodos)D.completedTodos=[];
         if(!D.trash)D.trash=[];if(!D.contentTrash)D.contentTrash=[];
-        saveData();renderTodos();renderNotes();renderDiary();renderDashboard();renderCalendar();renderKanban();renderReading();updTrashBadge();updateReminderBadge();
+        saveData();renderTodos();renderNotes();renderDiary();renderDashboard();renderKanban();renderReading();updTrashBadge();updateReminderBadge();
         res.style.color='var(--easy)';res.textContent=`✓ Geri yüklendi — ${D.notes.length} not, ${D.diary.length} günlük, ${D.todos.length} görev`;
         showToast('Yedek geri yüklendi ✓');
       });
@@ -5242,7 +5230,15 @@ function saveProfileFromSheet(){
 }
 function openProfile(){openProfilePage();}
 function openPrivacyModal(){openModal('privacyModal');}
-function openSettingsPage(){initSettingsToggles();initTheme();document.getElementById('settingsPage').classList.add('open');}
+function openSettingsPage(){initSettingsToggles();initTheme();updateThemeLabel();document.getElementById('settingsPage').classList.add('open');}
+
+function updateThemeLabel(){
+  var t=D.profile.theme||'default';
+  var labels={default:'Varsayılan',midnight:'Gece',forest:'Orman',sunset:'Batım',ocean:'Okyanus',sand:'Kum'};
+  var el=document.getElementById('currentThemeLabel');
+  if(el)el.textContent=labels[t]||t;
+}
+
 function closeSettingsPage(){document.getElementById('settingsPage').classList.remove('open');}
 
 // FIX 2: Profil resmine tıklayınca fotoğraf değiştir
@@ -5371,4 +5367,281 @@ function renderTimeCapsules() {
       ? (cap.opened ? '✓ Okundu' : '🎉 Açılabilir!')
       : (daysLeft === 1 ? 'Yarın açılıyor!' : daysLeft + ' gün kaldı');
 
-   
+    return '<div class="capsule-card ' + (isUnlocked ? 'unlocked' : 'locked') + '" onclick="viewCapsule(' + cap.id + ')">'
+      + '<div style="display:flex;align-items:flex-start;gap:12px;">'
+      + '<div style="font-size:2rem;flex-shrink:0;line-height:1.2;">' + cap.emoji + '</div>'
+      + '<div style="flex:1;min-width:0;">'
+      + '<div class="capsule-title">' + escHtml(cap.title) + '</div>'
+      + '<div class="capsule-meta">'
+      + 'Oluşturuldu: ' + fmtDate(cap.createdAt) + ' · '
+      + 'Açılış: ' + fmtDate(cap.openDate)
+      + '</div>'
+      + '<span class="capsule-countdown ' + countdownClass + '">'
+      + (isUnlocked ? '' : '🔒 ') + countdownText
+      + '</span>'
+      + '</div>'
+      + '<button onclick="event.stopPropagation();deleteCapsuleConfirm(' + cap.id + ')" '
+      + 'style="background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;border-radius:6px;flex-shrink:0;opacity:0;transition:all .18s;" '
+      + 'onmouseover="this.style.color=var(--hard);this.style.opacity=1" '
+      + 'onmouseout="this.style.color=var(--text3);this.style.opacity=0" '
+      + 'class="cap-del-btn">✕</button>'
+      + '</div>'
+      + '</div>';
+  }).join('');
+
+  // Show delete buttons on hover of parent
+  cont.querySelectorAll('.capsule-card').forEach(function(card) {
+    card.addEventListener('mouseenter', function() {
+      var btn = card.querySelector('.cap-del-btn');
+      if (btn) btn.style.opacity = '1';
+    });
+    card.addEventListener('mouseleave', function() {
+      var btn = card.querySelector('.cap-del-btn');
+      if (btn) btn.style.opacity = '0';
+    });
+  });
+
+  // Check for newly unlocked capsules and notify
+  checkCapsuleNotifications();
+}
+
+function viewCapsule(id) {
+  initTimeCapsule();
+  var cap = D.timeCapsules.find(function(c) { return c.id === id; });
+  if (!cap) return;
+  var today = new Date();
+  today.setHours(0, 0, 0, 0);
+  var openDate = new Date(cap.openDate);
+  openDate.setHours(0, 0, 0, 0);
+  var isUnlocked = openDate <= today;
+
+  if (!isUnlocked) {
+    var daysLeft = Math.ceil((openDate - today) / (1000 * 60 * 60 * 24));
+    var modal = document.createElement('div');
+    modal.className = 'capsule-open-overlay open';
+    var lockedHtml = '<div class="capsule-open-card">'
+      + '<div style="font-size:3rem;margin-bottom:12px;">🔒</div>'
+      + '<div style="font-size:1rem;font-weight:500;color:var(--text);margin-bottom:8px;">' + escHtml(cap.title) + '</div>'
+      + '<div style="font-size:.78rem;color:var(--text3);margin-bottom:16px;line-height:1.6;">'
+      + 'Bu kapsül henüz açılmadı.<br>'
+      + '<span style="color:var(--accent2);font-weight:500;">' + daysLeft + ' gün</span> sonra açılacak.'
+      + '</div>'
+      + '<div style="font-size:.7rem;color:var(--text3);margin-bottom:20px;">'
+      + fmtDate(cap.openDate) + ' - ' + fmtDate(cap.createdAt) + 'de mühürlendi'
+      + '</div>'
+      + '<button id="closeLocked" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 24px;cursor:pointer;font-family:Sora,sans-serif;font-size:.8rem;color:var(--text2);">Kapat</button>'
+      + '</div>';
+    modal.innerHTML = lockedHtml;
+    modal.querySelector('#closeLocked').onclick = function() { modal.remove(); };
+    modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
+    document.body.appendChild(modal);
+    return;
+  }
+
+  var isFirstOpen = !cap.opened;
+  if (isFirstOpen) {
+    cap.opened = true;
+    saveData();
+    renderTimeCapsules();
+  }
+
+  var overlay = document.createElement('div');
+  overlay.className = 'capsule-open-overlay';
+  var contentHtml = cap.content
+    ? '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:left;font-size:.84rem;color:var(--text2);line-height:1.8;white-space:pre-wrap;max-height:240px;overflow-y:auto;margin-bottom:18px;">' + escHtml(cap.content) + '</div>'
+    : '<div style="color:var(--text3);font-style:italic;margin-bottom:18px;font-size:.8rem;">Bu kapsülde içerik yok.</div>';
+
+  var daysSince = Math.ceil((new Date() - new Date(cap.createdAt)) / (1000 * 60 * 60 * 24));
+  overlay.innerHTML = '<div class="capsule-open-card' + (isFirstOpen ? ' capsule-open-anim' : '') + '">'
+    + '<div style="font-size:3.5rem;margin-bottom:10px;">' + cap.emoji + '</div>'
+    + (isFirstOpen ? '<div style="font-size:.6rem;letter-spacing:.2em;color:var(--accent2);text-transform:uppercase;margin-bottom:10px;">✨ Kapsül Açıldı!</div>' : '')
+    + '<div style="font-size:1.05rem;font-weight:500;color:var(--text);margin-bottom:6px;">' + escHtml(cap.title) + '</div>'
+    + '<div style="font-size:.62rem;color:var(--text3);margin-bottom:16px;">'
+    + fmtDate(cap.createdAt) + 'den · ' + daysSince + ' gün önce yazıldı'
+    + '</div>'
+    + contentHtml
+    + '<button id="closeCapsule" style="background:linear-gradient(135deg,var(--accent),var(--diary));border:none;border-radius:10px;padding:11px 28px;cursor:pointer;font-family:Sora,sans-serif;font-size:.82rem;color:#fff;font-weight:500;">Kapat ✓</button>'
+    + '</div>';
+
+  overlay.querySelector('#closeCapsule').onclick = function() { overlay.remove(); };
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+  requestAnimationFrame(function() { overlay.classList.add('open'); });
+
+  if (isFirstOpen) {
+    addNotification('🎉 "' + cap.title + '" zaman kapsülünü açtın! ' + daysSince + ' gün önce yazmıştın.', 'capsule');
+  }
+}
+function deleteCapsuleConfirm(id) {
+  initTimeCapsule();
+  var cap = D.timeCapsules.find(function(c) { return c.id === id; });
+  if (!cap) return;
+  showConfirm('"' + cap.title + '" kapsülü silinsin mi?', function() {
+    D.timeCapsules = D.timeCapsules.filter(function(c) { return c.id !== id; });
+    saveData();
+    renderTimeCapsules();
+    showToast('Kapsül silindi');
+  });
+}
+
+function checkCapsuleNotifications() {
+  if (!D.timeCapsules) return;
+  var today = new Date();
+  today.setHours(0, 0, 0, 0);
+  var todayKey = today.toISOString().split('T')[0];
+  D.timeCapsules.forEach(function(cap) {
+    if (cap.opened) return;
+    var openDate = new Date(cap.openDate);
+    openDate.setHours(0, 0, 0, 0);
+    var daysLeft = Math.ceil((openDate - today) / (1000 * 60 * 60 * 24));
+    // Notify on exact open day
+    var notifKey = 'capsule_notif_' + cap.id + '_' + todayKey;
+    if (daysLeft <= 0 && !localStorage.getItem(notifKey)) {
+      addNotification('⏰ "' + cap.title + '" zaman kapsülü bugün açılıyor! Hemen bak 🎉', 'capsule');
+      localStorage.setItem(notifKey, '1');
+    }
+    // Notify 1 day before
+    if (daysLeft === 1 && !localStorage.getItem(notifKey + '_1d')) {
+      addNotification('⏳ "' + cap.title + '" kapsülü yarın açılıyor!', 'capsule');
+      localStorage.setItem(notifKey + '_1d', '1');
+    }
+  });
+}
+
+
+// ═══════════════════════════════════════════════════════
+// FIXES & NEW FEATURES
+// ═══════════════════════════════════════════════════════
+
+// FIX: Avatar upload in profile page
+function handleIgAvatarClick() {
+  var inp = document.getElementById('avatarUpload');
+  if (!inp) {
+    inp = document.createElement('input');
+    inp.type = 'file';
+    inp.accept = 'image/*';
+    inp.id = 'avatarUpload';
+    inp.style.display = 'none';
+    inp.onchange = function(e) { handleAvatarUpload(e); };
+    document.body.appendChild(inp);
+  }
+  inp.click();
+}
+
+// ═══════════════════════════════════════════════════════
+// MÜHÜRLÜ NOT & GÜNLÜK (Sealed Notes/Diary)
+// ═══════════════════════════════════════════════════════
+function sealEntry(type, id) {
+  var arr = type === 'note' ? D.notes : D.diary;
+  var entry = arr.find(function(e) { return e.id === id; });
+  if (!entry) return;
+  if (entry.sealed) {
+    // Mühürü kaldır
+    showConfirm('Mühürü kaldırmak istiyor musun?', function() {
+      delete entry.sealed;
+      saveData();
+      if (type === 'note') renderNotes(); else renderDiary();
+      showToast('Mühür kaldırıldı');
+    });
+    return;
+  }
+  // PIN varsa PIN ile mühürle, yoksa direkt mühürle
+  var hasPIN = !!localStorage.getItem('capsula_pin');
+  if (hasPIN) {
+    openSealPinModal(type, id);
+  } else {
+    entry.sealed = true;
+    saveData();
+    if (type === 'note') renderNotes(); else renderDiary();
+    showToast('Mühürlendi 🔒 — Tekrar basmak için PIN gerekir');
+  }
+}
+
+function openSealPinModal(type, id) {
+  document.getElementById('sealPinModal') && document.getElementById('sealPinModal').remove();
+  var modal = document.createElement('div');
+  modal.id = 'sealPinModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:3500;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);';
+  modal.innerHTML = '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:28px 24px;text-align:center;width:min(320px,90vw);">'
+    + '<div style="font-size:1.8rem;margin-bottom:10px;">🔒</div>'
+    + '<div style="font-size:.9rem;font-weight:500;color:var(--text);margin-bottom:6px;">PIN ile Mühürle</div>'
+    + '<div style="font-size:.74rem;color:var(--text3);margin-bottom:20px;line-height:1.6;">Bu içerik PIN girilmeden görüntülenemez.</div>'
+    + '<div style="display:flex;gap:8px;justify-content:center;">'
+    + '<button id="sealCancel" style="flex:1;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-family:Sora,sans-serif;font-size:.8rem;color:var(--text2);">Vazgeç</button>'
+    + '<button id="sealConfirm" style="flex:1;padding:10px;background:linear-gradient(135deg,var(--accent),var(--diary));border:none;border-radius:10px;cursor:pointer;font-family:Sora,sans-serif;font-size:.8rem;color:#fff;font-weight:500;">Mühürle</button>'
+    + '</div></div>';
+  document.body.appendChild(modal);
+  modal.querySelector('#sealCancel').onclick = function() { modal.remove(); };
+  modal.querySelector('#sealConfirm').onclick = function() {
+    var arr = type === 'note' ? D.notes : D.diary;
+    var entry = arr.find(function(e) { return e.id === id; });
+    if (entry) {
+      entry.sealed = true;
+      saveData();
+      if (type === 'note') renderNotes(); else renderDiary();
+      showToast('Mühürlendi 🔒');
+    }
+    modal.remove();
+  };
+  modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
+}
+
+function viewSealedEntry(type, id) {
+  var hasPIN = !!localStorage.getItem('capsula_pin');
+  if (!hasPIN) {
+    // PIN yok, direkt aç
+    viewEntry(type, id);
+    return;
+  }
+  // PIN iste
+  var pinBuf = '';
+  var modal = document.createElement('div');
+  modal.id = 'sealViewModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:3500;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);';
+  modal.innerHTML = '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:28px 24px;text-align:center;width:min(300px,90vw);">'
+    + '<div style="font-size:1.8rem;margin-bottom:8px;">🔒</div>'
+    + '<div style="font-size:.88rem;font-weight:500;color:var(--text);margin-bottom:16px;">PIN Gir</div>'
+    + '<div style="display:flex;gap:10px;justify-content:center;margin-bottom:16px;" id="svDots">'
+    + '<div class="pin-dot" id="sv0"></div><div class="pin-dot" id="sv1"></div><div class="pin-dot" id="sv2"></div><div class="pin-dot" id="sv3"></div>'
+    + '</div>'
+    + '<div class="pin-pad" style="max-width:200px;margin:0 auto 12px;">'
+    + [1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(function(k,i) {
+        if (k === '') return '<div class="pin-key empty"></div>';
+        if (k === '⌫') return '<div class="pin-key del" id="svDel">⌫</div>';
+        return '<div class="pin-key" data-k="' + k + '">' + k + '</div>';
+      }).join('')
+    + '</div>'
+    + '<button id="svCancel" style="background:none;border:none;cursor:pointer;font-size:.64rem;color:var(--text3);font-family:JetBrains Mono,monospace;text-decoration:underline;">İptal</button>'
+    + '</div>';
+  document.body.appendChild(modal);
+
+  function updateDots() {
+    for (var i = 0; i < 4; i++) {
+      var d = document.getElementById('sv' + i);
+      if (d) d.classList.toggle('filled', i < pinBuf.length);
+    }
+  }
+  modal.querySelectorAll('.pin-key[data-k]').forEach(function(el) {
+    el.addEventListener('click', function() {
+      if (pinBuf.length >= 4) return;
+      pinBuf += el.dataset.k;
+      updateDots();
+      if (pinBuf.length === 4) {
+        setTimeout(async function() {
+          var stored = localStorage.getItem('capsula_pin');
+          var ok = await verifyPin(pinBuf, stored);
+          if (ok) {
+            modal.remove();
+            viewEntry(type, id);
+          } else {
+            document.querySelectorAll('#svDots .pin-dot').forEach(function(d) { d.classList.add('error'); });
+            setTimeout(function() {
+              document.querySelectorAll('#svDots .pin-dot').forEach(function(d) { d.classList.remove('error', 'filled'); });
+              pinBuf = '';
+            }, 500);
+          }
+        }, 80);
+      }
+    });
+  });
+  document.getElementById('svDel').addEventListener('click', functi
