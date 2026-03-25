@@ -1303,6 +1303,7 @@ if(!D.notebook)D.notebook=[];
 if(!D.contentTrash)D.contentTrash=[];
 if(!D.trash)D.trash=[];
 if(!D.timeCapsules)D.timeCapsules=[];
+if(!D.habits)D.habits=[];
 }
 initTheme();
 localStorage.setItem('capsula_visited','1');
@@ -1552,7 +1553,7 @@ function openPrivacyModal(){openModal('privacyModal');}
 function openSettingsPage(){initSettingsToggles();initTheme();updateThemeLabel();document.getElementById('settingsPage').classList.add('open');}
 function updateThemeLabel(){
 var t=D.profile.theme||'default';
-var labels={default:'Varsayılan',midnight:'Gece',forest:'Orman',sunset:'Batım',ocean:'Okyanus',sand:'Kum'};
+var labels={default:'Varsayılan',midnight:'Gece',forest:'Orman',sunset:'Batım',ocean:'Okyanus',sand:'Kum',light:'Aydınlık','light-warm':'Sıcak Aydınlık'};
 var el=document.getElementById('currentThemeLabel');
 if(el)el.textContent=labels[t]||t;
 }
@@ -2020,3 +2021,137 @@ viewEntry('diary', eid);
 }
 };
 })();
+// ══════════════════════════════════════════════════════
+// HABIT TRACKER
+// ══════════════════════════════════════════════════════
+var HABIT_ICONS=['💪','📚','🏃','💧','🧘','🎯','✍️','🎵','🌅','💤','🥗','📵','🚶','💊','🧹','🌿'];
+function _todayKey(){return new Date().toISOString().split('T')[0];}
+function _getWeekDays(){
+var days=[];var now=new Date();
+var monday=new Date(now);monday.setDate(now.getDate()-((now.getDay()+6)%7));
+for(var i=0;i<7;i++){var d=new Date(monday);d.setDate(monday.getDate()+i);days.push(d.toISOString().split('T')[0]);}
+return days;
+}
+function openHabitAdd(){
+document.getElementById('habitAddModal')&&document.getElementById('habitAddModal').remove();
+var modal=document.createElement('div');
+modal.id='habitAddModal';
+modal.style.cssText='position:fixed;inset:0;z-index:3500;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;padding:20px;';
+modal.innerHTML='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:22px;width:100%;max-width:360px;position:relative;">'
++'<button onclick="document.getElementById(\'habitAddModal\').remove()" style="position:absolute;top:10px;right:12px;background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--text3);">✕</button>'
++'<div style="font-size:.86rem;font-weight:500;color:var(--text);margin-bottom:14px;">Yeni Alışkanlık</div>'
++'<input type="text" id="habitNameInput" placeholder="Alışkanlık adı..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:Sora,sans-serif;font-size:.84rem;color:var(--text);outline:none;margin-bottom:10px;box-sizing:border-box;">'
++'<div style="font-size:.66rem;color:var(--text3);margin-bottom:6px;">İkon seç</div>'
++'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;" id="habitIconPicker">'
++HABIT_ICONS.map(function(ico,i){return '<button onclick="document.getElementById(\'habitIconVal\').value=\''+ico+'\';document.querySelectorAll(\'#habitIconPicker button\').forEach(function(b){b.style.borderColor=\'var(--border)\';});this.style.borderColor=\'var(--accent)\'" style="font-size:1.2rem;background:var(--bg3);border:2px solid '+(i===0?'var(--accent)':'var(--border)')+';border-radius:8px;padding:6px 8px;cursor:pointer;transition:all .15s;">'+ico+'</button>';}).join('')
++'</div>'
++'<input type="hidden" id="habitIconVal" value="'+HABIT_ICONS[0]+'">'
++'<div style="font-size:.66rem;color:var(--text3);margin-bottom:6px;">Hedef (günlük tekrar)</div>'
++'<select id="habitFreqInput" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:Sora,sans-serif;font-size:.8rem;color:var(--text);outline:none;margin-bottom:14px;box-sizing:border-box;">'
++'<option value="daily">Her gün</option><option value="weekdays">Hafta içi</option><option value="3x">Haftada 3</option></select>'
++'<button onclick="saveHabit()" style="width:100%;padding:11px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:10px;color:#fff;font-family:Sora,sans-serif;font-size:.84rem;cursor:pointer;">Ekle</button>'
++'</div>';
+document.body.appendChild(modal);
+modal.addEventListener('click',function(e){if(e.target===modal)modal.remove();});
+setTimeout(function(){document.getElementById('habitNameInput').focus();},100);
+}
+function saveHabit(){
+var name=document.getElementById('habitNameInput').value.trim();
+if(!name){showToast('Alışkanlık adı gir');return;}
+var icon=document.getElementById('habitIconVal').value;
+var freq=document.getElementById('habitFreqInput').value;
+if(!D.habits)D.habits=[];
+D.habits.push({id:Date.now(),name:name,icon:icon,freq:freq,log:{},createdAt:new Date().toISOString()});
+saveData();document.getElementById('habitAddModal').remove();renderHabits();showToast('Alışkanlık eklendi '+icon);
+}
+function toggleHabitDay(habitId,dateKey){
+if(!D.habits)return;
+var h=D.habits.find(function(x){return x.id===habitId;});
+if(!h)return;
+if(!h.log)h.log={};
+h.log[dateKey]=!h.log[dateKey];
+saveData();renderHabits();
+}
+function deleteHabit(id){
+showConfirm('Bu alışkanlığı silmek istiyor musun?',function(){
+D.habits=D.habits.filter(function(h){return h.id!==id;});
+saveData();renderHabits();showToast('Alışkanlık silindi');
+});
+}
+function getHabitStreak(habit){
+var s=0;var d=new Date();
+for(var i=0;i<365;i++){
+var dk=new Date(d);dk.setDate(d.getDate()-i);
+var key=dk.toISOString().split('T')[0];
+if(habit.log&&habit.log[key])s++;
+else if(i>0)break;
+}
+return s;
+}
+function renderHabits(){
+if(!D.habits)D.habits=[];
+var cont=document.getElementById('habitsList');
+var weekInfo=document.getElementById('habitsWeekGrid');
+var streakInfo=document.getElementById('habitsStreakInfo');
+if(!cont)return;
+var today=_todayKey();
+var weekDays=_getWeekDays();
+var dayLabels=['Pt','Sa','Ça','Pe','Cu','Ct','Pz'];
+var totalDone=0;var totalPossible=0;
+D.habits.forEach(function(h){weekDays.forEach(function(dk){totalPossible++;if(h.log&&h.log[dk])totalDone++;});});
+if(streakInfo)streakInfo.textContent=D.habits.length?totalDone+'/'+totalPossible+' bu hafta tamamlandı':'';
+if(!D.habits.length){
+cont.innerHTML='<div style="text-align:center;padding:48px 20px;">'
++'<div style="font-size:2.5rem;margin-bottom:12px;">💪</div>'
++'<div style="font-size:.88rem;color:var(--text2);margin-bottom:6px;">Henüz alışkanlık yok</div>'
++'<div style="font-size:.72rem;color:var(--text3);line-height:1.6;">Yukarıdaki "Ekle" butonu ile<br>ilk alışkanlığını oluştur.</div></div>';
+if(weekInfo)weekInfo.innerHTML='';
+return;
+}
+// Week overview grid
+var wHtml='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;overflow-x:auto;">';
+wHtml+='<table style="width:100%;border-collapse:collapse;"><thead><tr><th style="text-align:left;font-size:.68rem;color:var(--text3);padding:4px 6px;font-weight:400;min-width:90px;"></th>';
+weekDays.forEach(function(dk,i){
+var isToday=dk===today;
+wHtml+='<th style="text-align:center;font-size:.52rem;font-family:JetBrains Mono,monospace;color:'+(isToday?'var(--accent2)':'var(--text3)')+';padding:4px 2px;font-weight:'+(isToday?'600':'400')+';">'+dayLabels[i]+'<br><span style="font-size:.44rem;">'+dk.slice(8)+'</span></th>';
+});
+wHtml+='</tr></thead><tbody>';
+D.habits.forEach(function(h){
+wHtml+='<tr><td style="font-size:.72rem;color:var(--text);padding:6px;white-space:nowrap;"><span style="margin-right:4px;">'+h.icon+'</span>'+escHtml(h.name)+'</td>';
+weekDays.forEach(function(dk){
+var done=h.log&&h.log[dk];
+var isToday=dk===today;
+var isPast=dk<today;
+wHtml+='<td style="text-align:center;padding:4px 2px;">'
++'<button onclick="toggleHabitDay('+h.id+',\''+dk+'\')" style="width:28px;height:28px;border-radius:8px;border:1.5px solid '+(done?'var(--easy)':isToday?'var(--accent)':'var(--border)')+';background:'+(done?'var(--easy)':'transparent')+';cursor:pointer;display:flex;align-items:center;justify-content:center;margin:0 auto;transition:all .15s;">'
++(done?'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" style="width:14px;height:14px;"><polyline points="20 6 9 17 4 12"/></svg>':'')
++'</button></td>';
+});
+wHtml+='</tr>';
+});
+wHtml+='</tbody></table></div>';
+if(weekInfo)weekInfo.innerHTML=wHtml;
+// Habit cards
+var cards='';
+D.habits.forEach(function(h){
+var streak=getHabitStreak(h);
+var todayDone=h.log&&h.log[today];
+var last7=0;weekDays.forEach(function(dk){if(h.log&&h.log[dk])last7++;});
+cards+='<div style="background:var(--bg2);border:1px solid '+(todayDone?'rgba(74,222,128,.25)':'var(--border)')+';border-radius:14px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;transition:all .2s;">'
++'<button onclick="toggleHabitDay('+h.id+',\''+today+'\')" style="width:44px;height:44px;border-radius:12px;border:2px solid '+(todayDone?'var(--easy)':'var(--border)')+';background:'+(todayDone?'rgba(74,222,128,.12)':'transparent')+';cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.3rem;transition:all .2s;flex-shrink:0;">'
++(todayDone?'<svg viewBox="0 0 24 24" fill="none" stroke="var(--easy)" stroke-width="3" style="width:22px;height:22px;"><polyline points="20 6 9 17 4 12"/></svg>':h.icon)
++'</button>'
++'<div style="flex:1;min-width:0;">'
++'<div style="font-size:.82rem;font-weight:500;color:var(--text);margin-bottom:2px;">'+escHtml(h.name)+'</div>'
++'<div style="display:flex;gap:8px;font-size:.58rem;font-family:JetBrains Mono,monospace;">'
++'<span style="color:'+(streak>=3?'var(--easy)':'var(--text3)')+';">'+streak+' gün seri</span>'
++'<span style="color:var(--text3);">'+last7+'/7 bu hafta</span>'
++'</div>'
++'</div>'
++'<button onclick="deleteHabit('+h.id+')" style="background:none;border:1px solid var(--border);border-radius:8px;cursor:pointer;color:var(--text3);padding:6px;transition:all .15s;" onmouseover="this.style.color=\'var(--hard)\'" onmouseout="this.style.color=\'var(--text3)\'">'
++'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>'
++'</button>'
++'</div>';
+});
+cont.innerHTML=cards;
+}
