@@ -1451,12 +1451,18 @@ if(btn){btn.style.color=(i===idx)?'var(--accent2)':'var(--text3)';btn.style.bord
 var cont=document.getElementById('igTabContent');
 if(!cont)return;
 if(idx===0){
-if(!D.notes.length){cont.innerHTML='<div class="empty-state">Henüz not yok</div>';return;}
-var html='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;">';
-D.notes.slice(0,18).forEach(function(n){
-html+='<div data-nid="'+n.id+'" class="ig-note-thumb" style="aspect-ratio:1;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:8px;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;">'
-+'<div style="font-size:.62rem;font-weight:500;color:var(--text);overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;">'+escHtml(n.title||'Başlıksız')+'</div>'
-+'<div style="font-size:.48rem;color:var(--text3);">'+fmtDate(n.createdAt)+'</div></div>';
+if(!D.notes.length){cont.innerHTML='<div style="text-align:center;padding:40px 20px;"><div style="font-size:2rem;margin-bottom:8px;">📝</div><div style="font-size:.82rem;color:var(--text2);margin-bottom:4px;">Henüz not yok</div><div style="font-size:.68rem;color:var(--text3);">İlk notunu yaz!</div></div>';return;}
+var html='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">';
+D.notes.slice(0,12).forEach(function(n){
+var tags=(n.tags||[]).slice(0,2).map(function(t){return '<span style="font-size:.48rem;color:'+tagColor(t)+';background:'+tagColor(t)+'15;border-radius:4px;padding:1px 5px;">#'+escHtml(t)+'</span>';}).join(' ');
+var hasMedia=n.media&&n.media.length>0;
+html+='<div data-nid="'+n.id+'" class="ig-note-thumb" style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;cursor:pointer;display:flex;flex-direction:column;gap:8px;transition:all .2s;position:relative;overflow:hidden;">'
++(hasMedia?'<div style="position:absolute;top:8px;right:8px;font-size:.5rem;color:var(--text3);">📎</div>':'')
++'<div style="font-size:.78rem;font-weight:500;color:var(--text);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.4;">'+escHtml(n.title||'Başlıksız')+'</div>'
++'<div style="font-size:.64rem;color:var(--text3);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5;">'+escHtml((n.content||'').slice(0,60))+'</div>'
++(tags?'<div style="display:flex;gap:4px;flex-wrap:wrap;">'+tags+'</div>':'')
++'<div style="font-size:.52rem;color:var(--text3);font-family:JetBrains Mono,monospace;margin-top:auto;">'+fmtDate(n.createdAt)+'</div>'
++'</div>';
 });
 html+='</div>';
 cont.innerHTML=html;
@@ -1464,13 +1470,19 @@ cont.querySelectorAll('.ig-note-thumb').forEach(function(el){
 el.addEventListener('click',function(){var nid=parseInt(el.dataset.nid);closeProfilePage();setTimeout(function(){viewEntry('note',nid);},300);});
 });
 } else if(idx===1){
-if(!D.diary.length){cont.innerHTML='<div class="empty-state">Günlük yok</div>';return;}
+if(!D.diary.length){cont.innerHTML='<div style="text-align:center;padding:40px 20px;"><div style="font-size:2rem;margin-bottom:8px;">📖</div><div style="font-size:.82rem;color:var(--text2);margin-bottom:4px;">Günlük yok</div><div style="font-size:.68rem;color:var(--text3);">İlk günlüğünü yaz!</div></div>';return;}
 var html2='';
-D.diary.slice(0,10).forEach(function(e){
-html2+='<div data-eid="'+e.id+'" class="ig-diary-item" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg2);border-radius:10px;margin-bottom:8px;cursor:pointer;border:1px solid var(--border);">'
-+'<span style="font-size:1.2rem;">'+(e.mood||'📖')+'</span>'
-+'<div style="flex:1;min-width:0;"><div style="font-size:.8rem;font-weight:400;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+escHtml(e.title||'Günlük Girişi')+'</div>'
-+'<div style="font-size:.58rem;color:var(--text3);margin-top:2px;">'+fmtDate(e.createdAt)+'</div></div></div>';
+D.diary.slice(0,10).forEach(function(e,i){
+var preview=(e.content||'').slice(0,80);
+html2+='<div data-eid="'+e.id+'" class="ig-diary-item" style="display:flex;align-items:flex-start;gap:14px;padding:16px;background:var(--bg2);border-radius:14px;margin-bottom:10px;cursor:pointer;border:1px solid var(--border);transition:all .2s;position:relative;">'
++'<div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;">'
++'<span style="font-size:1.5rem;line-height:1;">'+(e.mood||'📖')+'</span>'
++'<div style="font-size:.44rem;color:var(--text3);font-family:JetBrains Mono,monospace;">'+new Date(e.createdAt).toLocaleDateString('tr-TR',{day:'numeric',month:'short'})+'</div>'
++'</div>'
++'<div style="flex:1;min-width:0;">'
++'<div style="font-size:.82rem;font-weight:500;color:var(--text);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escHtml(e.title||'Günlük Girişi')+'</div>'
++(preview?'<div style="font-size:.68rem;color:var(--text3);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">'+escHtml(preview)+'</div>':'')
++'</div></div>';
 });
 cont.innerHTML=html2;
 cont.querySelectorAll('.ig-diary-item').forEach(function(el){
@@ -1479,15 +1491,23 @@ el.addEventListener('click',function(){var eid=parseInt(el.dataset.eid);closePro
 } else {
 var streak=calcStreak(),booksRead=D.reading.filter(function(r){return r.status==='done';}).length,todoDone=D.completedTodos.length;
 var ach=[
-{icon:'🔥',title:'Seri Ustası',desc:streak+' gün',unlocked:streak>=3},
-{icon:'📚',title:'Kitap Kurdu',desc:booksRead+' kitap',unlocked:booksRead>=1},
-{icon:'✅',title:'Üretken',desc:todoDone+' görev',unlocked:todoDone>=10},
-{icon:'✍️',title:'Günlükçü',desc:D.diary.length+' giriş',unlocked:D.diary.length>=5},
-{icon:'📝',title:'Not Ustası',desc:D.notes.length+' not',unlocked:D.notes.length>=10},
-{icon:'🍅',title:'Odak Şamp.',desc:'Pomodoro',unlocked:parseInt(localStorage.getItem('capsula_pomo_total')||'0')>=5},
+{icon:'🔥',title:'Seri Ustası',desc:streak+' gün',unlocked:streak>=3,color:'var(--hard)'},
+{icon:'📚',title:'Kitap Kurdu',desc:booksRead+' kitap',unlocked:booksRead>=1,color:'var(--note)'},
+{icon:'✅',title:'Üretken',desc:todoDone+' görev',unlocked:todoDone>=10,color:'var(--easy)'},
+{icon:'✍️',title:'Günlükçü',desc:D.diary.length+' giriş',unlocked:D.diary.length>=5,color:'var(--diary)'},
+{icon:'📝',title:'Not Ustası',desc:D.notes.length+' not',unlocked:D.notes.length>=10,color:'var(--accent2)'},
+{icon:'🍅',title:'Odak Şamp.',desc:'Pomodoro',unlocked:parseInt(localStorage.getItem('capsula_pomo_total')||'0')>=5,color:'var(--mid)'},
 ];
-var html3='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">';
-ach.forEach(function(a){html3+='<div style="background:var(--bg2);border:1px solid '+(a.unlocked?'rgba(124,111,247,.3)':'var(--border)')+';border-radius:12px;padding:14px;text-align:center;opacity:'+(a.unlocked?'1':'.4')+';">'+'<div style="font-size:1.8rem;margin-bottom:6px;">'+a.icon+'</div>'+'<div style="font-size:.76rem;font-weight:500;">'+a.title+'</div>'+'<div style="font-size:.62rem;color:var(--text3);margin-top:2px;">'+a.desc+'</div>'+'</div>';});
+var html3='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">';
+ach.forEach(function(a){
+var bg=a.unlocked?a.color+'12':'var(--bg2)';
+var bdr=a.unlocked?a.color+'30':'var(--border)';
+html3+='<div style="background:'+bg+';border:1px solid '+bdr+';border-radius:14px;padding:14px 8px;text-align:center;opacity:'+(a.unlocked?'1':'.35')+';transition:all .3s;">'
++'<div style="font-size:1.6rem;margin-bottom:6px;filter:'+(a.unlocked?'none':'grayscale(1)')+';">'+a.icon+'</div>'
++'<div style="font-size:.68rem;font-weight:500;color:var(--text);">'+a.title+'</div>'
++'<div style="font-size:.52rem;color:'+(a.unlocked?a.color:'var(--text3)')+';margin-top:3px;font-family:JetBrains Mono,monospace;">'+a.desc+'</div>'
++'</div>';
+});
 cont.innerHTML=html3+'</div>';
 }
 }

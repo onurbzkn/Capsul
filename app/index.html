@@ -38,7 +38,7 @@
 <span id="notifHeaderBadge" style="display:none;position:absolute;top:2px;right:2px;width:8px;height:8px;border-radius:50%;background:var(--hard);border:2px solid var(--bg);"></span>
 </button>
 <button class="avatar-btn" id="avatarBtn" onclick="openProfilePage()">
-<img id="avatarImg" src="" style="display:none">
+<img id="avatarImg" src="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;">
 <span class="avatar-initials" id="avatarInitials">KY</span>
 </button>
 <div onclick="openProfilePage()" style="cursor:pointer;text-align:left;display:none;min-width:0;" id="headerUserInfo">
@@ -68,7 +68,13 @@
 <div class="pp mid" data-p="mid" onclick="selectPriority('mid')">Orta</div>
 <div class="pp hard" data-p="hard" onclick="selectPriority('hard')">Zor</div>
 </div>
-<input type="datetime-local" class="date-pick" id="todoDate" title="Tarih ve saat seç">
+<div style="position:relative;flex:1;">
+<input type="datetime-local" class="date-pick" id="todoDate" title="Tarih ve saat seç" style="width:100%;" onfocus="this.parentElement.querySelector('.date-placeholder').style.display='none'" onblur="if(!this.value)this.parentElement.querySelector('.date-placeholder').style.display='flex'">
+<div class="date-placeholder" style="position:absolute;inset:0;display:flex;align-items:center;gap:4px;padding:0 8px;font-size:.65rem;color:var(--text3);pointer-events:none;font-family:'Sora',sans-serif;">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+Tarih Seç
+</div>
+</div>
 <select id="todoRepeat" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:4px 7px;font-family:'Sora',sans-serif;font-size:.65rem;color:var(--text2);outline:none;cursor:pointer;">
 <option value="">Tekrar yok</option>
 <option value="daily">Her gün 🔁</option>
