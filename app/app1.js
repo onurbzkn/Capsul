@@ -337,10 +337,6 @@ wc.textContent=`${words} kelime · ${chars} karakter`;
 }
 function openModal(id){
 document.getElementById(id).classList.add('open');
-if(id==='settingsModal'){
-document.querySelectorAll('#settingsModal .acc-body').forEach(b=>{b.style.display='none';});
-document.querySelectorAll('#settingsModal .acc-arrow').forEach(a=>{a.classList.remove('open');});
-}
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
@@ -649,6 +645,43 @@ ${p.motto?`<div style="font-size:.75rem;color:rgba(240,238,255,.55);font-style:i
 document.getElementById('profileCardPreview').innerHTML=card;
 closeModal('profileModal');
 openModal('profileCardModal');
+}
+function applyCalPicker(){
+const m=parseInt(document.getElementById('calPickerMonth').value);
+const y=parseInt(document.getElementById('calPickerYear').value);
+if(isNaN(y))return;
+closeModal('calPickerModal');
+showToast(`${['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'][m]} ${y}`);
+}
+let _calDayDate=null;
+function openCalDay(dateStr){
+_calDayDate=dateStr;
+const el=document.getElementById('calDayModalTitle');if(el)el.textContent=fmtDate(dateStr);
+document.getElementById('calDayModalInput').value='';
+document.getElementById('calDayPrio').value='mid';
+document.querySelectorAll('[name="calDayPrio"]').forEach(r=>r.checked=r.value==='mid');
+const existing=document.getElementById('calDayModalExisting');
+if(existing){
+const plans=(D.calPlans[dateStr]||[]);
+existing.innerHTML=plans.map((p,i)=>`<div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid var(--border);"><span style="flex:1;font-size:.76rem;color:var(--text2);">${escHtml(p.text)}</span><button onclick="deleteCalPlan('${dateStr}',${i})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:.7rem;">✕</button></div>`).join('');
+}
+openModal('calDayModal');
+}
+function saveCalDayEntry(addToTodo){
+const text=document.getElementById('calDayModalInput').value.trim();
+if(!text){showToast('Bir şeyler yaz');return;}
+const prio=document.getElementById('calDayPrio').value||'mid';
+if(!D.calPlans[_calDayDate])D.calPlans[_calDayDate]=[];
+D.calPlans[_calDayDate].push({text,priority:prio,createdAt:new Date().toISOString()});
+if(addToTodo){
+D.todos.push({id:Date.now(),text,priority:prio,dueDate:_calDayDate,createdAt:new Date().toISOString()});
+renderTodos();
+}
+saveData();closeModal('calDayModal');showToast(addToTodo?'Takvim + Görev eklendi':'Takvime eklendi');
+}
+function deleteCalPlan(dateStr,idx){
+if(D.calPlans[dateStr]){D.calPlans[dateStr].splice(idx,1);if(!D.calPlans[dateStr].length)delete D.calPlans[dateStr];}
+saveData();openCalDay(dateStr);
 }
 function showConfirm(msg,onYes){_confirmCb=onYes;document.getElementById('confirmMsg').textContent=msg;openModal('confirmModal');}
 function confirmYes(){closeModal('confirmModal');if(_confirmCb){_confirmCb();_confirmCb=null;}}
