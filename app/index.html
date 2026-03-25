@@ -116,8 +116,14 @@
 </div>
 <!-- DIARY -->
 <div class="page" id="page-diary">
+<div id="diaryAddBar" style="margin-bottom:14px;">
+<button onclick="openEditor('diary')" style="width:100%;padding:14px;background:linear-gradient(135deg,rgba(244,114,182,.08),rgba(244,114,182,.03));border:1px dashed rgba(244,114,182,.3);border-radius:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Sora',sans-serif;font-size:.82rem;color:var(--diary);transition:all .2s;" onmouseover="this.style.background='rgba(244,114,182,.12)';this.style.borderStyle='solid'" onmouseout="this.style.background='linear-gradient(135deg,rgba(244,114,182,.08),rgba(244,114,182,.03))';this.style.borderStyle='dashed'">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+Yeni Günlük Girişi
+</button>
+</div>
 <div class="diary-timeline" id="diary-list"></div>
-<div class="empty-state" id="diary-empty" style="display:none">Günlüğün boş.<br>Merkezdeki ✦ ile başla.</div>
+<div class="empty-state" id="diary-empty" style="display:none">Günlüğün boş.<br>Yukarıdaki + ile başla.</div>
 </div>
 <!-- SEARCH (tüm modlarda) -->
 <div class="page" id="page-search">
@@ -801,32 +807,7 @@
 <button onclick="openProfileEditSheet()" style="background:rgba(124,111,247,.15);border:1px solid rgba(124,111,247,.4);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:.76rem;color:var(--accent2);font-family:'Sora',sans-serif;font-weight:500;min-height:34px;min-width:64px;">Düzenle</button>
 </div>
 <div class="fullpage-body">
-<div style="padding:24px 20px 0;">
-<div style="display:flex;align-items:flex-start;gap:20px;margin-bottom:16px;">
-<div style="position:relative;flex-shrink:0;" onclick="handleIgAvatarClick()">
-<div id="igAvatar" style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--diary));display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:#fff;overflow:hidden;box-shadow:0 0 0 3px rgba(124,111,247,.35);cursor:pointer;">
-<img id="igAvatarImg" src="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;">
-<span id="igAvatarInitials">KY</span>
-</div>
-<div style="position:absolute;bottom:0;right:0;width:24px;height:24px;border-radius:50%;background:var(--bg3);border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:.7rem;">📷</div>
-</div>
-<div style="display:flex;gap:0;flex:1;justify-content:space-around;padding-top:8px;">
-<div style="text-align:center;"><div id="igStatTodos" style="font-size:1.2rem;font-weight:700;color:var(--text);font-family:'JetBrains Mono',monospace;">0</div><div style="font-size:.58rem;color:var(--text3);margin-top:2px;">Görev</div></div>
-<div style="text-align:center;"><div id="igStatNotes" style="font-size:1.2rem;font-weight:700;color:var(--text);font-family:'JetBrains Mono',monospace;">0</div><div style="font-size:.58rem;color:var(--text3);margin-top:2px;">Not</div></div>
-<div style="text-align:center;"><div id="igStatStreak" style="font-size:1.2rem;font-weight:700;color:var(--text);font-family:'JetBrains Mono',monospace;">0🔥</div><div style="font-size:.58rem;color:var(--text3);margin-top:2px;">Seri</div></div>
-</div>
-</div>
-<div id="igName" style="font-size:1rem;font-weight:600;color:var(--text);margin-bottom:2px;"></div>
-<div id="igUsername" style="font-size:.72rem;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:6px;"></div>
-<div id="igBadge" style="font-size:.65rem;color:var(--accent2);margin-bottom:6px;"></div>
-<div id="igBio" style="font-size:.78rem;font-weight:300;color:var(--text2);line-height:1.6;margin-bottom:6px;white-space:pre-wrap;"></div>
-<div id="igMotto" style="font-size:.72rem;font-style:italic;color:var(--text3);padding-left:10px;border-left:2px solid var(--accent);display:none;margin-bottom:4px;"></div>
-<div style="display:flex;border-bottom:1px solid var(--border);margin-top:16px;">
-<button id="igTab0" onclick="switchIgTab(0)" style="flex:1;padding:10px;background:none;border:none;cursor:pointer;font-size:.72rem;color:var(--accent2);border-bottom:2px solid var(--accent);transition:all .2s;font-family:'Sora',sans-serif;">Notlar</button>
-<button id="igTab1" onclick="switchIgTab(1)" style="flex:1;padding:10px;background:none;border:none;cursor:pointer;font-size:.72rem;color:var(--text3);border-bottom:2px solid transparent;transition:all .2s;font-family:'Sora',sans-serif;">Günlük</button>
-<button id="igTab2" onclick="switchIgTab(2)" style="flex:1;padding:10px;background:none;border:none;cursor:pointer;font-size:.72rem;color:var(--text3);border-bottom:2px solid transparent;transition:all .2s;font-family:'Sora',sans-serif;">Başarılar</button>
-</div>
-</div>
+<div id="igProfileContainer"></div>
 <div id="igTabContent" style="padding:14px 16px 100px;"></div>
 </div>
 </div>
@@ -882,7 +863,7 @@
 <h3 style="font-size:.9rem;font-weight:500;color:var(--text);margin:0 0 8px;">Üçüncü Taraf Hizmetler</h3>
 <p style="margin-bottom:14px;">Herhangi bir üçüncü taraf analitik, reklam veya izleme servisi kullanılmaz.</p>
 <h3 style="font-size:.9rem;font-weight:500;color:var(--text);margin:0 0 8px;">İletişim</h3>
-<p>Sorularınız için: <a href="/cdn-cgi/l/email-protection#2d4243585f4f4257464c43191a1f6d4a404c4441034e4240" style="color:var(--accent2);"><span class="__cf_email__" data-cfemail="e18e8f9493838e9b8a808fd5d6d3a1868c80888dcf828e8c">[email&#160;protected]</span></a></p>
+<p>Sorularınız için: <a href="mailto:Onurbozkan472@gmail.com" style="color:var(--accent2);">Onurbozkan472@gmail.com</a></p>
 </div>
 </div>
 </div>
@@ -908,14 +889,38 @@
 </div>
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--text3);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
 </div>
-<div id="themeExpandArea" style="display:none;padding:12px 16px 16px;border-top:1px solid var(--border);">
-<div class="theme-grid" style="margin-top:0;">
-<div class="theme-swatch active" data-theme="default" data-label="Varsayılan" style="background:linear-gradient(135deg,#0d0d12,#7c6ff7)" onclick="applyTheme('default',this);updateThemeLabel()"></div>
-<div class="theme-swatch" data-theme="midnight" data-label="Gece" style="background:linear-gradient(135deg,#050508,#818cf8)" onclick="applyTheme('midnight',this);updateThemeLabel()"></div>
-<div class="theme-swatch" data-theme="forest" data-label="Orman" style="background:linear-gradient(135deg,#060e08,#4ade80)" onclick="applyTheme('forest',this);updateThemeLabel()"></div>
-<div class="theme-swatch" data-theme="sunset" data-label="Batım" style="background:linear-gradient(135deg,#12080a,#f472b6)" onclick="applyTheme('sunset',this);updateThemeLabel()"></div>
-<div class="theme-swatch" data-theme="ocean" data-label="Okyanus" style="background:linear-gradient(135deg,#030d14,#38bdf8)" onclick="applyTheme('ocean',this);updateThemeLabel()"></div>
-<div class="theme-swatch" data-theme="sand" data-label="Kum" style="background:linear-gradient(135deg,#0f0d08,#fbbf24)" onclick="applyTheme('sand',this);updateThemeLabel()"></div>
+<div id="themeExpandArea" style="display:none;padding:14px 16px 18px;border-top:1px solid var(--border);">
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+<div class="theme-swatch active" data-theme="default" data-label="Varsayılan" onclick="applyTheme('default',this);updateThemeLabel()" style="position:relative;border-radius:14px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .25s;aspect-ratio:1.4;">
+<div style="position:absolute;inset:0;background:linear-gradient(145deg,#0d0d12 40%,#7c6ff7);"></div>
+<div style="position:absolute;bottom:0;left:0;right:0;padding:7px 9px;background:linear-gradient(transparent,rgba(0,0,0,.7));"><div style="font-size:.62rem;font-weight:500;color:#f0eeff;">Varsayılan</div><div style="font-size:.44rem;color:rgba(255,255,255,.4);margin-top:1px;">Mor · Koyu</div></div>
+<div style="position:absolute;top:6px;right:6px;display:flex;gap:3px;"><div style="width:8px;height:8px;border-radius:50%;background:#7c6ff7;"></div><div style="width:8px;height:8px;border-radius:50%;background:#f472b6;"></div><div style="width:8px;height:8px;border-radius:50%;background:#60a5fa;"></div></div>
+</div>
+<div class="theme-swatch" data-theme="midnight" data-label="Gece" onclick="applyTheme('midnight',this);updateThemeLabel()" style="position:relative;border-radius:14px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .25s;aspect-ratio:1.4;">
+<div style="position:absolute;inset:0;background:linear-gradient(145deg,#050508 40%,#818cf8);"></div>
+<div style="position:absolute;bottom:0;left:0;right:0;padding:7px 9px;background:linear-gradient(transparent,rgba(0,0,0,.7));"><div style="font-size:.62rem;font-weight:500;color:#e0e7ff;">Gece</div><div style="font-size:.44rem;color:rgba(255,255,255,.4);margin-top:1px;">İndigo · Derin</div></div>
+<div style="position:absolute;top:6px;right:6px;display:flex;gap:3px;"><div style="width:8px;height:8px;border-radius:50%;background:#818cf8;"></div><div style="width:8px;height:8px;border-radius:50%;background:#a5b4fc;"></div><div style="width:8px;height:8px;border-radius:50%;background:#6366f1;"></div></div>
+</div>
+<div class="theme-swatch" data-theme="forest" data-label="Orman" onclick="applyTheme('forest',this);updateThemeLabel()" style="position:relative;border-radius:14px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .25s;aspect-ratio:1.4;">
+<div style="position:absolute;inset:0;background:linear-gradient(145deg,#060e08 40%,#4ade80);"></div>
+<div style="position:absolute;bottom:0;left:0;right:0;padding:7px 9px;background:linear-gradient(transparent,rgba(0,0,0,.7));"><div style="font-size:.62rem;font-weight:500;color:#d1fae5;">Orman</div><div style="font-size:.44rem;color:rgba(255,255,255,.4);margin-top:1px;">Yeşil · Doğa</div></div>
+<div style="position:absolute;top:6px;right:6px;display:flex;gap:3px;"><div style="width:8px;height:8px;border-radius:50%;background:#4ade80;"></div><div style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></div><div style="width:8px;height:8px;border-radius:50%;background:#16a34a;"></div></div>
+</div>
+<div class="theme-swatch" data-theme="sunset" data-label="Batım" onclick="applyTheme('sunset',this);updateThemeLabel()" style="position:relative;border-radius:14px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .25s;aspect-ratio:1.4;">
+<div style="position:absolute;inset:0;background:linear-gradient(145deg,#12080a 40%,#f472b6);"></div>
+<div style="position:absolute;bottom:0;left:0;right:0;padding:7px 9px;background:linear-gradient(transparent,rgba(0,0,0,.7));"><div style="font-size:.62rem;font-weight:500;color:#fce7f3;">Gün Batımı</div><div style="font-size:.44rem;color:rgba(255,255,255,.4);margin-top:1px;">Pembe · Sıcak</div></div>
+<div style="position:absolute;top:6px;right:6px;display:flex;gap:3px;"><div style="width:8px;height:8px;border-radius:50%;background:#f472b6;"></div><div style="width:8px;height:8px;border-radius:50%;background:#fb7185;"></div><div style="width:8px;height:8px;border-radius:50%;background:#ec4899;"></div></div>
+</div>
+<div class="theme-swatch" data-theme="ocean" data-label="Okyanus" onclick="applyTheme('ocean',this);updateThemeLabel()" style="position:relative;border-radius:14px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .25s;aspect-ratio:1.4;">
+<div style="position:absolute;inset:0;background:linear-gradient(145deg,#030d14 40%,#38bdf8);"></div>
+<div style="position:absolute;bottom:0;left:0;right:0;padding:7px 9px;background:linear-gradient(transparent,rgba(0,0,0,.7));"><div style="font-size:.62rem;font-weight:500;color:#e0f2fe;">Okyanus</div><div style="font-size:.44rem;color:rgba(255,255,255,.4);margin-top:1px;">Mavi · Huzur</div></div>
+<div style="position:absolute;top:6px;right:6px;display:flex;gap:3px;"><div style="width:8px;height:8px;border-radius:50%;background:#38bdf8;"></div><div style="width:8px;height:8px;border-radius:50%;background:#0ea5e9;"></div><div style="width:8px;height:8px;border-radius:50%;background:#0284c7;"></div></div>
+</div>
+<div class="theme-swatch" data-theme="sand" data-label="Kum" onclick="applyTheme('sand',this);updateThemeLabel()" style="position:relative;border-radius:14px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:all .25s;aspect-ratio:1.4;">
+<div style="position:absolute;inset:0;background:linear-gradient(145deg,#0f0d08 40%,#fbbf24);"></div>
+<div style="position:absolute;bottom:0;left:0;right:0;padding:7px 9px;background:linear-gradient(transparent,rgba(0,0,0,.7));"><div style="font-size:.62rem;font-weight:500;color:#fef3c7;">Kum</div><div style="font-size:.44rem;color:rgba(255,255,255,.4);margin-top:1px;">Altın · Sıcak</div></div>
+<div style="position:absolute;top:6px;right:6px;display:flex;gap:3px;"><div style="width:8px;height:8px;border-radius:50%;background:#fbbf24;"></div><div style="width:8px;height:8px;border-radius:50%;background:#f59e0b;"></div><div style="width:8px;height:8px;border-radius:50%;background:#d97706;"></div></div>
+</div>
 </div>
 </div>
 </div>
@@ -960,6 +965,44 @@
 <div onclick="setPomoStyle('clock')" class="pomo-style-opt" id="ps-clock"><svg viewBox="0 0 40 40" style="width:32px;height:32px;"><circle cx="20" cy="20" r="16" fill="none" stroke="var(--border2)" stroke-width="2"/><line x1="20" y1="20" x2="20" y2="7" stroke="var(--text)" stroke-width="2" stroke-linecap="round"/><line x1="20" y1="20" x2="28" y2="20" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/></svg><span>Analog</span></div>
 <div onclick="setPomoStyle('flip')" class="pomo-style-opt" id="ps-flip"><div style="background:var(--bg3);border-radius:5px;padding:3px 6px;font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--text);border:1px solid var(--border2);">25</div><span>Flip</span></div>
 <div onclick="setPomoStyle('minimal')" class="pomo-style-opt" id="ps-minimal"><div style="width:28px;height:28px;border-radius:50%;background:conic-gradient(var(--accent) 70%,var(--bg3) 0);display:flex;align-items:center;justify-content:center;"><div style="width:18px;height:18px;border-radius:50%;background:var(--bg2);"></div></div><span>Minimal</span></div>
+</div>
+</div>
+</div>
+<!-- PROFİL GÖRÜNÜMÜ -->
+<div class="stt-section-label">Profil Görünümü</div>
+<div class="stt-group">
+<div class="stt-item" onclick="document.getElementById('profileLayoutExpand').style.display=document.getElementById('profileLayoutExpand').style.display==='none'?'block':'none'">
+<div class="stt-icon" style="background:linear-gradient(135deg,#a78bfa,#7c3aed);">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+</div>
+<div class="stt-text">
+<div class="stt-title">Profil Düzeni</div>
+<div class="stt-sub" id="currentLayoutLabel">Klasik</div>
+</div>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--text3);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+</div>
+<div id="profileLayoutExpand" style="display:none;padding:14px 16px 16px;border-top:1px solid var(--border);">
+<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;" id="profileLayoutGrid">
+<div onclick="setProfileLayout('classic')" class="pomo-style-opt active" id="pl-classic" style="padding:8px 4px;">
+<svg viewBox="0 0 40 40" style="width:28px;height:28px;"><circle cx="20" cy="14" r="8" fill="none" stroke="var(--accent)" stroke-width="2"/><rect x="6" y="26" width="28" height="3" rx="1.5" fill="var(--border2)"/><rect x="10" y="31" width="20" height="2" rx="1" fill="var(--border)"/></svg>
+<span>Klasik</span>
+</div>
+<div onclick="setProfileLayout('card')" class="pomo-style-opt" id="pl-card" style="padding:8px 4px;">
+<svg viewBox="0 0 40 40" style="width:28px;height:28px;"><rect x="4" y="4" width="32" height="32" rx="6" fill="none" stroke="var(--border2)" stroke-width="2"/><circle cx="20" cy="16" r="6" fill="none" stroke="var(--accent)" stroke-width="1.5"/><rect x="10" y="26" width="20" height="2" rx="1" fill="var(--border2)"/></svg>
+<span>Kart</span>
+</div>
+<div onclick="setProfileLayout('minimal')" class="pomo-style-opt" id="pl-minimal" style="padding:8px 4px;">
+<svg viewBox="0 0 40 40" style="width:28px;height:28px;"><circle cx="12" cy="20" r="7" fill="none" stroke="var(--accent)" stroke-width="1.5"/><rect x="22" y="16" width="14" height="2" rx="1" fill="var(--border2)"/><rect x="22" y="21" width="10" height="2" rx="1" fill="var(--border)"/></svg>
+<span>Minimal</span>
+</div>
+<div onclick="setProfileLayout('hero')" class="pomo-style-opt" id="pl-hero" style="padding:8px 4px;">
+<svg viewBox="0 0 40 40" style="width:28px;height:28px;"><rect x="4" y="4" width="32" height="14" rx="3" fill="none" stroke="var(--accent)" stroke-width="1.5" opacity=".5"/><circle cx="20" cy="20" r="6" fill="none" stroke="var(--accent)" stroke-width="2"/><rect x="10" y="30" width="20" height="2" rx="1" fill="var(--border2)"/></svg>
+<span>Hero</span>
+</div>
+<div onclick="setProfileLayout('terminal')" class="pomo-style-opt" id="pl-terminal" style="padding:8px 4px;">
+<svg viewBox="0 0 40 40" style="width:28px;height:28px;"><rect x="4" y="6" width="32" height="28" rx="4" fill="none" stroke="var(--border2)" stroke-width="1.5"/><text x="8" y="18" fill="var(--accent)" font-size="6" font-family="monospace">&gt;_</text><rect x="8" y="24" width="16" height="2" rx="1" fill="var(--border)"/></svg>
+<span>Terminal</span>
+</div>
 </div>
 </div>
 </div>

@@ -1093,6 +1093,10 @@ if(ra)ra.classList.toggle('on',localStorage.getItem('capsula_reading_autoarchive
 if(sw)sw.classList.toggle('on',localStorage.getItem('capsula_sched_weekly')==='on');
 const ps=document.getElementById('ps-'+pomoStyle);
 if(ps)ps.classList.add('active');
+var pl=localStorage.getItem('capsula_profile_layout')||'classic';
+document.querySelectorAll('#profileLayoutGrid .pomo-style-opt').forEach(function(el){el.classList.toggle('active',el.id==='pl-'+pl);});
+var plLbl=document.getElementById('currentLayoutLabel');
+if(plLbl){var plLabels={classic:'Klasik',card:'Kart',minimal:'Minimal',hero:'Hero',terminal:'Terminal'};plLbl.textContent=plLabels[pl]||pl;}
 }
 let quickNoteMediaData=[];
 let quickNotePrio='easy';
@@ -1323,35 +1327,118 @@ navigator.serviceWorker.register('/app/service-worker.js')
 .catch(err => console.warn('SW kayıt hatası:', err));
 });
 }
-function openProfilePage(){
+var _profileLayout=localStorage.getItem('capsula_profile_layout')||'classic';
+function setProfileLayout(layout){
+_profileLayout=layout;localStorage.setItem('capsula_profile_layout',layout);
+document.querySelectorAll('#profileLayoutGrid .pomo-style-opt').forEach(function(el){el.classList.toggle('active',el.id==='pl-'+layout);});
+var lbl=document.getElementById('currentLayoutLabel');
+var labels={classic:'Klasik',card:'Kart',minimal:'Minimal',hero:'Hero',terminal:'Terminal'};
+if(lbl)lbl.textContent=labels[layout]||layout;
+if(document.getElementById('profilePage').classList.contains('open'))openProfilePage();
+}
+function _getAvatarHtml(p,size,initials){
+var av=p.avatarId&&!p.avatar?SYSTEM_AVATARS.find(function(a){return a.id===p.avatarId;}):null;
+var bg=av?av.bg:'linear-gradient(135deg,var(--accent),var(--diary))';
+var inner=p.avatar?'<img src="'+p.avatar+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">':('<span style="font-size:'+(size*0.4)+'px;">'+(av?av.emoji:initials)+'</span>');
+return '<div style="width:'+size+'px;height:'+size+'px;border-radius:50%;background:'+bg+';display:flex;align-items:center;justify-content:center;color:#fff;overflow:hidden;box-shadow:0 0 0 3px rgba(124,111,247,.35);cursor:pointer;flex-shrink:0;" onclick="handleIgAvatarClick()">'+inner+'</div>';
+}
+function _profileStats(){
+var streak=calcStreak();
+return '<div style="display:flex;gap:0;flex:1;justify-content:space-around;padding-top:4px;">'
++'<div style="text-align:center;"><div style="font-size:1.2rem;font-weight:700;color:var(--text);font-family:JetBrains Mono,monospace;">'+D.completedTodos.length+'</div><div style="font-size:.58rem;color:var(--text3);margin-top:2px;">Görev</div></div>'
++'<div style="text-align:center;"><div style="font-size:1.2rem;font-weight:700;color:var(--text);font-family:JetBrains Mono,monospace;">'+(D.notes.length+D.diary.length)+'</div><div style="font-size:.58rem;color:var(--text3);margin-top:2px;">Not</div></div>'
++'<div style="text-align:center;"><div style="font-size:1.2rem;font-weight:700;color:var(--text);font-family:JetBrains Mono,monospace;">'+streak+'\ud83d\udd25</div><div style="font-size:.58rem;color:var(--text3);margin-top:2px;">Seri</div></div>'
++'</div>';
+}
+function _profileTabs(){
+return '<div style="display:flex;border-bottom:1px solid var(--border);margin-top:16px;">'
++'<button id="igTab0" onclick="switchIgTab(0)" style="flex:1;padding:10px;background:none;border:none;cursor:pointer;font-size:.72rem;color:var(--accent2);border-bottom:2px solid var(--accent);transition:all .2s;font-family:Sora,sans-serif;">Notlar</button>'
++'<button id="igTab1" onclick="switchIgTab(1)" style="flex:1;padding:10px;background:none;border:none;cursor:pointer;font-size:.72rem;color:var(--text3);border-bottom:2px solid transparent;transition:all .2s;font-family:Sora,sans-serif;">Günlük</button>'
++'<button id="igTab2" onclick="switchIgTab(2)" style="flex:1;padding:10px;background:none;border:none;cursor:pointer;font-size:.72rem;color:var(--text3);border-bottom:2px solid transparent;transition:all .2s;font-family:Sora,sans-serif;">Başarılar</button>'
++'</div>';
+}
+function _profileInfo(p,badge){
+return (p.bio?'<div style="font-size:.78rem;font-weight:300;color:var(--text2);line-height:1.6;margin-bottom:6px;white-space:pre-wrap;">'+escHtml(p.bio)+'</div>':'')
++(p.motto?'<div style="font-size:.72rem;font-style:italic;color:var(--text3);padding-left:10px;border-left:2px solid var(--accent);margin-bottom:4px;">"'+escHtml(p.motto)+'"</div>':'');
+}
+function renderProfileLayout(){
 var p=D.profile;
 var initials=p.name.split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase()||'KY';
-var igImg=document.getElementById('igAvatarImg');
-var igInit=document.getElementById('igAvatarInitials');
-var igAvEl=document.getElementById('igAvatar');
-if(p.avatarId&&!p.avatar){
-var av=SYSTEM_AVATARS.find(function(a){return a.id===p.avatarId;});
-if(av){if(igInit)igInit.textContent=av.emoji;if(igAvEl)igAvEl.style.background=av.bg;if(igImg)igImg.style.display='none';}
-} else if(p.avatar){
-if(igImg){igImg.src=p.avatar;igImg.style.display='block';}
-if(igInit)igInit.style.display='none';
-} else {
-if(igImg)igImg.style.display='none';
-if(igInit){igInit.style.display='';igInit.textContent=initials;}
-if(igAvEl)igAvEl.style.background='';
-}
-document.getElementById('igStatTodos').textContent=D.completedTodos.length;
-document.getElementById('igStatNotes').textContent=D.notes.length+D.diary.length;
-document.getElementById('igStatStreak').textContent=calcStreak()+'🔥';
-document.getElementById('igName').textContent=p.name||'';
-document.getElementById('igUsername').textContent=p.username?('@'+p.username):'';
 var badge=BADGES.find(function(b){return b.id===(p.badge||'student');});
-document.getElementById('igBadge').textContent=badge?(badge.ico+' '+badge.lbl):'';
-document.getElementById('igBio').textContent=p.bio||'';
-var mottoEl=document.getElementById('igMotto');
-if(mottoEl){if(p.motto){mottoEl.textContent='"'+p.motto+'"';mottoEl.style.display='block';}else{mottoEl.style.display='none';}}
+var badgeStr=badge?(badge.ico+' '+badge.lbl):'';
+var cont=document.getElementById('igProfileContainer');
+if(!cont)return;
+var layout=_profileLayout;
+var html='';
+if(layout==='card'){
+html='<div style="padding:20px 16px 0;"><div style="background:linear-gradient(145deg,var(--bg2),var(--bg3));border:1px solid var(--border);border-radius:20px;padding:24px;text-align:center;position:relative;overflow:hidden;">'
++'<div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,var(--accent)22,transparent 70%);pointer-events:none;"></div>'
++_getAvatarHtml(p,88,initials).replace('onclick="handleIgAvatarClick()"','onclick="handleIgAvatarClick()" style="'+arguments[0]+';margin:0 auto 12px;"').replace(/style="([^"]*)"/, function(m,s){return 'style="'+s+';margin:0 auto 12px;"';})
++'<div style="font-size:1.1rem;font-weight:600;color:var(--text);margin-bottom:2px;">'+escHtml(p.name||'')+'</div>'
++(p.username?'<div style="font-size:.72rem;color:var(--text3);font-family:JetBrains Mono,monospace;margin-bottom:6px;">@'+escHtml(p.username)+'</div>':'')
++'<div style="font-size:.65rem;color:var(--accent2);margin-bottom:10px;">'+badgeStr+'</div>'
++_profileInfo(p,badge)
++'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">'
++'<div><div style="font-size:1.3rem;font-weight:700;color:var(--accent2);font-family:JetBrains Mono,monospace;">'+D.completedTodos.length+'</div><div style="font-size:.52rem;color:var(--text3);">Görev</div></div>'
++'<div><div style="font-size:1.3rem;font-weight:700;color:var(--note);font-family:JetBrains Mono,monospace;">'+(D.notes.length+D.diary.length)+'</div><div style="font-size:.52rem;color:var(--text3);">Not</div></div>'
++'<div><div style="font-size:1.3rem;font-weight:700;color:var(--diary);font-family:JetBrains Mono,monospace;">'+calcStreak()+'\ud83d\udd25</div><div style="font-size:.52rem;color:var(--text3);">Seri</div></div>'
++'</div></div>'+_profileTabs()+'</div>';
+} else if(layout==='minimal'){
+html='<div style="padding:28px 20px 0;display:flex;align-items:center;gap:16px;margin-bottom:12px;">'
++_getAvatarHtml(p,56,initials)
++'<div style="flex:1;"><div style="font-size:1rem;font-weight:600;color:var(--text);">'+escHtml(p.name||'')+'</div>'
++(p.username?'<div style="font-size:.68rem;color:var(--text3);font-family:JetBrains Mono,monospace;">@'+escHtml(p.username)+'</div>':'')
++'<div style="font-size:.6rem;color:var(--accent2);margin-top:2px;">'+badgeStr+'</div></div>'
++'<div style="display:flex;gap:14px;">'
++'<div style="text-align:center;"><div style="font-size:1rem;font-weight:700;color:var(--text);font-family:JetBrains Mono,monospace;">'+D.completedTodos.length+'</div><div style="font-size:.5rem;color:var(--text3);">görev</div></div>'
++'<div style="text-align:center;"><div style="font-size:1rem;font-weight:700;color:var(--text);font-family:JetBrains Mono,monospace;">'+(D.notes.length+D.diary.length)+'</div><div style="font-size:.5rem;color:var(--text3);">not</div></div>'
++'</div></div>'
++'<div style="padding:0 20px;">'+_profileInfo(p,badge)+_profileTabs()+'</div>';
+} else if(layout==='hero'){
+var heroBg=p.avatar?'url('+p.avatar+')':'linear-gradient(135deg,var(--accent),var(--diary))';
+html='<div style="position:relative;height:140px;background:'+heroBg+';background-size:cover;background-position:center;overflow:hidden;">'
++'<div style="position:absolute;inset:0;background:linear-gradient(transparent 40%,var(--bg) 100%);"></div></div>'
++'<div style="padding:0 20px;margin-top:-40px;position:relative;z-index:1;">'
++_getAvatarHtml(p,76,initials)
++'<div style="margin-top:10px;"><div style="font-size:1.1rem;font-weight:600;color:var(--text);">'+escHtml(p.name||'')+'</div>'
++(p.username?'<div style="font-size:.68rem;color:var(--text3);font-family:JetBrains Mono,monospace;margin-bottom:4px;">@'+escHtml(p.username)+'</div>':'')
++'<div style="font-size:.6rem;color:var(--accent2);margin-bottom:8px;">'+badgeStr+'</div>'
++_profileInfo(p,badge)
++_profileStats()+_profileTabs()+'</div></div>';
+} else if(layout==='terminal'){
+var streak=calcStreak();
+html='<div style="padding:20px 16px 0;"><div style="background:#0a0a10;border:1px solid rgba(124,111,247,.2);border-radius:12px;padding:16px;font-family:JetBrains Mono,monospace;font-size:.72rem;line-height:1.9;">'
++'<div style="color:var(--text3);margin-bottom:2px;">capsula@terminal:~$ whoami</div>'
++'<div style="color:var(--accent2);">'+escHtml(p.name||'user')+(p.username?' <span style="color:var(--text3);">(@'+escHtml(p.username)+')</span>':'')+'</div>'
++'<div style="color:var(--text3);margin-top:6px;">capsula@terminal:~$ stats</div>'
++'<div style="color:var(--easy);">tasks_done: <span style="color:var(--text);">'+D.completedTodos.length+'</span></div>'
++'<div style="color:var(--note);">notes: <span style="color:var(--text);">'+(D.notes.length+D.diary.length)+'</span></div>'
++'<div style="color:var(--diary);">streak: <span style="color:var(--text);">'+streak+' \ud83d\udd25</span></div>'
++'<div style="color:var(--accent2);">badge: <span style="color:var(--text);">'+badgeStr+'</span></div>'
++(p.motto?'<div style="color:var(--text3);margin-top:6px;">capsula@terminal:~$ echo motto</div><div style="color:var(--mid);font-style:italic;">"'+escHtml(p.motto)+'"</div>':'')
++(p.bio?'<div style="color:var(--text3);margin-top:6px;">capsula@terminal:~$ cat bio.txt</div><div style="color:var(--text2);">'+escHtml(p.bio)+'</div>':'')
++'<div style="color:var(--text3);margin-top:6px;">capsula@terminal:~$ <span class="splash-cursor" style="animation:blink 1s infinite;">_</span></div>'
++'</div>'+_profileTabs()+'</div>';
+} else {
+// classic (default)
+html='<div style="padding:24px 20px 0;">'
++'<div style="display:flex;align-items:flex-start;gap:20px;margin-bottom:16px;">'
++_getAvatarHtml(p,80,initials)
++_profileStats()
++'</div>'
++'<div style="font-size:1rem;font-weight:600;color:var(--text);margin-bottom:2px;">'+escHtml(p.name||'')+'</div>'
++(p.username?'<div style="font-size:.72rem;color:var(--text3);font-family:JetBrains Mono,monospace;margin-bottom:6px;">@'+escHtml(p.username)+'</div>':'')
++'<div style="font-size:.65rem;color:var(--accent2);margin-bottom:6px;">'+badgeStr+'</div>'
++_profileInfo(p,badge)
++_profileTabs()+'</div>';
+}
+cont.innerHTML=html;
+}
+function openProfilePage(){
+var p=D.profile;
 var titleEl=document.getElementById('profilePageTitle');
 if(titleEl)titleEl.textContent=p.username?('@'+p.username):(p.name||'Profil');
+renderProfileLayout();
 switchIgTab(0);
 document.getElementById('profilePage').classList.add('open');
 }
@@ -1568,10 +1655,10 @@ return '<div class="capsule-card ' + (isUnlocked ? 'unlocked' : 'locked') + '" o
 + '</span>'
 + '</div>'
 + '<button onclick="event.stopPropagation();deleteCapsuleConfirm(' + cap.id + ')" '
-+ 'style="background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;border-radius:6px;flex-shrink:0;opacity:0;transition:all .18s;" '
-+ "onmouseover=\"this.style.color='var(--hard)';this.style.opacity=1\" "
-+ "onmouseout=\"this.style.color='var(--text3)';this.style.opacity=0\" "
-+ 'class="cap-del-btn">✕</button>'
++ 'style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);cursor:pointer;color:var(--hard);padding:6px 8px;border-radius:8px;flex-shrink:0;transition:all .18s;font-size:.62rem;font-family:Sora,sans-serif;display:flex;align-items:center;gap:4px;" '
++ "onmouseover=\"this.style.background='rgba(248,113,113,.18)'\" "
++ "onmouseout=\"this.style.background='rgba(248,113,113,.08)'\" "
++ 'class="cap-del-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>Sil</button>'
 + '</div>'
 + '</div>';
 }).join('');
