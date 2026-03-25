@@ -5055,9 +5055,32 @@ function renderDiaryAIPrompt(){
   page.insertBefore(box,page.firstChild);
 }
 
-window.addEventListener('load',async ()=>{
-  // Önce şifreli veriyi yükle
-  const loaded=await loadDataEncrypted();
+window.addEventListener('load', function() {
+  // Veriyi yükle — hata olursa boş başlat
+  var startTimeout = setTimeout(function() {
+    // 3 saniye içinde yüklenemezse direkt başlat
+    console.warn('Veri yükleme zaman aşımı, boş başlatılıyor');
+    _startApp(null);
+  }, 3000);
+
+  loadDataEncrypted().then(function(loaded) {
+    clearTimeout(startTimeout);
+    _startApp(loaded);
+  }).catch(function(err) {
+    clearTimeout(startTimeout);
+    console.warn('Veri yükleme hatası:', err);
+    // localStorage'dan düz JSON dene
+    try {
+      var raw = localStorage.getItem('capsula_v4');
+      var loaded = raw ? JSON.parse(raw) : null;
+      _startApp(loaded);
+    } catch(e) {
+      _startApp(null);
+    }
+  });
+});
+
+function _startApp(loaded) {
   if(loaded){
     D=loaded;
     if(!D.calPlans)D.calPlans={};
@@ -5069,32 +5092,28 @@ window.addEventListener('load',async ()=>{
     if(!D.notebook)D.notebook=[];
     if(!D.contentTrash)D.contentTrash=[];
     if(!D.trash)D.trash=[];
+    if(!D.timeCapsules)D.timeCapsules=[];
   }
   initTheme();
-  // Auth state değişince initApp çağrılıyor, burada sadece splash ve seed data
-  const isFirstVisit=!localStorage.getItem('capsula_toured')&&!localStorage.getItem('capsula_visited');
   localStorage.setItem('capsula_visited','1');
-
-  // Auth state onAuthStateChanged hallediyor
 
   // Seed demo data
   if(!D.todos.length&&!D.notes.length&&!D.diary.length){
-    const tmr=new Date();tmr.setDate(tmr.getDate()+1);
+    var tmr=new Date();tmr.setDate(tmr.getDate()+1);
     D.todos=[
       {id:1,text:"Capsula'ya hoş geldin! Bu görevi tamamla ✓",priority:'easy',dueDate:null,createdAt:new Date().toISOString()},
       {id:2,text:"Profil fotoğrafını veya avatarını ayarla",priority:'easy',dueDate:null,createdAt:new Date().toISOString()},
-      {id:3,text:"Bir görev ekle ve takvimde gün üzerine sürükle",priority:'mid',dueDate:tmr.toISOString().split('T')[0],createdAt:new Date().toISOString()},
+      {id:3,text:"Bir görev ekle ve not yaz",priority:'mid',dueDate:tmr.toISOString().split('T')[0],createdAt:new Date().toISOString()},
     ];
-    D.notes=[{id:101,title:'Capsula Rehberi',content:'Hoş geldin! 🎉\n\nNotlar, görevler, pomodoro, takvim ve daha fazlası burada.\n\nSol üstteki ≡ menüden tüm özelliklere ulaşabilirsin.',media:[],tags:['rehber'],createdAt:new Date().toISOString()}];
-    D.diary=[{id:201,title:'İlk gün',content:'Capsula yolculuğum başlıyor. Bugün neler öğrenecek, neler yapacağım?',mood:'\ud83d\udcab',media:[],tags:[],createdAt:new Date().toISOString()}];
+    D.notes=[{id:101,title:'Capsula Rehberi',content:'Hoş geldin! 🎉\n\nNotlar, görevler, pomodoro ve daha fazlası burada.\n\nSol üstteki ≡ menüden tüm özelliklere ulaşabilirsin.',media:[],tags:['rehber'],createdAt:new Date().toISOString()}];
+    D.diary=[{id:201,title:'İlk gün',content:'Capsula yolculuğum başlıyor.',mood:'\ud83d\udcab',media:[],tags:[],createdAt:new Date().toISOString()}];
     saveData();
   }
 
-
-  runSplash(()=>{
+  runSplash(function(){
     initApp();
   });
-});
+};
 
 
 
@@ -5634,14 +5653,4 @@ function viewSealedEntry(type, id) {
             modal.remove();
             viewEntry(type, id);
           } else {
-            document.querySelectorAll('#svDots .pin-dot').forEach(function(d) { d.classList.add('error'); });
-            setTimeout(function() {
-              document.querySelectorAll('#svDots .pin-dot').forEach(function(d) { d.classList.remove('error', 'filled'); });
-              pinBuf = '';
-            }, 500);
-          }
-        }, 80);
-      }
-    });
-  });
-  document.getElementById('svDel').addEventListener('click', functi
+            document.querySelectorAll('#svDots .pin-dot').fo
