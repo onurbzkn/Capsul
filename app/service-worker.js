@@ -13,9 +13,12 @@ const CACHE_VERSION = 'capsula-v1';
 const APP_SHELL = [
   '/app/',
   '/app/index.html',
+  '/app/app.css',
+  '/app/app1.js',
+  '/app/app2.js',
   '/app/manifest.json',
-  '/app/.icons/icon-192.png',
-  '/app/.icons/icon-512.png',
+  '/app/icon-192.png',
+  '/app/icon-512.png',
 ];
 
 // ── INSTALL ──────────────────────────────────────────────────────────────────

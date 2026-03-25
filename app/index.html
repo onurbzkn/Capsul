@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Capsula</title>
 <link rel="manifest" href="/app/manifest.json">
-<link rel="apple-touch-icon" sizes="192x192" href="/app/.icons/icon-192.png">
-<link rel="apple-touch-icon" sizes="512x512" href="/app/.icons/icon-512.png">
+<link rel="apple-touch-icon" sizes="192x192" href="/app/icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="/app/icon-512.png">
 <meta name="theme-color" content="#7c6ff7">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -18,7 +18,7 @@
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap"></noscript>
-<link rel="stylesheet" href="/app/style.css">
+<link rel="stylesheet" href="/app/app.css">
 </head>
 <body>
 <div id="app">
@@ -128,7 +128,7 @@
 </div>
 <div id="search-results"></div>
 </div>
-<!-- CALENDAR (shared) -->
+<!-- POMODORO -->
 <div class="page" id="page-pomodoro">
 <div class="pomo-card">
 <div class="pomo-modes">
@@ -149,7 +149,7 @@
 <line id="clockMinHand" x1="70" y1="70" x2="70" y2="18" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
 </svg>
 <!-- Minimal conic -->
-<div id="pomoMinimalWrap" style="display:none;width:140px;height:140px;border-radius:50%;background:conic-gradient(var(--accent) 0deg, var(--bg3) 0deg);display:none;align-items:center;justify-content:center;">
+<div id="pomoMinimalWrap" style="display:none;width:140px;height:140px;border-radius:50%;background:conic-gradient(var(--accent) 0deg, var(--bg3) 0deg);align-items:center;justify-content:center;">
 <div style="width:90px;height:90px;border-radius:50%;background:var(--bg2);"></div>
 </div>
 <div class="pomo-time" id="pomoTime">25:00</div>
@@ -236,7 +236,7 @@
 <div style="font-size:.58rem;color:var(--text3);opacity:.7;">Ayarlar'dan değiştirebilirsiniz</div>
 </div>
 </div>
-<div id="schedWeekNav" style="display:none;display:flex;gap:6px;margin-bottom:10px;">
+<div id="schedWeekNav" style="display:none;gap:6px;margin-bottom:10px;">
 <button onclick="changeSchedWeek(-1)" style="flex:1;padding:7px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:.72rem;color:var(--text2);cursor:pointer;">← Önceki Hafta</button>
 <button onclick="changeSchedWeek(0)" style="padding:7px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:.72rem;color:var(--text3);cursor:pointer;">Bugün</button>
 <button onclick="changeSchedWeek(1)" style="flex:1;padding:7px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:.72rem;color:var(--text2);cursor:pointer;">Sonraki Hafta →</button>
@@ -309,7 +309,7 @@
 <div class="drawer-user-name" id="drawerUserName">Kullanıcı</div>
 <div class="drawer-user-email" id="drawerUserEmail"></div>
 </div>
-<button onclick="authSignOut()" title="Çıkış Yap" style="background:none;border:none;color:var(--text3);cursor:pointer;padding:6px;border-radius:8px;transition:all .18s;flex-shrink:0;" onmouseover="this.style.color='var(--hard)';this.style.background='rgba(248,113,113,.08)'" onmouseout="this.style.color='var(--text3)';this.style.background='none'">
+<button onclick="clearAllData()" title="Çıkış Yap" style="background:none;border:none;color:var(--text3);cursor:pointer;padding:6px;border-radius:8px;transition:all .18s;flex-shrink:0;" onmouseover="this.style.color='var(--hard)';this.style.background='rgba(248,113,113,.08)'" onmouseout="this.style.color='var(--text3)';this.style.background='none'">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:18px;height:18px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
 </button>
 </div>
@@ -1105,7 +1105,7 @@
 <div style="height:40px;"></div>
 </div>
 </div></div><!-- settingsPage -->
-<script src="/app/app_part1.js"></script>
-<script src="/app/app_part2.js"></script>
+<script src="/app/app1.js"></script>
+<script src="/app/app2.js"></script>
 </body>
 </html>
