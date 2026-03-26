@@ -7,13 +7,14 @@
 //   • formspree.io (iletişim formu) → Network Only (offline'da sessizce hata ver)
 // ─────────────────────────────────────────────────────────────────────────────
 
-const CACHE_VERSION = 'capsula-v4';
+const CACHE_VERSION = 'capsula-v5';
 
 // İlk yüklemede cache'e alınacak app shell dosyaları
 const APP_SHELL = [
   '/app/',
   '/app/index.html',
   '/app/app.css',
+  '/app/lang.js',
   '/app/app1.js',
   '/app/app2.js',
   '/app/manifest.json',

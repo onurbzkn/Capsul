@@ -223,7 +223,7 @@ uni:[
 {id:'search',lbl:'Ara',ico:ICO_SEARCH},
 ],
 };
-const PAGE_TITLES={home:'Ana Ekran',stats:'İstatistikler',slides:'Slaytlar',todo:'Görevler',notes:'Notlar',diary:'Günlük',search:'Arama',calendar:'Takvim',pomodoro:'Pomodoro',kanban:'Kanban',weekly:'Haftalık Özet',reading:'Okuma Listesi',pro:'Profesyonel',schedule:'Ders Programı',exams:'Sınav Takvimi',notebook:'Not Defteri',chat:'Sohbet',habits:'Alışkanlıklar'};
+function getPageTitles(){return{home:t('pageHome'),stats:t('pageStats'),todo:t('pageTodo'),notes:t('pageNotes'),diary:t('pageDiary'),search:t('pageSearch'),pomodoro:t('pagePomodoro'),kanban:t('pageKanban'),weekly:t('pageWeekly'),reading:t('pageReading'),pro:t('pagePro'),schedule:t('pageSchedule'),exams:t('pageExams'),notebook:t('pageNotebook'),habits:t('pageHabits')};}
 function setMode(mode){
 curMode=mode;
 buildNav();
@@ -238,7 +238,8 @@ const b=document.createElement('button');b.className='nav-center-fab';b.id='cent
 b.innerHTML=item.ico;b.onclick=()=>switchPage(item.id);w.appendChild(b);ng.appendChild(w);
 } else {
 const b=document.createElement('button');b.className='nav-btn'+(curPage===item.id?' active':'');
-b.dataset.pid=item.id;b.innerHTML=item.ico+`<span>${item.lbl}</span>`;
+var navKeys={notes:'navNote',todo:'navTask',pomodoro:'navFocus',diary:'navDiary',search:'navSearch',schedule:'navSchedule'};
+b.dataset.pid=item.id;b.innerHTML=item.ico+`<span>${t(navKeys[item.id])||item.lbl}</span>`;
 b.onclick=()=>switchPage(item.id);ng.appendChild(b);
 }
 });
@@ -249,7 +250,7 @@ const el=document.getElementById('page-'+page);if(el)el.classList.add('active');
 curPage=page;
 document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.pid===page));
 const titleEl=document.getElementById('pageTitle');
-if(titleEl)titleEl.textContent=PAGE_TITLES[page]||'Capsula';
+if(titleEl)titleEl.textContent=getPageTitles()[page]||'Capsula';
 document.getElementById('fabNotes').style.display=page==='notes'?'flex':'none';
 document.getElementById('fabDiary').style.display=page==='diary'?'flex':'none';
 if(page==='home')renderDashboard();
@@ -307,14 +308,14 @@ function hidePinScreen(){const ps=document.getElementById('pinScreen');ps.classL
 function pinKey(k){if(pinBuffer.length>=4)return;pinBuffer+=k;updatePinDots();if(pinBuffer.length===4){setTimeout(async()=>{const stored=localStorage.getItem('capsula_pin');const ok=await verifyPin(pinBuffer,stored);if(ok)hidePinScreen();else{document.querySelectorAll('#pinDots .pin-dot').forEach(d=>d.classList.add('error'));setTimeout(()=>{document.querySelectorAll('#pinDots .pin-dot').forEach(d=>d.classList.remove('error'));pinBuffer='';updatePinDots();},500);}},80);}}
 function pinDel(){if(pinBuffer.length>0){pinBuffer=pinBuffer.slice(0,-1);updatePinDots();}}
 function updatePinDots(){for(let i=0;i<4;i++){const d=document.getElementById('pd'+i);if(d){d.classList.toggle('filled',i<pinBuffer.length);d.classList.remove('error');}}}
-function pinForgot(){showConfirm('PIN sıfırlanacak? Bu işlem geri alınamaz.',()=>{localStorage.removeItem('capsula_pin');D.profile.pinEnabled=false;saveData();hidePinScreen();showToast('PIN kaldırıldı');});}
+function pinForgot(){showConfirm('PIN sıfırlanacak? Bu işlem geri alınamaz.',()=>{localStorage.removeItem('capsula_pin');D.profile.pinEnabled=false;saveData();hidePinScreen();showToast(t('pinRemoved'));});}
 function togglePinSetting(){const tog=document.getElementById('pinToggle');if(tog.classList.contains('on'))showPinDisablePrompt();else{tog.classList.add('on');document.getElementById('pinSetupArea').style.display='block';}}
 let _pinDisableBuf='';
 function showPinDisablePrompt(){_pinDisableBuf='';for(let i=0;i<4;i++){const d=document.getElementById('dd'+i);if(d)d.classList.remove('filled','error');}openModal('pinDisableModal');}
 function pinDisableKey(k){if(_pinDisableBuf.length>=4)return;_pinDisableBuf+=k;for(let i=0;i<4;i++){const d=document.getElementById('dd'+i);if(d)d.classList.toggle('filled',i<_pinDisableBuf.length);}if(_pinDisableBuf.length===4){setTimeout(async()=>{const stored=localStorage.getItem('capsula_pin');const ok=await verifyPin(_pinDisableBuf,stored);if(ok){closeModal('pinDisableModal');removePinCode();document.getElementById('pinToggle').classList.remove('on');document.getElementById('pinSetupArea').style.display='none';showToast('PIN kilidi kaldırıldı');}else{document.querySelectorAll('#pinDisableDots .pin-dot').forEach(d=>d.classList.add('error'));setTimeout(()=>{document.querySelectorAll('#pinDisableDots .pin-dot').forEach(d=>{d.classList.remove('error','filled');});_pinDisableBuf='';},600);}},80);}}
 function pinDisableDel(){_pinDisableBuf=_pinDisableBuf.slice(0,-1);for(let i=0;i<4;i++){const d=document.getElementById('dd'+i);if(d)d.classList.toggle('filled',i<_pinDisableBuf.length);}}
 function pinDisableCancel(){closeModal('pinDisableModal');_pinDisableBuf='';}
-async function savePinCode(){const val=document.getElementById('newPinInput').value;if(!/^\d{4}$/.test(val)){showToast('4 haneli rakam gir');return;}const hashed=await hashPin(val);localStorage.setItem('capsula_pin',hashed);D.profile.pinEnabled=true;saveData();document.getElementById('newPinInput').value='';document.getElementById('pinSetupArea').style.display='none';document.getElementById('pinToggle').classList.add('on');showToast('PIN kaydedildi \ud83d\udd12');}
+async function savePinCode(){const val=document.getElementById('newPinInput').value;if(!/^\d{4}$/.test(val)){showToast('4 haneli rakam gir');return;}const hashed=await hashPin(val);localStorage.setItem('capsula_pin',hashed);D.profile.pinEnabled=true;saveData();document.getElementById('newPinInput').value='';document.getElementById('pinSetupArea').style.display='none';document.getElementById('pinToggle').classList.add('on');showToast(t('pinSaved'));}
 function removePinCode(){localStorage.removeItem('capsula_pin');D.profile.pinEnabled=false;saveData();}
 function initPinToggle(){document.getElementById('pinToggle').classList.toggle('on',!!localStorage.getItem('capsula_pin'));}
 function toggleDrawer(){document.getElementById('drawer').classList.toggle('open');document.getElementById('drawerOverlay').classList.toggle('open');document.getElementById('hamBtn').classList.toggle('open');}
@@ -342,15 +343,15 @@ document.getElementById(id).classList.add('open');
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
 const BADGES=[
-{id:'student',ico:'\ud83c\udf93',lbl:'Öğrenci'},
-{id:'developer',ico:'\ud83d\udcbb',lbl:'Geliştirici'},
-{id:'creative',ico:'\ud83c\udfa8',lbl:'Yaratıcı'},
-{id:'reader',ico:'\ud83d\udcda',lbl:'Okuyucu'},
-{id:'athlete',ico:'\ud83c\udfc3',lbl:'Sporcu'},
-{id:'scientist',ico:'\ud83d\udd2c',lbl:'Bilimci'},
-{id:'musician',ico:'\ud83c\udfb5',lbl:'Müzisyen'},
-{id:'writer',ico:'✍️',lbl:'Yazar'},
-{id:'explorer',ico:'\ud83c\udf0d',lbl:'Kaşif'},
+{id:'student',ico:'\ud83c\udf93',get lbl(){return t('badgeStudent')}},
+{id:'developer',ico:'\ud83d\udcbb',get lbl(){return t('badgeDeveloper')}},
+{id:'creative',ico:'\ud83c\udfa8',get lbl(){return t('badgeCreative')}},
+{id:'reader',ico:'\ud83d\udcda',get lbl(){return t('badgeReader')}},
+{id:'athlete',ico:'\ud83c\udfc3',get lbl(){return t('badgeAthlete')}},
+{id:'scientist',ico:'\ud83d\udd2c',get lbl(){return t('badgeScientist')}},
+{id:'musician',ico:'\ud83c\udfb5',get lbl(){return t('badgeMusician')}},
+{id:'writer',ico:'✍️',get lbl(){return t('badgeWriter')}},
+{id:'explorer',ico:'\ud83c\udf0d',get lbl(){return t('badgeExplorer')}},
 ];
 const ACCENT_COLORS=[
 {name:'purple',val:'#7c6ff7',val2:'#a89ffe'},
@@ -527,7 +528,7 @@ D.profile.bio=document.getElementById('profileBio').value.trim();
 D.profile.motto=document.getElementById('profileMotto').value.trim();
 const uname=document.getElementById('profileUsername')?.value.trim().toLowerCase().replace(/[^a-z0-9_.]/g,'')||'';
 if(uname)D.profile.username=uname;
-saveData();updateProfileUI();closeModal('profileModal');showToast('Profil güncellendi ✦');
+saveData();updateProfileUI();closeModal('profileModal');showToast(t('profileUpdated'));
 }
 function updateProfileUI(){
 const p=D.profile;
@@ -704,11 +705,11 @@ const df=item.kind==='content'?`permDeleteContent(${item.idx})`:`permDeleteTrash
 return`<div class="trash-item"><div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:5px;margin-bottom:2px;"><span style="font-size:.4rem;font-family:'JetBrains Mono',monospace;color:${item.accent};letter-spacing:.1em;border:1px solid ${item.accent};border-radius:3px;padding:1px 4px;flex-shrink:0;opacity:.8;">${item.label}</span><div class="trash-item-text">${escHtml(item.title)}</div></div><div style="font-size:.5rem;font-family:'JetBrains Mono',monospace;">${daysLeftLabel(dl)}</div></div><button class="trash-restore-btn" onclick="${rf}">Geri Al</button><button class="trash-del-btn" onclick="${df}">✕</button></div>`;
 }).join('');
 }
-function restoreContent(i){if(!D.contentTrash)return;const e=D.contentTrash.splice(i,1)[0];const tp=e._trashType;delete e._trashType;delete e._trashedAt;D[tp==='note'?'notes':'diary'].unshift(e);saveData();updTrashBadge();renderTrashList();if(tp==='note')renderNotes();else renderDiary();showToast('Geri alındı');}
+function restoreContent(i){if(!D.contentTrash)return;const e=D.contentTrash.splice(i,1)[0];const tp=e._trashType;delete e._trashType;delete e._trashedAt;D[tp==='note'?'notes':'diary'].unshift(e);saveData();updTrashBadge();renderTrashList();if(tp==='note')renderNotes();else renderDiary();showToast(t('restored'));}
 function permDeleteContent(i){D.contentTrash.splice(i,1);saveData();updTrashBadge();renderTrashList();}
-function restoreFromTrash(i){const t=D.trash.splice(i,1)[0];delete t.trashedAt;delete t.completedAt;D.todos.push(t);saveData();updTrashBadge();renderTrashList();renderTodos();showToast('Görev geri alındı');}
+function restoreFromTrash(i){const t=D.trash.splice(i,1)[0];delete t.trashedAt;delete t.completedAt;D.todos.push(t);saveData();updTrashBadge();renderTrashList();renderTodos();showToast(t('restored'));}
 function permDeleteTrash(i){D.trash.splice(i,1);saveData();updTrashBadge();renderTrashList();}
-function emptyAllTrash(){showConfirm('Çöpteki her şey kalıcı silinecek?',()=>{D.trash=[];D.contentTrash=[];saveData();updTrashBadge();renderTrashList();showToast('Çöp boşaltıldı');});}
+function emptyAllTrash(){showConfirm('Çöpteki her şey kalıcı silinecek?',()=>{D.trash=[];D.contentTrash=[];saveData();updTrashBadge();renderTrashList();showToast(t('trashEmptied'));});}
 function autoTrash(){if(!D.contentTrash)D.contentTrash=[];const now=Date.now(),mo=30*24*60*60*1000;const mv=D.completedTodos.filter(t=>now-new Date(t.completedAt).getTime()>mo);mv.forEach(t=>{t.trashedAt=new Date().toISOString();D.trash.push(t);});D.completedTodos=D.completedTodos.filter(t=>now-new Date(t.completedAt).getTime()<=mo);D.contentTrash=D.contentTrash.filter(e=>now-new Date(e._trashedAt).getTime()<mo);D.trash=D.trash.filter(t=>!t.trashedAt||(now-new Date(t.trashedAt).getTime()<mo));if(mv.length)saveData();}
 function updTrashBadge(){if(!D.contentTrash)D.contentTrash=[];const total=(D.trash||[]).length+(D.contentTrash||[]).length;const b=document.getElementById('trashBadge');if(total>0){b.textContent=total;b.style.display='inline';}else b.style.display='none';}
 function selectPriority(p){curPriority=p;document.querySelectorAll('.pp').forEach(el=>el.classList.toggle('sel',el.dataset.p===p));}
@@ -722,7 +723,7 @@ const repeat=document.getElementById('todoRepeat')?.value||'';
 D.todos.push({id:Date.now(),text,priority:curPriority,dueDate:dueDate||null,dueTime:dueTime||null,repeat:repeat||null,createdAt:new Date().toISOString()});
 inp.value='';document.getElementById('todoDate').value='';
 if(document.getElementById('todoRepeat'))document.getElementById('todoRepeat').value='';
-saveData();renderTodos();updateReminderBadge();showToast('Görev eklendi');
+saveData();renderTodos();updateReminderBadge();showToast(t('taskAdded'));
 }
 function confirmReset(type){
 const msgs={
@@ -783,7 +784,7 @@ n.content=document.getElementById('neContent')?.value||'';
 const tagsRaw=document.getElementById('neTags')?.value||'';
 n.tags=tagsRaw.split(',').map(t=>t.trim()).filter(Boolean);
 n.updatedAt=new Date().toISOString();
-saveData();renderNotes();document.getElementById('noteEditModal')?.remove();showToast('Not güncellendi ✓');
+saveData();renderNotes();document.getElementById('noteEditModal')?.remove();showToast(t('noteUpdated'));
 }
 function openDiaryEdit(id){
 const e=D.diary.find(x=>x.id===id);if(!e)return;
@@ -816,7 +817,7 @@ e.title=document.getElementById('deTitle')?.value.trim()||e.title;
 e.content=document.getElementById('deContent')?.value||'';
 e.mood=document.getElementById('deMood')?.value||e.mood;
 e.updatedAt=new Date().toISOString();
-saveData();renderDiary();document.getElementById('diaryEditModal')?.remove();showToast('Günlük güncellendi ✓');
+saveData();renderDiary();document.getElementById('diaryEditModal')?.remove();showToast(t('diaryUpdated'));
 }
 function deleteDiaryConfirm(id){
 document.getElementById('diaryEditModal')?.remove();
@@ -824,7 +825,7 @@ showConfirm('Bu günlük girişini silmek istiyor musun?',()=>{
 const e=D.diary.find(x=>x.id===id);
 if(e){if(!D.contentTrash)D.contentTrash=[];D.contentTrash.push({...e,_trashType:'diary',_trashedAt:new Date().toISOString()});}
 D.diary=D.diary.filter(x=>x.id!==id);
-saveData();renderDiary();updTrashBadge();showToast('Günlük silindi');
+saveData();renderDiary();updTrashBadge();showToast(t('diaryDeleted'));
 });
 }
 function deleteNoteConfirm(id){
@@ -833,7 +834,7 @@ showConfirm('Bu notu silmek istiyor musun?',()=>{
 const n=D.notes.find(x=>x.id===id);
 if(n){D.contentTrash.push({...n,_trashType:'note',_trashedAt:new Date().toISOString()});}
 D.notes=D.notes.filter(x=>x.id!==id);
-saveData();renderNotes();showToast('Not silindi');
+saveData();renderNotes();showToast(t('noteDeleted'));
 });
 }
 function openScheduleEdit(id){
@@ -889,7 +890,7 @@ s.link=document.getElementById('seLinkInp')?.value.trim()||'';
 s.start=document.getElementById('seStartInp')?.value||'';
 s.end=document.getElementById('seEndInp')?.value||'';
 s.days=[...document.querySelectorAll('#sedays input:checked')].map(i=>parseInt(i.value));
-saveData();renderSchedule();document.getElementById('schedEditModal')?.remove();showToast('Ders güncellendi ✓');
+saveData();renderSchedule();document.getElementById('schedEditModal')?.remove();showToast(t('lessonUpdated'));
 }
 function openContactModal(){
 document.getElementById('contactModal')?.remove();
@@ -968,7 +969,7 @@ toAdd.push({id:Date.now()+Math.random(),text:t.text,priority:t.priority,dueDate:
 });
 if(toAdd.length){D.todos.push(...toAdd);saveData();renderTodos();showToast(`${toAdd.length} tekrarlayan görev eklendi \ud83d\udd01`);}
 }
-function completeTodo(id){const idx=D.todos.findIndex(t=>t.id===id);if(idx===-1)return;const el=document.getElementById('todo-'+id);if(el)el.classList.add('completing');setTimeout(()=>{const t=D.todos.splice(idx,1)[0];t.completedAt=new Date().toISOString();D.completedTodos.unshift(t);saveData();renderTodos();showToast('Tamamlandı ✓');},360);}
+function completeTodo(id){const idx=D.todos.findIndex(t=>t.id===id);if(idx===-1)return;const el=document.getElementById('todo-'+id);if(el)el.classList.add('completing');setTimeout(()=>{const t=D.todos.splice(idx,1)[0];t.completedAt=new Date().toISOString();D.completedTodos.unshift(t);saveData();renderTodos();showToast(t('completed'));},360);}
 function uncompleteTodo(id){const idx=D.completedTodos.findIndex(t=>t.id===id);if(idx===-1)return;const t=D.completedTodos.splice(idx,1)[0];delete t.completedAt;D.todos.push(t);saveData();renderTodos();}
 function moveTodoToTrash(id){const idx=D.completedTodos.findIndex(t=>t.id===id);if(idx===-1)return;const t=D.completedTodos.splice(idx,1)[0];t.trashedAt=new Date().toISOString();D.trash.push(t);saveData();updTrashBadge();renderTodos();showToast('Çöpe taşındı');}
 function getDueClass(dd){if(!dd)return'';const diff=Math.ceil((new Date(dd)-new Date())/86400000);if(diff<0)return'overdue';if(diff===0)return'today';if(diff<=3)return'soon';return'';}
@@ -1036,11 +1037,11 @@ if(dt){const[d,ti]=dt.split('T');dueDate=d;dueTime=ti?ti.slice(0,5):null;}
 t.text=text;t.priority=window.tePrio||t.priority;
 t.dueDate=dueDate;t.dueTime=dueTime;
 t.repeat=document.getElementById('teRepeat')?.value||null;
-saveData();renderTodos();document.getElementById('todoEditModal')?.remove();showToast('Güncellendi ✓');
+saveData();renderTodos();document.getElementById('todoEditModal')?.remove();showToast(t('taskUpdated'));
 }
 function deleteTodoPermanent(id){
 D.todos=D.todos.filter(t=>t.id!==id);
-saveData();renderTodos();showToast('Görev silindi');
+saveData();renderTodos();showToast(t('taskDeleted'));
 }
 function renderStats(){
 const el=document.getElementById('statsContent');
@@ -1278,7 +1279,7 @@ function removeMedia(i){editorMediaFiles.splice(i,1);renderMPrev();}
 function saveEntry(){
 const title=document.getElementById('editorTitle').value.trim();
 const content=document.getElementById('editorContent').value.trim();
-if(!title&&!content){showToast('Bir şeyler yaz önce');return;}
+if(!title&&!content){showToast(t('writeFirst'));return;}
 let createdAt=new Date().toISOString();
 if(editorType==='diary'){const dv=document.getElementById('diaryDate').value;if(dv){const[y,m,d]=dv.split('-');const dt=new Date();dt.setFullYear(+y,+m-1,+d);createdAt=dt.toISOString();}}
 const entry={id:Date.now(),title:title||(editorType==='note'?'Başlıksız Not':'Günlük Girişi'),content,media:[...editorMediaFiles],tags:[...editorTags],createdAt};
@@ -1357,7 +1358,7 @@ return`<div class="search-result-item" onclick="${action}"><div class="srt" styl
 function renderDashboard(){
 const now=new Date();
 const hr=now.getHours();
-const greet=hr<6?'Gece geç saatler…':hr<12?'Günaydın,':hr<17?'İyi günler,':hr<21?'İyi akşamlar,':'İyi geceler,';
+const greet=hr<6?t('greetNight'):hr<12?t('greetMorning'):hr<17?t('greetAfternoon'):hr<21?t('greetEvening'):t('greetGoodnight');
 document.getElementById('dashGreeting').textContent=greet+' '+D.profile.name.split(' ')[0]+'!';
 document.getElementById('dashDate').textContent=fmtDateFull(now.toISOString());
 if(curMode==='uni'){renderStudentDashboard(now);return;}
