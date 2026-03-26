@@ -2320,17 +2320,37 @@ document.getElementById('svCancel').addEventListener('click', function() { modal
 }
 (function() {
 var _origRenderNotes = window.renderNotes || renderNotes;
+window._noteTagFilter=window._noteTagFilter||null;
+window.filterNotesByTag=function(tag){
+window._noteTagFilter=(window._noteTagFilter===tag)?null:tag;
+window.renderNotes();
+};
 window.renderNotes = function() {
 var grid = document.getElementById('notes-grid');
 var empty = document.getElementById('notes-empty');
+var filterEl=document.getElementById('notesTagFilter');
 if (!D.notes.length) {
 if (grid) grid.innerHTML = '';
 if (empty) empty.style.display = 'block';
+if(filterEl)filterEl.style.display='none';
 return;
 }
 if (empty) empty.style.display = 'none';
+// Tag filter bar
+var allTags=[];
+D.notes.forEach(function(n){(n.tags||[]).forEach(function(t){if(allTags.indexOf(t)===-1)allTags.push(t);});});
+if(filterEl){
+if(allTags.length){
+filterEl.style.display='block';
+filterEl.innerHTML='<button onclick="filterNotesByTag(null)" style="display:inline-block;padding:5px 12px;border-radius:20px;border:1px solid '+(window._noteTagFilter===null?'var(--accent)':'var(--border)')+';background:'+(window._noteTagFilter===null?'rgba(124,111,247,.15)':'transparent')+';color:'+(window._noteTagFilter===null?'var(--accent2)':'var(--text3)')+';font-size:.66rem;font-family:Sora,sans-serif;cursor:pointer;margin-right:6px;transition:all .15s;">Tümü</button>'
++allTags.map(function(tag){var sel=window._noteTagFilter===tag;return '<button onclick="filterNotesByTag(\''+tag+'\')" style="display:inline-block;padding:5px 12px;border-radius:20px;border:1px solid '+(sel?tagColor(tag)+'88':'var(--border)')+';background:'+(sel?tagColor(tag)+'18':'transparent')+';color:'+(sel?tagColor(tag):'var(--text3)')+';font-size:.66rem;font-family:Sora,sans-serif;cursor:pointer;margin-right:6px;transition:all .15s;">#'+escHtml(tag)+'</button>';}).join('');
+} else {filterEl.style.display='none';}
+}
+var notesToRender=window._noteTagFilter?D.notes.filter(function(n){return (n.tags||[]).indexOf(window._noteTagFilter)!==-1;}):D.notes;
+if(!notesToRender.length&&window._noteTagFilter){if(grid)grid.innerHTML='<div style="text-align:center;padding:20px;color:var(--text3);font-size:.76rem;">Bu etikette not yok.</div>';return;}
 if (grid) {
-grid.innerHTML = D.notes.map(function(n) {
+var _notesData=notesToRender;
+grid.innerHTML = _notesData.map(function(n) {
 var tags = (n.tags || []).map(function(t) {
 return '<span class="note-tag-chip" style="color:' + tagColor(t) + ';border-color:' + tagColor(t) + '44;">#' + escHtml(t) + '</span>';
 }).join('');
