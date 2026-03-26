@@ -77,7 +77,7 @@ D.profile=profile;
 saveData();
 renderTodos();renderNotes();renderDiary();renderDashboard();renderKanban();renderReading();updTrashBadge();updateReminderBadge();
 _updateGdriveUI('connected','Birleştirme tamamlandı ✓');
-showToast('Veriler birleştirildi ✓');
+showToast(t('gdriveMerged'));
 }
 function _gdriveDoOverwrite(imported){
 var profile=D.profile;
@@ -94,7 +94,7 @@ if(!D.timeCapsules)D.timeCapsules=[];
 saveData();
 renderTodos();renderNotes();renderDiary();renderDashboard();renderKanban();renderReading();updTrashBadge();updateReminderBadge();
 _updateGdriveUI('connected','Üzerine yazma tamamlandı ✓');
-showToast('Yedek üzerine yazıldı ✓');
+showToast(t('gdriveOverwritten'));
 }
 function _updateGdriveUI(state,msg){
 var statusEl=document.getElementById('gdriveStatus');
@@ -151,12 +151,12 @@ body:form
 }
 localStorage.setItem('capsula_gdrive_last',new Date().toISOString());
 _updateGdriveUI('connected','Yedekleme tamamlandı ✓');
-showToast('Google Drive\'a yedeklendi ✓');
+showToast(t('gdriveSaved'));
 }catch(err){
 console.error('GDrive backup error:',err);
 _gdriveToken=null;
 _updateGdriveUI('error','Hata: '+err.message);
-showToast('Yedekleme başarısız');
+showToast(t('gdriveBackupFailed'));
 }
 }
 
@@ -168,7 +168,7 @@ _updateGdriveUI('loading','Yedek aranıyor...');
 var file=await _gdriveFindFile(token);
 if(!file){
 _updateGdriveUI('connected','Drive\'da yedek bulunamadı');
-showToast('Drive\'da yedek yok');
+showToast(t('gdriveNoBackup'));
 return;
 }
 var res=await fetch('https://www.googleapis.com/drive/v3/files/'+file.id+'?alt=media',{
@@ -206,7 +206,7 @@ _updateGdriveUI('connected','Google hesabına bağlı');
 console.error('GDrive restore error:',err);
 _gdriveToken=null;
 _updateGdriveUI('error','Hata: '+err.message);
-showToast('Geri yükleme başarısız');
+showToast(t('gdriveRestoreFailed'));
 }
 }
 
@@ -231,7 +231,7 @@ updatePomoDisplay();
 function resetPomo(){setPomoMode(pomoMode);}
 function togglePomo(){
 if(pomoRunning){clearInterval(pomoInterval);pomoRunning=false;document.getElementById('pomoIcon').innerHTML='<polygon points="5 3 19 12 5 21 5 3" fill="currentColor"/>';}
-else{pomoRunning=true;document.getElementById('pomoIcon').innerHTML='<rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/>';pomoInterval=setInterval(()=>{pomoSecs--;if(pomoSecs<=0){clearInterval(pomoInterval);pomoRunning=false;if(pomoMode==='work'){pomoSessions++;updatePomoSessions();showToast('Seans tamamlandı! \ud83c\udf45');}else showToast('Mola bitti!');return;}updatePomoDisplay();},1000);}
+else{pomoRunning=true;document.getElementById('pomoIcon').innerHTML='<rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/>';pomoInterval=setInterval(()=>{pomoSecs--;if(pomoSecs<=0){clearInterval(pomoInterval);pomoRunning=false;if(pomoMode==='work'){pomoSessions++;updatePomoSessions();showToast(t('sessionComplete'));}else showToast(t('breakOver'));return;}updatePomoDisplay();},1000);}
 }
 function skipPomo(){pomoRunning=false;clearInterval(pomoInterval);setPomoMode(pomoMode==='work'?'short':'work');}
 function updatePomoDisplay(){
@@ -315,12 +315,12 @@ if(ll)ll.textContent=POMO_DUR_CUSTOM.long;
 const durModal=document.getElementById('pomoDurModal');
 if(durModal)durModal.remove();
 setPomoMode(pomoMode);
-showToast('Süreler güncellendi ✓');
+showToast(t('durationsUpdated'));
 }
 function setPomoStyle(s){
 pomoStyle=s;localStorage.setItem('capsula_pomo_style',s);
 document.querySelectorAll('.pomo-style-opt').forEach(el=>el.classList.toggle('active',el.id==='ps-'+s));
-updatePomoDisplay();showToast('Saat stili değiştirildi');
+updatePomoDisplay();showToast(t('clockStyleChanged'));
 }
 function updatePomoSessions(){const c=document.getElementById('pomoSessions');c.innerHTML=Array.from({length:4},(_,i)=>`<div class="pomo-sess-dot${i<pomoSessions%4?' done':''}"></div>`).join('');}
 function renderPomoTodos(){
@@ -578,7 +578,7 @@ status:document.getElementById('readingStatusInput').value,
 pagesRead:0,
 createdAt:new Date().toISOString()
 });
-saveData();closeModal('readingAddModal');renderReading();showToast('Eklendi \ud83d\udcda');
+saveData();closeModal('readingAddModal');renderReading();showToast(t('readingAdded'));
 }
 function cycleReadingStatus(id){const item=D.reading.find(r=>r.id===id);if(!item)return;const cycle={toread:'reading',reading:'done',done:'toread'};item.status=cycle[item.status];saveData();renderReading();}
 function renderReading(){
@@ -666,7 +666,7 @@ saveData();renderReading();document.getElementById('readingEditModal')?.remove()
 }
 function deleteReadingItem(id){
 D.reading=D.reading.filter(r=>r.id!==id);
-saveData();renderReading();showToast('Silindi');
+saveData();renderReading();showToast(t('readingDeleted'));
 }
 function getReadingAIEstimate(item){
 if(!item.pages||!item.pagesRead||!item.startDate)return'';
@@ -855,7 +855,7 @@ const name=document.getElementById('examNameInput').value.trim();
 if(!name)return;
 const type=document.querySelector('[name="examType"]:checked')?.value||'exam';
 D.exams.push({id:Date.now(),name,date:document.getElementById('examDateInput').value,time:document.getElementById('examTimeInput').value,type,note:document.getElementById('examNoteInput').value.trim(),createdAt:new Date().toISOString()});
-saveData();closeModal('examAddModal');renderExams();showToast('Eklendi');
+saveData();closeModal('examAddModal');renderExams();showToast(t('examAdded'));
 }
 function deleteExamItem(id){D.exams=D.exams.filter(e=>e.id!==id);saveData();renderExams();}
 function renderExams(){
@@ -1364,7 +1364,7 @@ if(inp)inp.value='';
 quickNoteMediaData=[];
 const prev=document.getElementById('quickNoteMediaPreview');
 if(prev)prev.innerHTML='';
-showToast('Not eklendi ✓');
+showToast(t('noteAddedQuick'));
 };
 function getNotifications(){
 return JSON.parse(localStorage.getItem('capsula_notifs')||'[]');
@@ -1420,7 +1420,7 @@ function clearAllNotifs(){
 localStorage.setItem('capsula_notifs','[]');
 updateNotifBadge();
 closeModal('notificationsModal');
-showToast('Bildirimler temizlendi');
+showToast(t('notifCleared'));
 }
 function checkSmartNotifications(){
 const now=new Date();
@@ -1767,7 +1767,7 @@ var uname=document.getElementById('editProfileUsername').value.trim().toLowerCas
 if(uname)D.profile.username=uname;
 saveData();updateProfileUI();closeProfileEditSheet();
 if(document.getElementById('profilePage').classList.contains('open'))openProfilePage();
-showToast('Profil güncellendi ✦');
+showToast(t('profileUpdated'));
 }
 function openProfile(){openProfilePage();}
 function openPrivacyModal(){openModal('privacyModal');}
@@ -1985,7 +1985,7 @@ showConfirm('"' + cap.title + '" kapsülü silinsin mi?', function() {
 D.timeCapsules = D.timeCapsules.filter(function(c) { return c.id !== id; });
 saveData();
 renderTimeCapsules();
-showToast('Kapsül silindi');
+showToast(t('capsuleDeleted'));
 });
 }
 function checkCapsuleNotifications() {
@@ -2283,7 +2283,7 @@ var icon=document.getElementById('habitIconVal').value;
 var freq=document.getElementById('habitFreqInput').value;
 if(!D.habits)D.habits=[];
 D.habits.push({id:Date.now(),name:name,icon:icon,freq:freq,log:{},createdAt:new Date().toISOString()});
-saveData();document.getElementById('habitAddModal').remove();renderHabits();showToast('Alışkanlık eklendi '+icon);
+saveData();document.getElementById('habitAddModal').remove();renderHabits();showToast(t('habitAdded')+' '+icon);
 }
 function toggleHabitDay(habitId,dateKey){
 if(!D.habits)return;
@@ -2296,7 +2296,7 @@ saveData();renderHabits();
 function deleteHabit(id){
 showConfirm('Bu alışkanlığı silmek istiyor musun?',function(){
 D.habits=D.habits.filter(function(h){return h.id!==id;});
-saveData();renderHabits();showToast('Alışkanlık silindi');
+saveData();renderHabits();showToast(t('habitDeleted'));
 });
 }
 function getHabitStreak(habit){

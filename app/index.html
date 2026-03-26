@@ -980,6 +980,33 @@ Drive'dan Geri Yükle
 </div>
 </div>
 <!-- GÜVENLİK -->
+<!-- DİL -->
+<div class="stt-section-label" data-i18n="language">Dil</div>
+<div class="stt-group">
+<div class="stt-item" onclick="document.getElementById('langExpandArea').style.display=document.getElementById('langExpandArea').style.display==='none'?'block':'none'">
+<div class="stt-icon" style="background:linear-gradient(135deg,#60a5fa,#3b82f6);">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+</div>
+<div class="stt-text">
+<div class="stt-title" data-i18n="language">Dil</div>
+<div class="stt-sub" id="currentLangLabel">Türkçe</div>
+</div>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--text3);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+</div>
+<div id="langExpandArea" style="display:none;padding:14px 16px 16px;border-top:1px solid var(--border);">
+<div style="display:flex;gap:8px;">
+<button onclick="setLang('tr')" style="flex:1;padding:12px;background:var(--bg3);border:2px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .2s;" id="langBtnTr">
+<div style="font-size:1.2rem;margin-bottom:4px;">🇹🇷</div>
+<div style="font-size:.76rem;font-weight:500;color:var(--text);">Türkçe</div>
+</button>
+<button onclick="setLang('en')" style="flex:1;padding:12px;background:var(--bg3);border:2px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .2s;" id="langBtnEn">
+<div style="font-size:1.2rem;margin-bottom:4px;">🇬🇧</div>
+<div style="font-size:.76rem;font-weight:500;color:var(--text);">English</div>
+</button>
+</div>
+</div>
+</div>
+<!-- GÜVENLİK -->
 <div class="stt-section-label">Güvenlik</div>
 <div class="stt-group">
 <div class="stt-item" onclick="togglePinSetting()">
@@ -1203,6 +1230,7 @@ Drive'dan Geri Yükle
 <div style="height:40px;"></div>
 </div>
 </div></div><!-- settingsPage -->
+<script src="/app/lang.js"></script>
 <script src="/app/app1.js"></script>
 <script src="/app/app2.js"></script>
 </body>
