@@ -855,6 +855,9 @@ Drive'dan Geri Yükle
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><polyline points="15 18 9 12 15 6"/></svg>
 </button>
 <span class="fullpage-title" id="profilePageTitle">Profil</span>
+<button onclick="shareProfileCard()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:.76rem;color:var(--text3);font-family:'Sora',sans-serif;min-height:34px;" title="Paylaş">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+</button>
 <button onclick="openProfileEditSheet()" style="background:rgba(124,111,247,.15);border:1px solid rgba(124,111,247,.4);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:.76rem;color:var(--accent2);font-family:'Sora',sans-serif;font-weight:500;min-height:34px;min-width:64px;">Düzenle</button>
 </div>
 <div class="fullpage-body">
@@ -1095,6 +1098,39 @@ Drive'dan Geri Yükle
 </div>
 </div>
 <!-- KANBAN -->
+<div class="stt-section-label">Görünüm Kişiselleştirme</div>
+<div class="stt-group">
+<div class="stt-item" onclick="document.getElementById('viewCustomExpand').style.display=document.getElementById('viewCustomExpand').style.display==='none'?'block':'none'">
+<div class="stt-icon" style="background:linear-gradient(135deg,#a78bfa,#8b5cf6);">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><circle cx="17.5" cy="17.5" r="3.5"/></svg>
+</div>
+<div class="stt-text">
+<div class="stt-title">Sayfa Görünümleri</div>
+<div class="stt-sub">Görevler, Kanban ve Okuma Listesi düzeni</div>
+</div>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--text3);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+</div>
+<div id="viewCustomExpand" style="display:none;padding:14px 16px 16px;border-top:1px solid var(--border);">
+<div style="font-size:.66rem;color:var(--text3);margin-bottom:8px;">Görevler Sayfası</div>
+<div style="display:flex;gap:6px;margin-bottom:14px;" id="todoViewPicker">
+<button onclick="setViewStyle('todo','board')" class="pomo-style-opt" id="tv-board" style="padding:6px 12px;"><span>Tahta</span></button>
+<button onclick="setViewStyle('todo','list')" class="pomo-style-opt" id="tv-list" style="padding:6px 12px;"><span>Liste</span></button>
+<button onclick="setViewStyle('todo','compact')" class="pomo-style-opt" id="tv-compact" style="padding:6px 12px;"><span>Kompakt</span></button>
+</div>
+<div style="font-size:.66rem;color:var(--text3);margin-bottom:8px;">Kanban Sayfası</div>
+<div style="display:flex;gap:6px;margin-bottom:14px;" id="kanbanViewPicker">
+<button onclick="setViewStyle('kanban','columns')" class="pomo-style-opt" id="kv-columns" style="padding:6px 12px;"><span>Sütunlar</span></button>
+<button onclick="setViewStyle('kanban','swim')" class="pomo-style-opt" id="kv-swim" style="padding:6px 12px;"><span>Swim Lane</span></button>
+<button onclick="setViewStyle('kanban','compact')" class="pomo-style-opt" id="kv-compact" style="padding:6px 12px;"><span>Kompakt</span></button>
+</div>
+<div style="font-size:.66rem;color:var(--text3);margin-bottom:8px;">Okuma Listesi</div>
+<div style="display:flex;gap:6px;" id="readingViewPicker">
+<button onclick="setViewStyle('reading','grid')" class="pomo-style-opt" id="rv-grid" style="padding:6px 12px;"><span>Grid</span></button>
+<button onclick="setViewStyle('reading','list')" class="pomo-style-opt" id="rv-list" style="padding:6px 12px;"><span>Liste</span></button>
+<button onclick="setViewStyle('reading','shelf')" class="pomo-style-opt" id="rv-shelf" style="padding:6px 12px;"><span>Raf</span></button>
+</div>
+</div>
+</div>
 <div class="stt-section-label">Kanban</div>
 <div class="stt-group">
 <div class="stt-item">
@@ -1169,6 +1205,16 @@ Drive'dan Geri Yükle
 <!-- VERİ -->
 <div class="stt-section-label">Veri</div>
 <div class="stt-group">
+<div class="stt-item">
+<div class="stt-icon" style="background:linear-gradient(135deg,#4ade80,#22c55e);">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+</div>
+<div class="stt-text">
+<div class="stt-title">Otomatik Drive Senkronizasyonu</div>
+<div class="stt-sub">Değişikliklerden 30sn sonra otomatik yedekle</div>
+</div>
+<div class="toggle" id="autoSyncToggle" onclick="toggleAutoSync()"></div>
+</div>
 <div class="stt-item" onclick="closeSettingsPage();setTimeout(openBackupModal,320);">
 <div class="stt-icon" style="background:linear-gradient(135deg,#a78bfa,#7c3aed);">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>

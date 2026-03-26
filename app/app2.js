@@ -1305,6 +1305,24 @@ localStorage.setItem('capsula_reading_autoarchive',cur?'off':'on');
 tog?.classList.toggle('on',!cur);
 showToast(cur?'Otomatik arşiv kapatıldı':'Otomatik arşiv açıldı');
 }
+function setViewStyle(section,style){
+localStorage.setItem('capsula_view_'+section,style);
+var prefixes={todo:'tv',kanban:'kv',reading:'rv'};
+var pre=prefixes[section];
+if(pre){document.querySelectorAll('#'+section+'ViewPicker .pomo-style-opt').forEach(function(el){el.classList.toggle('active',el.id===pre+'-'+style);});}
+if(section==='todo')renderTodos();
+else if(section==='kanban')renderKanban();
+else if(section==='reading')renderReading();
+showToast('Görünüm değiştirildi');
+}
+function getViewStyle(section){return localStorage.getItem('capsula_view_'+section)||{todo:'board',kanban:'columns',reading:'grid'}[section]||'board';}
+function toggleAutoSync(){
+var tog=document.getElementById('autoSyncToggle');
+var cur=localStorage.getItem('capsula_auto_sync')==='on';
+localStorage.setItem('capsula_auto_sync',cur?'off':'on');
+if(tog)tog.classList.toggle('on',!cur);
+showToast(cur?'Otomatik senkronizasyon kapatıldı':'Otomatik senkronizasyon açıldı');
+}
 function initSettingsToggles(){
 const kd=document.getElementById('kanbanAutoDelete');
 const ra=document.getElementById('readingAutoArchive');
@@ -1314,6 +1332,9 @@ if(ra)ra.classList.toggle('on',localStorage.getItem('capsula_reading_autoarchive
 if(sw)sw.classList.toggle('on',localStorage.getItem('capsula_sched_weekly')==='on');
 const ps=document.getElementById('ps-'+pomoStyle);
 if(ps)ps.classList.add('active');
+['todo','kanban','reading'].forEach(function(s){var pre={todo:'tv',kanban:'kv',reading:'rv'}[s];var cur=getViewStyle(s);document.querySelectorAll('#'+s+'ViewPicker .pomo-style-opt').forEach(function(el){el.classList.toggle('active',el.id===pre+'-'+cur);});});
+var asToggle=document.getElementById('autoSyncToggle');
+if(asToggle)asToggle.classList.toggle('on',localStorage.getItem('capsula_auto_sync')==='on');
 var pl=localStorage.getItem('capsula_profile_layout')||'classic';
 document.querySelectorAll('#profileLayoutGrid .pomo-style-opt').forEach(function(el){el.classList.toggle('active',el.id==='pl-'+pl);});
 var plLbl=document.getElementById('currentLayoutLabel');
@@ -1755,6 +1776,47 @@ html3+='<div onclick="showAchDetail('+idx+')" style="background:'+bg+';border:1p
 });
 cont.innerHTML=html3+'</div>';
 window._achList=ach;
+}
+}
+function shareProfileCard(){
+var p=D.profile;var streak=calcStreak();
+var badge=BADGES.find(function(b){return b.id===(p.badge||'student');})||BADGES[0];
+var accent=p.accentVal||'#7c6ff7';
+var initials=p.name.split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();
+var m=document.createElement('div');
+m.style.cssText='position:fixed;inset:0;z-index:3600;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:16px;';
+m.innerHTML='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:20px;width:min(360px,95vw);text-align:center;">'
++'<div style="font-size:.68rem;color:var(--text3);font-family:JetBrains Mono,monospace;margin-bottom:14px;">Ekran görüntüsü alarak paylaş</div>'
++'<div style="background:linear-gradient(145deg,#0d0d12,#1c1c28);border-radius:20px;padding:28px;text-align:center;border:1px solid rgba(255,255,255,0.08);position:relative;overflow:hidden;">'
++'<div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,'+accent+'33,transparent 70%);"></div>'
++'<div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,'+accent+',#f472b6);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;color:#fff;margin:0 auto 12px;box-shadow:0 0 20px '+accent+'55;overflow:hidden;">'
++(p.avatar?'<img src="'+p.avatar+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">':initials)
++'</div>'
++'<div style="font-size:1.1rem;font-weight:500;color:#f0eeff;">'+escHtml(p.name)+'</div>'
++(p.username?'<div style="font-size:.64rem;font-family:JetBrains Mono,monospace;color:'+accent+';margin-top:2px;">@'+escHtml(p.username)+'</div>':'')
++'<div style="font-size:.62rem;color:rgba(240,238,255,.5);margin-top:4px;">'+badge.ico+' '+badge.lbl+'</div>'
++(p.motto?'<div style="font-size:.72rem;color:rgba(240,238,255,.4);font-style:italic;margin-top:10px;padding:0 10px;">"'+escHtml(p.motto)+'"</div>':'')
++'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06);">'
++'<div><div style="font-size:1.2rem;font-weight:700;font-family:JetBrains Mono,monospace;color:'+accent+';">'+D.completedTodos.length+'</div><div style="font-size:.48rem;color:rgba(240,238,255,.3);text-transform:uppercase;letter-spacing:.1em;margin-top:3px;">Görev</div></div>'
++'<div><div style="font-size:1.2rem;font-weight:700;font-family:JetBrains Mono,monospace;color:'+accent+';">'+(D.notes.length+D.diary.length)+'</div><div style="font-size:.48rem;color:rgba(240,238,255,.3);text-transform:uppercase;letter-spacing:.1em;margin-top:3px;">Not</div></div>'
++'<div><div style="font-size:1.2rem;font-weight:700;font-family:JetBrains Mono,monospace;color:'+accent+';">'+streak+'\ud83d\udd25</div><div style="font-size:.48rem;color:rgba(240,238,255,.3);text-transform:uppercase;letter-spacing:.1em;margin-top:3px;">Seri</div></div>'
++'</div>'
++'<div style="margin-top:14px;font-size:.46rem;font-family:JetBrains Mono,monospace;color:rgba(240,238,255,.2);letter-spacing:.15em;">CAPSULA \u2726 '+new Date().toLocaleDateString('tr-TR')+'</div>'
++'</div>'
++'<div style="display:flex;gap:8px;margin-top:14px;">'
++'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="flex:1;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-family:Sora,sans-serif;font-size:.78rem;color:var(--text2);">Kapat</button>'
++'<button onclick="shareCardNative()" style="flex:1;padding:10px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:10px;cursor:pointer;font-family:Sora,sans-serif;font-size:.78rem;color:#fff;">Paylaş</button>'
++'</div>'
++'<div style="font-size:.56rem;color:var(--text3);margin-top:8px;">Kartı basılı tut veya ekran görüntüsü al</div>'
++'</div>';
+document.body.appendChild(m);
+m.addEventListener('click',function(e){if(e.target===m)m.remove();});
+}
+function shareCardNative(){
+if(navigator.share){
+navigator.share({title:'Capsula Profilim',text:D.profile.name+' - '+calcStreak()+' günlük seri \ud83d\udd25 | Capsula',url:'https://capsulaapp.com'}).catch(function(){});
+} else {
+navigator.clipboard.writeText(D.profile.name+' - '+calcStreak()+' günlük seri \ud83d\udd25 | capsulaapp.com').then(function(){showToast('Link kopyalandı ✓');}).catch(function(){showToast('Kopyalanamadı');});
 }
 }
 function showAchDetail(idx){

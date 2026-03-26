@@ -182,6 +182,7 @@ reading:[],schedule:[],exams:[],notebook:[],
 profile:{name:'Kullanıcı',email:'ornek@eposta.com',avatar:'',theme:'default'},
 };
 let _saveErrorShown=false;
+var _autoSyncTimer=null;
 function saveData(){
 saveDataEncrypted().catch(err=>{
 console.error('Capsula kayıt hatası:',err);
@@ -191,6 +192,14 @@ showToast('⚠️ Veri kaydedilemedi — tarayıcı şifrelemeyi desteklemiyor o
 setTimeout(()=>{_saveErrorShown=false;},10000);
 }
 });
+if(localStorage.getItem('capsula_auto_sync')==='on'&&localStorage.getItem('capsula_gdrive_connected')){
+clearTimeout(_autoSyncTimer);
+_autoSyncTimer=setTimeout(function(){
+if(typeof gdriveBackup==='function'&&typeof _gdriveToken!=='undefined'){
+gdriveBackup();
+}
+},30000);
+}
 }
 let curMode='home', curPage='notes', curPriority='easy', kanbanPriority='mid';
 let editorType='note', editorMediaFiles=[], editorTags=[], selMoodVal='\ud83d\ude0a';
@@ -841,7 +850,7 @@ const rawDue=document.getElementById('todoDate').value;
 let dueDate=null,dueTime=null;
 if(rawDue){const[d,t]=rawDue.split('T');dueDate=d;dueTime=t?t.slice(0,5):null;}
 const repeat=document.getElementById('todoRepeat')?.value||'';
-D.todos.push({id:Date.now(),text,priority:curPriority,dueDate:dueDate||null,dueTime:dueTime||null,repeat:repeat||null,createdAt:new Date().toISOString()});
+D.todos.push({id:Date.now(),text,priority:curPriority,dueDate:dueDate||null,dueTime:dueTime||null,repeat:repeat||null,subtasks:[],createdAt:new Date().toISOString()});
 inp.value='';document.getElementById('todoDate').value='';
 if(document.getElementById('todoRepeat'))document.getElementById('todoRepeat').value='';
 saveData();renderTodos();updateReminderBadge();showToast(t('taskAdded'));
@@ -1099,6 +1108,8 @@ function getDueLabel(dd){if(!dd)return'';const diff=Math.ceil((new Date(dd)-new 
 function todoItemHtml(t,labels,dl,dc){
 const timeStr=t.dueTime?`<span class="due-tag" style="color:var(--text3);">⏰ ${t.dueTime}</span>`:'';
 const repeatIco=t.repeat?`<span style="font-size:.58rem;color:var(--accent2);margin-left:3px;">${t.repeat==='daily'?'\ud83d\udd01 Günlük':t.repeat==='weekly'?'\ud83d\udd01 Haftalık':'\ud83d\udd01 Aylık'}</span>`:'';
+const subCount=t.subtasks?.length||0;const subDone=t.subtasks?.filter(s=>s.done).length||0;
+const subtaskBadge=subCount?`<span style="font-size:.54rem;color:${subDone===subCount?'var(--easy)':'var(--text3)'};font-family:'JetBrains Mono',monospace;margin-left:3px;">${subDone}/${subCount} alt görev</span>`:'';
 return`<div class="todo-item ${t.priority}" id="todo-${t.id}" draggable="true" ondragstart="dragTodo(event,${t.id})">
 <div class="todo-check" onclick="completeTodo(${t.id})"></div>
 <div class="todo-body" onclick="openTodoEdit(${t.id})" style="cursor:pointer;flex:1;">
@@ -1106,7 +1117,7 @@ return`<div class="todo-item ${t.priority}" id="todo-${t.id}" draggable="true" o
 <div class="todo-meta">
 <span class="todo-badge">${labels[t.priority]}</span>
 ${dl?`<span class="due-tag ${dc}">${dl}</span>`:''}
-${timeStr}${repeatIco}
+${timeStr}${repeatIco}${subtaskBadge}
 </div>
 </div>
 <button onclick="event.stopPropagation();openTodoEdit(${t.id})" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;border-radius:6px;transition:color .15s;" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text3)'" title="Düzenle">
@@ -1140,6 +1151,12 @@ ${['easy','mid','hard'].map(p=>`<button onclick="tePrio='${p}';document.querySel
 <option value="weekly" ${t.repeat==='weekly'?'selected':''}>Her hafta</option>
 <option value="monthly" ${t.repeat==='monthly'?'selected':''}>Her ay</option>
 </select>
+<div style="font-size:.66rem;color:var(--text3);margin-bottom:6px;">Alt Görevler</div>
+<div id="teSubtaskList" style="margin-bottom:8px;">${(t.subtasks||[]).map((s,i)=>`<div style="display:flex;align-items:center;gap:6px;padding:4px 0;"><button onclick="toggleSubtask(${id},${i})" style="width:18px;height:18px;border-radius:4px;border:1.5px solid ${s.done?'var(--easy)':'var(--border)'};background:${s.done?'var(--easy)':'transparent'};cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${s.done?'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" style="width:10px;height:10px;"><polyline points="20 6 9 17 4 12"/></svg>':''}</button><span style="font-size:.76rem;color:${s.done?'var(--text3)':'var(--text)'};${s.done?'text-decoration:line-through;':''}">${escHtml(s.text)}</span><button onclick="removeSubtask(${id},${i})" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text3);font-size:.7rem;padding:2px;">✕</button></div>`).join('')}</div>
+<div style="display:flex;gap:6px;margin-bottom:14px;">
+<input type="text" id="teSubInput" placeholder="Alt görev ekle..." style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:'Sora',sans-serif;font-size:.74rem;color:var(--text);outline:none;box-sizing:border-box;" onkeydown="if(event.key==='Enter'){addSubtask(${id});this.value='';}">
+<button onclick="addSubtask(${id})" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:7px 10px;cursor:pointer;color:var(--accent2);font-size:.68rem;font-family:'Sora',sans-serif;">+</button>
+</div>
 <div style="display:flex;gap:8px;">
 <button onclick="saveTodoEdit(${id})" style="flex:1;padding:11px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:10px;color:#fff;font-family:'Sora',sans-serif;font-size:.84rem;cursor:pointer;">Kaydet</button>
 <button onclick="deleteTodoPermanent(${id});document.getElementById('todoEditModal')?.remove();" style="padding:11px 14px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);border-radius:10px;color:var(--hard);font-family:'Sora',sans-serif;font-size:.84rem;cursor:pointer;">Sil</button>
@@ -1160,6 +1177,26 @@ t.text=text;t.priority=window.tePrio||t.priority;
 t.dueDate=dueDate;t.dueTime=dueTime;
 t.repeat=document.getElementById('teRepeat')?.value||null;
 saveData();renderTodos();document.getElementById('todoEditModal')?.remove();showToast(t('taskUpdated'));
+}
+function addSubtask(todoId){
+var inp=document.getElementById('teSubInput');if(!inp)return;
+var text=inp.value.trim();if(!text)return;
+var todo=D.todos.find(function(x){return x.id===todoId;});if(!todo)return;
+if(!todo.subtasks)todo.subtasks=[];
+todo.subtasks.push({text:text,done:false});
+inp.value='';saveData();
+document.getElementById('todoEditModal')?.remove();
+openTodoEdit(todoId);
+}
+function toggleSubtask(todoId,idx){
+var todo=D.todos.find(function(x){return x.id===todoId;});if(!todo||!todo.subtasks)return;
+todo.subtasks[idx].done=!todo.subtasks[idx].done;
+saveData();document.getElementById('todoEditModal')?.remove();openTodoEdit(todoId);
+}
+function removeSubtask(todoId,idx){
+var todo=D.todos.find(function(x){return x.id===todoId;});if(!todo||!todo.subtasks)return;
+todo.subtasks.splice(idx,1);
+saveData();document.getElementById('todoEditModal')?.remove();openTodoEdit(todoId);
 }
 function deleteTodoPermanent(id){
 D.todos=D.todos.filter(t=>t.id!==id);
@@ -1289,6 +1326,52 @@ const labels={hard:'Zor',mid:'Orta',easy:'Kolay'};
 const clr={easy:'var(--easy)',mid:'var(--mid)',hard:'var(--hard)'};
 const today=new Date();today.setHours(0,0,0,0);
 const todayKey=today.toISOString().split('T')[0];
+const viewStyle=typeof getViewStyle==='function'?getViewStyle('todo'):'board';
+if(viewStyle==='list'||viewStyle==='compact'){
+let html='';
+if(!D.todos.length){html='<div class="empty-state">Aktif görev yok \ud83c\udf89</div>';}
+else{
+const sorted=[...D.todos].sort((a,b)=>{const po={hard:0,mid:1,easy:2};return (po[a.priority]||1)-(po[b.priority]||1);});
+sorted.forEach(t=>{
+const isOverdue=t.dueDate&&new Date(t.dueDate)<today;
+const isToday=t.dueDate===todayKey;
+const subCount=t.subtasks?.length||0;const subDone=t.subtasks?.filter(s=>s.done).length||0;
+if(viewStyle==='compact'){
+html+=`<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border);">
+<button onclick="completeTodo(${t.id})" style="width:18px;height:18px;border-radius:50%;border:1.5px solid ${clr[t.priority]};background:none;cursor:pointer;flex-shrink:0;"></button>
+<span style="flex:1;font-size:.78rem;color:var(--text);${isOverdue?'color:var(--hard);':''}overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" onclick="openTodoEdit(${t.id})">${escHtml(t.text)}</span>
+${subCount?`<span style="font-size:.5rem;color:var(--text3);font-family:JetBrains Mono,monospace;">${subDone}/${subCount}</span>`:''}
+${t.dueDate?`<span style="font-size:.5rem;color:${isOverdue?'var(--hard)':isToday?'var(--accent2)':'var(--text3)'};font-family:JetBrains Mono,monospace;">${isToday?'Bugün':getDueLabel(t.dueDate)}</span>`:''}
+</div>`;
+} else {
+html+=`<div style="background:var(--bg2);border:1px solid ${isOverdue?'rgba(248,113,113,.25)':'var(--border)'};border-radius:12px;padding:12px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px;">
+<button onclick="completeTodo(${t.id})" style="width:22px;height:22px;border-radius:50%;border:2px solid ${clr[t.priority]};background:none;cursor:pointer;flex-shrink:0;margin-top:2px;"></button>
+<div style="flex:1;min-width:0;" onclick="openTodoEdit(${t.id})">
+<div style="font-size:.82rem;color:var(--text);margin-bottom:3px;">${escHtml(t.text)}</div>
+<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+<span style="font-size:.56rem;color:${clr[t.priority]};background:${clr[t.priority]}15;padding:1px 6px;border-radius:4px;">${labels[t.priority]}</span>
+${t.dueDate?`<span style="font-size:.54rem;color:${isOverdue?'var(--hard)':isToday?'var(--accent2)':'var(--text3)'};">${isToday?'Bugün':getDueLabel(t.dueDate)}</span>`:''}
+${subCount?`<span style="font-size:.52rem;color:${subDone===subCount?'var(--easy)':'var(--text3)'};font-family:JetBrains Mono,monospace;">${subDone}/${subCount} alt görev</span>`:''}
+${t.repeat?`<span style="font-size:.52rem;color:var(--accent2);">\ud83d\udd01</span>`:''}
+</div>
+</div>
+<button onclick="deleteTodoPermanent(${t.id})" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;" onmouseover="this.style.color='var(--hard)'" onmouseout="this.style.color='var(--text3)'">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+</button>
+</div>`;
+}
+});
+}
+document.getElementById('todo-active-list').innerHTML=html;
+// completed section aynı kalıyor
+let ch='';
+if(D.completedTodos.length){
+ch=`<button class="completed-toggle ${completedOpen?'open':''}" onclick="toggleCompleted()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>Tamamlananlar<span class="completed-badge">${D.completedTodos.length}</span></button><div class="completed-list ${completedOpen?'open':''}">`;
+D.completedTodos.forEach(t=>{ch+=`<div class="todo-item done ${t.priority}"><div class="todo-check" onclick="uncompleteTodo(${t.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:9px;height:9px;color:var(--text3)"><polyline points="20 6 9 17 4 12"/></svg></div><div class="todo-body"><div class="todo-text">${escHtml(t.text)}</div><div class="todo-meta"><span class="due-tag">${fmtDate(t.completedAt)}</span></div></div><button onclick="moveTodoToTrash(${t.id})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:.75rem;padding:2px 4px;" onmouseover="this.style.color='var(--hard)'" onmouseout="this.style.color='var(--text3)'">\ud83d\uddd1</button></div>`;});
+ch+='</div>';}
+document.getElementById('todo-completed-section').innerHTML=ch;
+return;
+}
 const cols=[
 {key:'easy',lbl:'Kolay',clr:'var(--easy)',ico:'\ud83d\udfe2'},
 {key:'mid',lbl:'Orta',clr:'var(--mid)',ico:'\ud83d\udfe1'},
