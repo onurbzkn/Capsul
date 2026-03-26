@@ -1255,18 +1255,26 @@ el.innerHTML=`
 </div>
 <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px;">
 <div style="font-size:.6rem;letter-spacing:.15em;font-family:'JetBrains Mono',monospace;color:var(--text3);text-transform:uppercase;margin-bottom:10px;">Son 30 Gün Aktivitesi</div>
-<div style="display:flex;align-items:flex-end;gap:2px;height:40px;">
-${last30.map((v,i)=>{const h=Math.max(3,Math.round((v/maxDay)*38));const alpha=v===0?0.08:0.2+((v/maxDay)*0.8);const isToday=i===29;return`<div style="flex:1;height:${h}px;background:${isToday?'var(--accent)':`rgba(124,111,247,${alpha})`};border-radius:2px;" title="${v} görev"></div>`;}).join('')}
-</div>
+<svg viewBox="0 0 300 60" style="width:100%;height:60px;">
+${last30.map((v,i)=>{const x=i*(300/29);const y=60-Math.max(2,(v/maxDay)*55);return i===0?`<path d="M${x},${y}`:`L${x},${y}`;}).join(' ')+`" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`}
+${last30.map((v,i)=>{const x=i*(300/29);const y=60-Math.max(2,(v/maxDay)*55);return i===0?`<path d="M${x},${y}`:`L${x},${y}`;}).join(' ')+` L${29*(300/29)},60 L0,60 Z" fill="url(#grad)" opacity=".3"/>`}
+<defs><linearGradient id="grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs>
+${last30[29]>0?`<circle cx="${29*(300/29)}" cy="${60-Math.max(2,(last30[29]/maxDay)*55)}" r="3" fill="var(--accent)"/>`:''}
+</svg>
 <div style="display:flex;justify-content:space-between;margin-top:4px;">
 <span style="font-size:.48rem;font-family:'JetBrains Mono',monospace;color:var(--text3);">30 gün önce</span>
-<span style="font-size:.48rem;font-family:'JetBrains Mono',monospace;color:var(--accent2);">Bugün</span>
+<span style="font-size:.48rem;font-family:'JetBrains Mono',monospace;color:var(--accent2);">Bugün · ${last30[29]} görev</span>
 </div>
 </div>
 <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px;">
 <div style="font-size:.6rem;letter-spacing:.15em;font-family:'JetBrains Mono',monospace;color:var(--text3);text-transform:uppercase;margin-bottom:10px;">Öncelik Dağılımı</div>
-<div style="display:flex;flex-direction:column;gap:6px;">
-${[{k:'easy',lbl:'Kolay',clr:'var(--easy)'},{k:'mid',lbl:'Orta',clr:'var(--mid)'},{k:'hard',lbl:'Zor',clr:'var(--hard)'}].map(p=>{const tot=completedTotal||1;return`<div style="display:flex;align-items:center;gap:8px;"><div style="font-size:.66rem;color:var(--text3);width:36px;">${p.lbl}</div><div style="flex:1;background:var(--bg3);border-radius:4px;height:7px;overflow:hidden;"><div style="height:100%;width:${(prioCount[p.k]/tot*100).toFixed(0)}%;background:${p.clr};border-radius:4px;transition:width .5s;"></div></div><div style="font-size:.62rem;font-family:'JetBrains Mono',monospace;color:${p.clr};width:24px;text-align:right;">${prioCount[p.k]}</div></div>`;}).join('')}
+<div style="display:flex;align-items:center;gap:16px;">
+<div style="flex-shrink:0;">
+${(function(){const tot=completedTotal||1;const eP=prioCount.easy/tot*100;const mP=prioCount.mid/tot*100;const hP=prioCount.hard/tot*100;const r=40;const c=2*Math.PI*r;const eD=eP/100*c;const mD=mP/100*c;const hD=hP/100*c;return '<svg viewBox="0 0 100 100" style="width:80px;height:80px;transform:rotate(-90deg);"><circle cx="50" cy="50" r="'+r+'" fill="none" stroke="var(--bg3)" stroke-width="10"/><circle cx="50" cy="50" r="'+r+'" fill="none" stroke="var(--easy)" stroke-width="10" stroke-dasharray="'+eD+' '+(c-eD)+'" stroke-dashoffset="0" stroke-linecap="round"/><circle cx="50" cy="50" r="'+r+'" fill="none" stroke="var(--mid)" stroke-width="10" stroke-dasharray="'+mD+' '+(c-mD)+'" stroke-dashoffset="-'+eD+'" stroke-linecap="round"/><circle cx="50" cy="50" r="'+r+'" fill="none" stroke="var(--hard)" stroke-width="10" stroke-dasharray="'+hD+' '+(c-hD)+'" stroke-dashoffset="-'+(eD+mD)+'" stroke-linecap="round"/></svg>';})()}
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;">
+${[{k:'easy',lbl:'Kolay',clr:'var(--easy)'},{k:'mid',lbl:'Orta',clr:'var(--mid)'},{k:'hard',lbl:'Zor',clr:'var(--hard)'}].map(p=>{const tot=completedTotal||1;const pct=(prioCount[p.k]/tot*100).toFixed(0);return`<div style="display:flex;align-items:center;gap:8px;"><div style="width:10px;height:10px;border-radius:3px;background:${p.clr};flex-shrink:0;"></div><div style="font-size:.72rem;color:var(--text2);flex:1;">${p.lbl}</div><div style="font-size:.72rem;font-family:'JetBrains Mono',monospace;color:${p.clr};font-weight:500;">${prioCount[p.k]}</div><div style="font-size:.52rem;color:var(--text3);">${pct}%</div></div>`;}).join('')}
+</div>
 </div>
 </div>
 <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px;">
@@ -1280,6 +1288,12 @@ ${[
 {lbl:'⚡ En Verimli Gün',val:bestDay},
 {lbl:'\ud83d\udcca Bu Hafta',val:completedThisWeek+' görev'},
 ].map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:.74rem;color:var(--text2);">${r.lbl}</span><span style="font-size:.76rem;font-family:'JetBrains Mono',monospace;color:var(--accent2);">${r.val}</span></div>`).join('')}
+</div>
+</div>
+<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px;">
+<div style="font-size:.6rem;letter-spacing:.15em;font-family:'JetBrains Mono',monospace;color:var(--text3);text-transform:uppercase;margin-bottom:10px;">Haftalık Aktivite Dağılımı</div>
+<div style="display:flex;align-items:flex-end;gap:6px;height:60px;padding:0 4px;">
+${['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'].map((d,i)=>{const di=[1,2,3,4,5,6,0][i];const v=dayTotals[di];const maxDT=Math.max(...dayTotals,1);const h=Math.max(4,Math.round((v/maxDT)*50));const isB=dayTotals.indexOf(Math.max(...dayTotals))===di;return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;"><div style="font-size:.48rem;font-family:JetBrains Mono,monospace;color:${isB?'var(--accent2)':'var(--text3)'};">${v}</div><div style="width:100%;height:${h}px;background:${isB?'var(--accent)':'var(--border2)'};border-radius:4px 4px 0 0;transition:height .4s;"></div><div style="font-size:.46rem;color:${isB?'var(--accent2)':'var(--text3)'};">${d}</div></div>`;}).join('')}
 </div>
 </div>
 ${booksReading.length?`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px;">
