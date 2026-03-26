@@ -118,8 +118,14 @@ Tarih Seç
 <div id="quickNoteMediaPreview" style="margin-top:8px;"></div>
 </div>
 </div>
+<div style="margin-bottom:14px;">
+<button onclick="openTemplates()" style="width:100%;padding:12px;background:linear-gradient(135deg,rgba(96,165,250,.08),rgba(96,165,250,.03));border:1px dashed rgba(96,165,250,.3);border-radius:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Sora',sans-serif;font-size:.82rem;color:var(--note);transition:all .2s;" onmouseover="this.style.background='rgba(96,165,250,.12)';this.style.borderStyle='solid'" onmouseout="this.style.background='linear-gradient(135deg,rgba(96,165,250,.08),rgba(96,165,250,.03))';this.style.borderStyle='dashed'">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+Şablondan Not Oluştur
+</button>
+</div>
 <div class="notes-grid" id="notes-grid"></div>
-<div class="empty-state" id="notes-empty" style="display:none">Henüz not yok.<br>Sağ alttaki + ile başla.</div>
+<div class="empty-state" id="notes-empty" style="display:none">Henüz not yok.<br>Yukarıdaki + ile başla.</div>
 </div>
 <!-- DIARY -->
 <div class="page" id="page-diary">
