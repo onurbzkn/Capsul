@@ -40,6 +40,62 @@ _gdriveTokenClient.requestAccessToken({prompt:'consent'});
 });
 }
 
+function _mergeArrayById(existing,incoming){
+var ids=new Set(existing.map(function(x){return x.id;}));
+incoming.forEach(function(item){if(!ids.has(item.id)){existing.push(item);ids.add(item.id);}});
+return existing;
+}
+function _gdriveDoMerge(imported){
+var profile=D.profile;
+// Array alanlarını birleştir (ID'ye göre, duplicate olmaz)
+D.todos=_mergeArrayById(D.todos,imported.todos||[]);
+D.completedTodos=_mergeArrayById(D.completedTodos,imported.completedTodos||[]);
+D.notes=_mergeArrayById(D.notes,imported.notes||[]);
+D.diary=_mergeArrayById(D.diary,imported.diary||[]);
+D.reading=_mergeArrayById(D.reading,imported.reading||[]);
+D.schedule=_mergeArrayById(D.schedule,imported.schedule||[]);
+D.exams=_mergeArrayById(D.exams,imported.exams||[]);
+D.notebook=_mergeArrayById(D.notebook,imported.notebook||[]);
+D.habits=_mergeArrayById(D.habits||[],imported.habits||[]);
+D.timeCapsules=_mergeArrayById(D.timeCapsules||[],imported.timeCapsules||[]);
+D.trash=_mergeArrayById(D.trash||[],imported.trash||[]);
+D.contentTrash=_mergeArrayById(D.contentTrash||[],imported.contentTrash||[]);
+// Kanban birleştir
+if(imported.kanban){
+['todo','doing','done'].forEach(function(col){
+D.kanban[col]=_mergeArrayById(D.kanban[col]||[],imported.kanban[col]||[]);
+});
+}
+// calPlans birleştir
+if(imported.calPlans){
+Object.keys(imported.calPlans).forEach(function(k){
+if(!D.calPlans[k])D.calPlans[k]=[];
+D.calPlans[k]=D.calPlans[k].concat(imported.calPlans[k]||[]);
+});
+}
+D.profile=profile;
+saveData();
+renderTodos();renderNotes();renderDiary();renderDashboard();renderKanban();renderReading();updTrashBadge();updateReminderBadge();
+_updateGdriveUI('connected','Birleştirme tamamlandı ✓');
+showToast('Veriler birleştirildi ✓');
+}
+function _gdriveDoOverwrite(imported){
+var profile=D.profile;
+Object.assign(D,imported);
+D.profile=profile;
+if(!D.calPlans)D.calPlans={};
+if(!D.kanban)D.kanban={todo:[],doing:[],done:[]};
+if(!D.reading)D.reading=[];
+if(!D.completedTodos)D.completedTodos=[];
+if(!D.trash)D.trash=[];
+if(!D.contentTrash)D.contentTrash=[];
+if(!D.habits)D.habits=[];
+if(!D.timeCapsules)D.timeCapsules=[];
+saveData();
+renderTodos();renderNotes();renderDiary();renderDashboard();renderKanban();renderReading();updTrashBadge();updateReminderBadge();
+_updateGdriveUI('connected','Üzerine yazma tamamlandı ✓');
+showToast('Yedek üzerine yazıldı ✓');
+}
 function _updateGdriveUI(state,msg){
 var statusEl=document.getElementById('gdriveStatus');
 var lastSync=document.getElementById('gdriveLastSync');
@@ -120,24 +176,31 @@ headers:{'Authorization':'Bearer '+token}
 });
 var raw=await res.json();
 var backupDate=raw.meta?new Date(raw.meta.exportedAt).toLocaleString('tr-TR'):'Bilinmiyor';
-showConfirm('Drive\'dan geri yüklenecek.\\nYedek tarihi: '+backupDate+'\\nMevcut veriler silinecek. Emin misin?',function(){
 var imported=raw.data||raw;
-var profile=D.profile;
-Object.assign(D,imported);
-D.profile=profile;
-if(!D.calPlans)D.calPlans={};
-if(!D.kanban)D.kanban={todo:[],doing:[],done:[]};
-if(!D.reading)D.reading=[];
-if(!D.completedTodos)D.completedTodos=[];
-if(!D.trash)D.trash=[];
-if(!D.contentTrash)D.contentTrash=[];
-if(!D.habits)D.habits=[];
-if(!D.timeCapsules)D.timeCapsules=[];
-saveData();
-renderTodos();renderNotes();renderDiary();renderDashboard();renderKanban();renderReading();updTrashBadge();updateReminderBadge();
-_updateGdriveUI('connected','Geri yükleme tamamlandı ✓');
-showToast('Drive\'dan geri yüklendi ✓');
-});
+// Özel restore modal: Birleştir veya Üzerine Yaz
+var rModal=document.createElement('div');
+rModal.id='gdriveRestoreModal';
+rModal.style.cssText='position:fixed;inset:0;z-index:3600;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+rModal.innerHTML='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:340px;text-align:center;">'
++'<div style="font-size:1.5rem;margin-bottom:10px;">☁️</div>'
++'<div style="font-size:.88rem;font-weight:500;color:var(--text);margin-bottom:6px;">Drive Yedeği Bulundu</div>'
++'<div style="font-size:.68rem;color:var(--text3);margin-bottom:16px;line-height:1.6;">Yedek tarihi: '+backupDate+'</div>'
++'<div style="display:flex;flex-direction:column;gap:8px;">'
++'<button id="gdrMerge" style="padding:12px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:10px;color:#fff;font-family:Sora,sans-serif;font-size:.82rem;cursor:pointer;"><div style="font-weight:500;">Birleştir</div><div style="font-size:.6rem;opacity:.7;margin-top:2px;">Mevcut veriler korunur + yedektekiler eklenir</div></button>'
++'<button id="gdrOverwrite" style="padding:12px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);border-radius:10px;color:var(--hard);font-family:Sora,sans-serif;font-size:.82rem;cursor:pointer;"><div style="font-weight:500;">Üzerine Yaz</div><div style="font-size:.6rem;opacity:.7;margin-top:2px;">Mevcut veriler silinir, sadece yedek yüklenir</div></button>'
++'<button id="gdrCancel" style="padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text3);font-family:Sora,sans-serif;font-size:.78rem;cursor:pointer;">Vazgeç</button>'
++'</div></div>';
+document.body.appendChild(rModal);
+rModal.addEventListener('click',function(e){if(e.target===rModal)rModal.remove();});
+document.getElementById('gdrCancel').onclick=function(){rModal.remove();};
+document.getElementById('gdrMerge').onclick=function(){
+rModal.remove();
+_gdriveDoMerge(imported);
+};
+document.getElementById('gdrOverwrite').onclick=function(){
+rModal.remove();
+_gdriveDoOverwrite(imported);
+};
 _updateGdriveUI('connected','Google hesabına bağlı');
 }catch(err){
 console.error('GDrive restore error:',err);
