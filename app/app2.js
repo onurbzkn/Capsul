@@ -1541,6 +1541,7 @@ saveData();
 }
 runSplash(function(){
 initApp();
+if(localStorage.getItem('capsula_pin')){showPinScreen();}
 });
 };
 if ('serviceWorker' in navigator) {
@@ -1712,26 +1713,63 @@ el.addEventListener('click',function(){var eid=parseInt(el.dataset.eid);closePro
 });
 } else {
 var streak=calcStreak(),booksRead=D.reading.filter(function(r){return r.status==='done';}).length,todoDone=D.completedTodos.length;
+var totalNotes=D.notes.length,totalDiary=D.diary.length,totalHabits=(D.habits||[]).length;
+var kanbanDone=(D.kanban.done||[]).length,schedCount=(D.schedule||[]).length;
+var capsuleCount=(D.timeCapsules||[]).filter(function(c){return c.opened;}).length;
 var ach=[
-{icon:'🔥',title:'Seri Ustası',desc:streak+' gün',unlocked:streak>=3,color:'var(--hard)'},
-{icon:'📚',title:'Kitap Kurdu',desc:booksRead+' kitap',unlocked:booksRead>=1,color:'var(--note)'},
-{icon:'✅',title:'Üretken',desc:todoDone+' görev',unlocked:todoDone>=10,color:'var(--easy)'},
-{icon:'✍️',title:'Günlükçü',desc:D.diary.length+' giriş',unlocked:D.diary.length>=5,color:'var(--diary)'},
-{icon:'📝',title:'Not Ustası',desc:D.notes.length+' not',unlocked:D.notes.length>=10,color:'var(--accent2)'},
-{icon:'🍅',title:'Odak Şamp.',desc:'Pomodoro',unlocked:parseInt(localStorage.getItem('capsula_pomo_total')||'0')>=5,color:'var(--mid)'},
+{icon:'🔥',title:'İlk Kıvılcım',desc:streak+'/1 gün',unlocked:streak>=1,color:'var(--mid)',how:'1 gün aktif ol'},
+{icon:'🔥',title:'Seri Ustası',desc:streak+'/3 gün',unlocked:streak>=3,color:'var(--mid)',how:'3 gün arka arkaya aktif ol'},
+{icon:'🔥',title:'Alev Topu',desc:streak+'/7 gün',unlocked:streak>=7,color:'var(--hard)',how:'7 gün arka arkaya aktif ol'},
+{icon:'🔥',title:'Durdurulamaz',desc:streak+'/30 gün',unlocked:streak>=30,color:'var(--hard)',how:'30 gün arka arkaya aktif ol'},
+{icon:'✅',title:'İlk Adım',desc:todoDone+'/1 görev',unlocked:todoDone>=1,color:'var(--easy)',how:'1 görev tamamla'},
+{icon:'✅',title:'Üretken',desc:todoDone+'/10 görev',unlocked:todoDone>=10,color:'var(--easy)',how:'10 görev tamamla'},
+{icon:'✅',title:'Görev Makinesi',desc:todoDone+'/50 görev',unlocked:todoDone>=50,color:'var(--easy)',how:'50 görev tamamla'},
+{icon:'✅',title:'Yüzlerce',desc:todoDone+'/100 görev',unlocked:todoDone>=100,color:'var(--easy)',how:'100 görev tamamla'},
+{icon:'📝',title:'İlk Not',desc:totalNotes+'/1 not',unlocked:totalNotes>=1,color:'var(--accent2)',how:'1 not yaz'},
+{icon:'📝',title:'Not Ustası',desc:totalNotes+'/10 not',unlocked:totalNotes>=10,color:'var(--accent2)',how:'10 not yaz'},
+{icon:'📝',title:'Ansiklopedist',desc:totalNotes+'/50 not',unlocked:totalNotes>=50,color:'var(--accent2)',how:'50 not yaz'},
+{icon:'✍️',title:'Günlükçü',desc:totalDiary+'/5 giriş',unlocked:totalDiary>=5,color:'var(--diary)',how:'5 günlük girişi yaz'},
+{icon:'✍️',title:'Yansıtıcı',desc:totalDiary+'/20 giriş',unlocked:totalDiary>=20,color:'var(--diary)',how:'20 günlük girişi yaz'},
+{icon:'✍️',title:'İç Ses',desc:totalDiary+'/50 giriş',unlocked:totalDiary>=50,color:'var(--diary)',how:'50 günlük girişi yaz'},
+{icon:'📚',title:'İlk Kitap',desc:booksRead+'/1 kitap',unlocked:booksRead>=1,color:'var(--note)',how:'1 kitap/makale bitir'},
+{icon:'📚',title:'Kitap Kurdu',desc:booksRead+'/5 kitap',unlocked:booksRead>=5,color:'var(--note)',how:'5 kitap/makale bitir'},
+{icon:'📚',title:'Kütüphaneci',desc:booksRead+'/15 kitap',unlocked:booksRead>=15,color:'var(--note)',how:'15 kitap/makale bitir'},
+{icon:'🍅',title:'Odaklanıcı',desc:'Pomodoro',unlocked:parseInt(localStorage.getItem('capsula_pomo_total')||'0')>=5,color:'var(--mid)',how:'5 pomodoro seansı tamamla'},
+{icon:'🍅',title:'Derin Odak',desc:'Pomodoro',unlocked:parseInt(localStorage.getItem('capsula_pomo_total')||'0')>=25,color:'var(--mid)',how:'25 pomodoro seansı tamamla'},
+{icon:'💪',title:'Alışkanlık',desc:totalHabits+'/1',unlocked:totalHabits>=1,color:'var(--accent)',how:'1 alışkanlık oluştur'},
+{icon:'💪',title:'Disiplinli',desc:totalHabits+'/3',unlocked:totalHabits>=3,color:'var(--accent)',how:'3 alışkanlık oluştur'},
+{icon:'📊',title:'Kanban Pro',desc:kanbanDone+'/5 kart',unlocked:kanbanDone>=5,color:'var(--accent2)',how:"5 kanban kartını 'Tamamlandı'ya taşı"},
+{icon:'⏳',title:'Zaman Yolcusu',desc:capsuleCount+'/1',unlocked:capsuleCount>=1,color:'var(--diary)',how:'1 zaman kapsülü aç'},
+{icon:'🎨',title:'Kişiselleştirici',desc:'Tema',unlocked:(D.profile.theme||'default')!=='default',color:'var(--accent)',how:'Varsayılan dışında bir tema seç'},
+{icon:'🔒',title:'Güvenlikçi',desc:'PIN',unlocked:!!localStorage.getItem('capsula_pin'),color:'var(--hard)',how:'PIN kilidi ayarla'},
 ];
 var html3='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">';
-ach.forEach(function(a){
+ach.forEach(function(a,idx){
 var bg=a.unlocked?a.color+'12':'var(--bg2)';
 var bdr=a.unlocked?a.color+'30':'var(--border)';
-html3+='<div style="background:'+bg+';border:1px solid '+bdr+';border-radius:14px;padding:14px 8px;text-align:center;opacity:'+(a.unlocked?'1':'.35')+';transition:all .3s;">'
-+'<div style="font-size:1.6rem;margin-bottom:6px;filter:'+(a.unlocked?'none':'grayscale(1)')+';">'+a.icon+'</div>'
-+'<div style="font-size:.68rem;font-weight:500;color:var(--text);">'+a.title+'</div>'
-+'<div style="font-size:.52rem;color:'+(a.unlocked?a.color:'var(--text3)')+';margin-top:3px;font-family:JetBrains Mono,monospace;">'+a.desc+'</div>'
+html3+='<div onclick="showAchDetail('+idx+')" style="background:'+bg+';border:1px solid '+bdr+';border-radius:14px;padding:14px 8px;text-align:center;opacity:'+(a.unlocked?'1':'.35')+';transition:all .3s;cursor:pointer;">'
++'<div style="font-size:1.4rem;margin-bottom:4px;filter:'+(a.unlocked?'none':'grayscale(1)')+';">'+a.icon+'</div>'
++'<div style="font-size:.64rem;font-weight:500;color:var(--text);">'+a.title+'</div>'
++'<div style="font-size:.48rem;color:'+(a.unlocked?a.color:'var(--text3)')+';margin-top:2px;font-family:JetBrains Mono,monospace;">'+a.desc+'</div>'
 +'</div>';
 });
 cont.innerHTML=html3+'</div>';
+window._achList=ach;
 }
+}
+function showAchDetail(idx){
+var a=window._achList&&window._achList[idx];if(!a)return;
+var m=document.createElement('div');m.style.cssText='position:fixed;inset:0;z-index:3600;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+m.innerHTML='<div style="background:var(--bg2);border:1px solid '+(a.unlocked?a.color+'40':'var(--border)')+';border-radius:18px;padding:28px 24px;text-align:center;width:min(300px,90vw);">'
++'<div style="font-size:2.5rem;margin-bottom:10px;filter:'+(a.unlocked?'none':'grayscale(1)')+';">'+a.icon+'</div>'
++'<div style="font-size:1rem;font-weight:600;color:var(--text);margin-bottom:4px;">'+a.title+'</div>'
++'<div style="font-size:.72rem;font-family:JetBrains Mono,monospace;color:'+(a.unlocked?a.color:'var(--text3)')+';margin-bottom:12px;">'+a.desc+'</div>'
++'<div style="font-size:.78rem;color:var(--text2);line-height:1.6;margin-bottom:6px;">'+(a.unlocked?'<span style="color:var(--easy);">✓ Kazanıldı!</span>':'<span style="color:var(--text3);">🔒 Kilitli</span>')+'</div>'
++'<div style="font-size:.74rem;color:var(--text3);background:var(--bg3);border-radius:8px;padding:10px;margin-bottom:16px;">💡 '+a.how+'</div>'
++'<button onclick="this.closest(\'div[style]\').parentElement.remove()" style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:8px 20px;cursor:pointer;font-family:Sora,sans-serif;font-size:.78rem;color:var(--text2);">Kapat</button>'
++'</div>';
+document.body.appendChild(m);
+m.addEventListener('click',function(e){if(e.target===m)m.remove();});
 }
 function openProfileEditSheet(){
 var p=D.profile;
@@ -2211,7 +2249,7 @@ return '<div class="diary-entry" data-eid="' + e.id + '" style="position:relativ
 + '<div class="diary-entry-header"><span class="diary-entry-date">' + fmtDateFull(e.createdAt) + '</span><span class="diary-mood-icon">' + (e.mood || '😊') + '</span></div>'
 + '<div class="diary-entry-title">' + escHtml(e.title || 'Günlük Girişi') + '</div>'
 + '<div class="diary-entry-preview">' + escHtml(e.content || '') + '</div>'
-+ '<button data-seal="' + e.id + '" data-type="diary" style="position:absolute;top:10px;right:12px;background:none;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.7rem;color:var(--text3);padding:3px 7px;opacity:0;transition:opacity .18s;" class="seal-btn">🔓</button>'
++ '<button data-edit-diary="' + e.id + '" style="position:absolute;top:10px;right:12px;background:none;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.58rem;color:var(--text3);padding:3px 7px;opacity:0;transition:opacity .18s;" class="seal-btn">✏️</button>'
 + '</div>';
 }).join('');
 list.querySelectorAll('.diary-entry').forEach(function(card) {
@@ -2224,14 +2262,14 @@ card.addEventListener('mouseenter', function() { sealBtn.style.opacity = '1'; })
 card.addEventListener('mouseleave', function() { sealBtn.style.opacity = '0'; });
 card.addEventListener('touchstart', function() { sealBtn.style.opacity = '1'; }, {passive:true});
 }
-card.querySelectorAll('[data-seal]').forEach(function(btn) {
+card.querySelectorAll('[data-edit-diary]').forEach(function(btn) {
 btn.addEventListener('click', function(ev) {
 ev.stopPropagation();
-sealEntry('diary', eid);
+openDiaryEdit(eid);
 });
 });
 card.addEventListener('click', function(ev) {
-if (ev.target.closest('[data-seal]')) return;
+if (ev.target.closest('[data-edit-diary]')) return;
 if (e.sealed) {
 viewSealedEntry('diary', eid);
 } else {

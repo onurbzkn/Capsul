@@ -325,8 +325,129 @@ else if(t==='settings')openSettingsPage();
 else if(t==='trash')openTrash();
 else if(t==='privacy')openModal('privacyModal');
 else if(t==='terms')showInfoModal('Kullanım Koşulları','Bu uygulama kişisel kullanım için tasarlanmıştır. Verilerinizi düzenli yedeklemeniz önerilir.');
-else if(t==='help')showInfoModal('Yardım','Üstte mod değiştirici: Profesyonel / Ana Ekran / Öğrenci. Her mod farklı araçlar gösterir. Silinen içerikler 30 gün çöpte kalır. Tema değişikliği Ayarlardan yapılır.');
+else if(t==='help')openHelpPage();
 },300);}
+function openHelpPage(){
+document.getElementById('helpPageModal')?.remove();
+var m=document.createElement('div');m.id='helpPageModal';
+m.style.cssText='position:fixed;inset:0;z-index:3500;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:12px;';
+m.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:18px;width:100%;max-width:440px;max-height:90vh;overflow-y:auto;position:relative;">
+<div style="position:sticky;top:0;background:var(--bg2);padding:18px 20px 12px;border-bottom:1px solid var(--border);z-index:1;display:flex;align-items:center;justify-content:space-between;">
+<div style="font-size:.94rem;font-weight:600;color:var(--text);">📖 Capsula Rehberi</div>
+<button onclick="document.getElementById('helpPageModal').remove()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:1.1rem;">✕</button>
+</div>
+<div style="padding:16px 20px 24px;font-size:.76rem;color:var(--text2);line-height:1.8;">
+
+<div style="font-size:.84rem;font-weight:500;color:var(--text);margin:16px 0 8px;">📋 Görevler</div>
+• Görev ekle: metin yaz + öncelik seç (Kolay/Orta/Zor) + tarih/saat belirle<br>
+• Tekrarlayan görevler: günlük, haftalık veya aylık tekrar ayarla<br>
+• Tamamla: görevin solundaki daireye tıkla<br>
+• Düzenle: görev kartına veya ✏️ ikonuna tıkla<br>
+• Sürükle-bırak: görevleri yeniden sırala<br>
+• Tamamlananlar bölümü: altta gizli, tıkla aç<br>
+
+<div style="font-size:.84rem;font-weight:500;color:var(--text);margin:16px 0 8px;">📝 Notlar</div>
+• Sağ alttaki + butonu ile şablon seç veya boş not oluştur<br>
+• 7 şablon: Toplantı, Kitap Özeti, Günlük Plan, Fikir, Seyahat, Hedef, Ders Notu<br>
+• Hızlı Not: üstteki alana yaz, fotoğraf/video/ses ekle<br>
+• Etiketleme: notlara #etiket ekle, renkli gösterilir<br>
+• Mühürleme: 🔒 ikonuyla notu PIN ile kilitle<br>
+• Düzenle: not kartına tıkla → Düzenle<br>
+
+<div style="font-size:.84rem;font-weight:500;color:var(--text);margin:16px 0 8px;">📖 Günlük</div>
+• "Yeni Günlük Girişi" butonuyla günlük yaz<br>
+• Ruh hali seç: 😊😔😤😌🤔💫🌧🔥<br>
+• Tarih seçebilirsin (geçmiş güne de yazılabilir)<br>
+• Fotoğraf, video, ses eklenebilir<br>
+• Düzenle butonu ile ruh hali, başlık, içerik değiştir<br>
+• Mühürleme: PIN ile kilitlenebilir<br>
+• Her gün farklı ilham sorusu gösterilir<br>
+
+<div style="font-size:.84rem;font-weight:500;color:var(--text);margin:16px 0 8px;">🍅 Pomodoro</div>
+• Çalışma/Kısa Mola/Uzun Mola süreleri ayarlanabilir<br>
+• 5 saat stili: Halka, Dijital, Analog, Flip, Minimal<br>
+• Görev bağlama: alttaki listeden bir görev seçerek odaklan<br>
+• Süre bitince bildirim gelir<br>
+• Seans sayacı: 4 seansta bir uzun mola<br>
+
+<div style="font-size:.84rem;font-weight:500;color:var(--text);margin:16px 0 8px;">📊 Kanban</div>
+• 3 sütun: Yapılacak → Devam Eden → Tamamlandı<br>
+• Kart ekle veya görevlerden aktar<br>
+• Kartları sütunlar arası taşı (Geri/İleri butonları)<br>
+• Tamamlananlar 30 gün sonra otomatik silinir (Ayarlardan kapatılabilir)<br>
+
+<div style="font-size:.84rem;font-weight:500;color:var(--text);margin:16px 0 8px;">💪 Alışkanlık Takipçisi</div>
+• Drawer menüden "Alışkanlıklar"a gir<br>
+• Alışkanlık ekle: isim + 16 ikon + frekans (günlük/hafta içi/3x)<br>
+• Haftalık grid: 7 günlük tablo, bugün vurgulu<br>
+• Tek tıkla tamamla (yeşil ✓)<br>
+• Streak takibi: ardışık gün sayacı<br>
+
+<div style="font-size:.84rem;font-weight:500;color:var(--text);margin:16px 0 8px;">📚 Okuma Listesi</div>
+• Kitap/Makale/Akademik/Diğer türünde ekle<br>
+• Durum: Okunacak → Okunuyor → Tamamlandı<br>
+• Sayfa takibi: okunan sayfayı güncelle, ilerleme çubuğu<br>
+• AI tahmini: bu hızda ne zaman bitersin hesaplar<br>
+• Bitiş hedefi tarihi belirle<br>
+
+<div style="font-size:.84rem;font-weight:500;color:var(--text);margin:16px 0 8px;">📅 Ders Programı</div>
+• Ders ekle: isim, dershane/link, başlangıç-bitiş saati, günler, renk<br>
+• Haftalık veya sabit program modu (Ayarlardan değiştir)<br>
+• Hafta navigasyonu: önceki/sonraki hafta<br>
+• Zoom/Meet linki eklenebilir<br>
+
+<div style="font-size:.84rem;font-weight:500;color:var(--text);margin:16px 0 8px;">📝 Sınav Takvimi</div>
+• Sınav/Ödev/Proje ekle + tarih + saat<br>
+• Geri sayım: kaç gün kaldı gösterir<br>
+• Yaklaşan ve geçmiş sınavlar ayrı listelenir<br>
+
+<div style="font-size:.84rem;font-weight:500;color:var(--text);margin:16px 0 8px;">⏳ Zaman Kapsülü</div>
+• Gelecekteki kendine mesaj yaz<br>
+• Açılış tarihi seç: 3 ay, 6 ay, 1-5 yıl<br>
+• Tarih gelene kadar kilitli kalır<br>
+• Açıldığında özel animasyon<br>
+
+<div style="font-size:.84rem;font-weight:500;color:var(--text);margin:16px 0 8px;">👤 Profil</div>
+• Avatar: 20 sistem avatarı veya kendi fotoğrafın<br>
+• Biyografi, motto, unvan, kişisel renk<br>
+• 5 profil düzeni: Klasik, Kart, Minimal, Hero, Terminal<br>
+• Profil kartı: ekran görüntüsü alarak paylaş<br>
+• Başarılar: streak, kitap, görev, günlük rozetleri<br>
+
+<div style="font-size:.84rem;font-weight:500;color:var(--text);margin:16px 0 8px;">⚙️ Ayarlar</div>
+• 8 tema: 6 koyu + 2 açık (Aydınlık, Sıcak Aydınlık)<br>
+• Dil: Türkçe / English<br>
+• PIN kilidi: 4 haneli PIN ile uygulama kilitle<br>
+• Pomodoro saat stili seç<br>
+• Profil düzeni seç<br>
+• Kanban/Okuma otomatik silme ayarları<br>
+
+<div style="font-size:.84rem;font-weight:500;color:var(--text);margin:16px 0 8px;">☁️ Yedekleme</div>
+• JSON yedek indir / yükle<br>
+• Okunabilir metin (.txt) olarak dışa aktar<br>
+• Google Drive'a yedekle / geri yükle<br>
+• Birleştir veya Üzerine Yaz seçenekleri<br>
+
+<div style="font-size:.84rem;font-weight:500;color:var(--text);margin:16px 0 8px;">🔒 Gizlilik & Güvenlik</div>
+• Tüm veriler cihazında saklanır (sunucu yok)<br>
+• AES-256-GCM şifreleme<br>
+• PIN koruması<br>
+• Not/Günlük mühürleme<br>
+• Hiçbir veri toplanmaz, reklam yok<br>
+
+<div style="font-size:.84rem;font-weight:500;color:var(--text);margin:16px 0 8px;">🔍 Akıllı Arama</div>
+• Tüm içeriklerde ara: not, görev, günlük, kanban, kitap, ders<br>
+• Bulunan sonuçlara tıklayarak doğrudan git<br>
+
+<div style="margin-top:20px;padding-top:14px;border-top:1px solid var(--border);text-align:center;">
+<div style="font-size:.68rem;color:var(--text3);margin-bottom:8px;">Sorun mu yaşıyorsun?</div>
+<button onclick="document.getElementById('helpPageModal').remove();setTimeout(openContactModal,300)" style="background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:9px;padding:9px 20px;cursor:pointer;color:#fff;font-size:.76rem;font-family:'Sora',sans-serif;">✉️ Bize Ulaşın</button>
+</div>
+</div>
+</div>`;
+document.body.appendChild(m);
+m.addEventListener('click',function(e){if(e.target===m)m.remove();});
+}
 function showInfoModal(t,b){document.getElementById('infoModalTitle').textContent=t;document.getElementById('infoModalBody').textContent=b;openModal('infoModal');}
 function updateWordCount(){
 const el=document.getElementById('editorContent');
@@ -805,6 +926,7 @@ modal.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border
 <textarea id="deContent" rows="6" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:'Sora',sans-serif;font-size:.82rem;color:var(--text);outline:none;resize:none;margin-bottom:14px;box-sizing:border-box;line-height:1.6;">${escHtml(e.content||'')}</textarea>
 <div style="display:flex;gap:8px;">
 <button onclick="saveDiaryEdit(${id})" style="flex:1;padding:11px;background:linear-gradient(135deg,var(--diary),rgba(244,114,182,.8));border:none;border-radius:10px;color:#fff;font-family:'Sora',sans-serif;font-size:.84rem;cursor:pointer;">Kaydet</button>
+<button onclick="document.getElementById('diaryEditModal')?.remove();sealEntry('diary',${id})" style="padding:11px 14px;background:rgba(124,111,247,.1);border:1px solid rgba(124,111,247,.25);border-radius:10px;color:var(--accent2);font-family:'Sora',sans-serif;font-size:.84rem;cursor:pointer;">${e.sealed?'🔓 Aç':'🔒 Kilitle'}</button>
 <button onclick="deleteDiaryConfirm(${id})" style="padding:11px 14px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);border-radius:10px;color:var(--hard);font-family:'Sora',sans-serif;font-size:.84rem;cursor:pointer;">Sil</button>
 </div>
 </div>`;
