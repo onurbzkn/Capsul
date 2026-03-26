@@ -7,7 +7,7 @@
 //   • formspree.io (iletişim formu) → Network Only (offline'da sessizce hata ver)
 // ─────────────────────────────────────────────────────────────────────────────
 
-const CACHE_VERSION = 'capsula-v3';
+const CACHE_VERSION = 'capsula-v4';
 
 // İlk yüklemede cache'e alınacak app shell dosyaları
 const APP_SHELL = [
@@ -47,6 +47,12 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const { request } = event;
   const url = new URL(request.url);
+
+  // Google APIs ve formspree → her zaman network
+  if (url.hostname === 'accounts.google.com' || url.hostname === 'www.googleapis.com' || url.hostname === 'oauth2.googleapis.com') {
+    event.respondWith(fetch(request));
+    return;
+  }
 
   // formspree.io → her zaman network, offline'da sessizce başarısız
   if (url.hostname === 'formspree.io') {

@@ -1,3 +1,161 @@
+// ══════════════════════════════════════════════════════
+// GOOGLE DRIVE BACKUP
+// ══════════════════════════════════════════════════════
+var GDRIVE_CLIENT_ID='951927360233-2onoimfgc3p7s06jleg5eio3bc051u4i.apps.googleusercontent.com';
+var GDRIVE_SCOPE='https://www.googleapis.com/auth/drive.appdata';
+var _gdriveToken=null;
+var _gdriveTokenClient=null;
+
+function _initGdriveClient(){
+if(_gdriveTokenClient)return;
+if(typeof google==='undefined'||!google.accounts)return;
+_gdriveTokenClient=google.accounts.oauth2.initTokenClient({
+client_id:GDRIVE_CLIENT_ID,
+scope:GDRIVE_SCOPE,
+callback:function(resp){
+if(resp.error){
+_updateGdriveUI('error','Giriş başarısız: '+resp.error);
+return;
+}
+_gdriveToken=resp.access_token;
+localStorage.setItem('capsula_gdrive_connected','1');
+_updateGdriveUI('connected','Google hesabına bağlı');
+}
+});
+}
+
+function _getGdriveToken(){
+return new Promise(function(resolve,reject){
+_initGdriveClient();
+if(!_gdriveTokenClient){reject(new Error('Google kütüphanesi yüklenemedi'));return;}
+if(_gdriveToken){resolve(_gdriveToken);return;}
+_gdriveTokenClient.callback=function(resp){
+if(resp.error){reject(new Error(resp.error));return;}
+_gdriveToken=resp.access_token;
+localStorage.setItem('capsula_gdrive_connected','1');
+_updateGdriveUI('connected','Google hesabına bağlı');
+resolve(_gdriveToken);
+};
+_gdriveTokenClient.requestAccessToken({prompt:'consent'});
+});
+}
+
+function _updateGdriveUI(state,msg){
+var statusEl=document.getElementById('gdriveStatus');
+var lastSync=document.getElementById('gdriveLastSync');
+if(statusEl){
+if(state==='connected')statusEl.innerHTML='<span style="color:var(--easy);">✓</span> '+msg;
+else if(state==='error')statusEl.innerHTML='<span style="color:var(--hard);">✗</span> '+msg;
+else if(state==='loading')statusEl.innerHTML='<span style="color:var(--mid);">⟳</span> '+msg;
+else statusEl.textContent=msg||'Bağlı değil';
+}
+var lastTime=localStorage.getItem('capsula_gdrive_last');
+if(lastSync&&lastTime){
+lastSync.style.display='block';
+lastSync.textContent='Son senkronizasyon: '+new Date(lastTime).toLocaleString('tr-TR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+}
+
+async function _gdriveFindFile(token){
+var res=await fetch('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name%3D%27capsula_backup.json%27&fields=files(id,name,modifiedTime)',{
+headers:{'Authorization':'Bearer '+token}
+});
+var data=await res.json();
+return data.files&&data.files.length?data.files[0]:null;
+}
+
+async function gdriveBackup(){
+try{
+_updateGdriveUI('loading','Bağlanılıyor...');
+var token=await _getGdriveToken();
+_updateGdriveUI('loading','Yedekleniyor...');
+var backupData=JSON.parse(JSON.stringify(D));
+delete backupData.profile.avatar;
+var payload=JSON.stringify({
+meta:{exportedAt:new Date().toISOString(),version:'capsula-v4',source:'gdrive'},
+data:backupData
+});
+var existing=await _gdriveFindFile(token);
+if(existing){
+await fetch('https://www.googleapis.com/upload/drive/v3/files/'+existing.id+'?uploadType=media',{
+method:'PATCH',
+headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+body:payload
+});
+} else {
+var metadata={name:'capsula_backup.json',parents:['appDataFolder']};
+var form=new FormData();
+form.append('metadata',new Blob([JSON.stringify(metadata)],{type:'application/json'}));
+form.append('file',new Blob([payload],{type:'application/json'}));
+await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{
+method:'POST',
+headers:{'Authorization':'Bearer '+token},
+body:form
+});
+}
+localStorage.setItem('capsula_gdrive_last',new Date().toISOString());
+_updateGdriveUI('connected','Yedekleme tamamlandı ✓');
+showToast('Google Drive\'a yedeklendi ✓');
+}catch(err){
+console.error('GDrive backup error:',err);
+_gdriveToken=null;
+_updateGdriveUI('error','Hata: '+err.message);
+showToast('Yedekleme başarısız');
+}
+}
+
+async function gdriveRestore(){
+try{
+_updateGdriveUI('loading','Bağlanılıyor...');
+var token=await _getGdriveToken();
+_updateGdriveUI('loading','Yedek aranıyor...');
+var file=await _gdriveFindFile(token);
+if(!file){
+_updateGdriveUI('connected','Drive\'da yedek bulunamadı');
+showToast('Drive\'da yedek yok');
+return;
+}
+var res=await fetch('https://www.googleapis.com/drive/v3/files/'+file.id+'?alt=media',{
+headers:{'Authorization':'Bearer '+token}
+});
+var raw=await res.json();
+var backupDate=raw.meta?new Date(raw.meta.exportedAt).toLocaleString('tr-TR'):'Bilinmiyor';
+showConfirm('Drive\'dan geri yüklenecek.\\nYedek tarihi: '+backupDate+'\\nMevcut veriler silinecek. Emin misin?',function(){
+var imported=raw.data||raw;
+var profile=D.profile;
+Object.assign(D,imported);
+D.profile=profile;
+if(!D.calPlans)D.calPlans={};
+if(!D.kanban)D.kanban={todo:[],doing:[],done:[]};
+if(!D.reading)D.reading=[];
+if(!D.completedTodos)D.completedTodos=[];
+if(!D.trash)D.trash=[];
+if(!D.contentTrash)D.contentTrash=[];
+if(!D.habits)D.habits=[];
+if(!D.timeCapsules)D.timeCapsules=[];
+saveData();
+renderTodos();renderNotes();renderDiary();renderDashboard();renderKanban();renderReading();updTrashBadge();updateReminderBadge();
+_updateGdriveUI('connected','Geri yükleme tamamlandı ✓');
+showToast('Drive\'dan geri yüklendi ✓');
+});
+_updateGdriveUI('connected','Google hesabına bağlı');
+}catch(err){
+console.error('GDrive restore error:',err);
+_gdriveToken=null;
+_updateGdriveUI('error','Hata: '+err.message);
+showToast('Geri yükleme başarısız');
+}
+}
+
+function _initGdriveOnLoad(){
+if(localStorage.getItem('capsula_gdrive_connected')){
+_updateGdriveUI('connected','Google hesabıyla daha önce bağlandı');
+} else {
+_updateGdriveUI(null,'Bağlı değil');
+}
+}
+setTimeout(_initGdriveOnLoad,1000);
+
 function setPomoMode(m){
 pomoMode=m;clearInterval(pomoInterval);pomoRunning=false;pomoSecs=POMO_DUR[m];
 ['work','short','long'].forEach(k=>document.getElementById('pomoBtn'+k.charAt(0).toUpperCase()+k.slice(1))?.classList.toggle('active',k===m));
