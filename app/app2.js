@@ -384,6 +384,52 @@ return true;
 });
 saveData();
 }
+const vs=typeof getViewStyle==='function'?getViewStyle('kanban'):'columns';
+if(vs==='swim'){
+// Swim lane: öncelik bazlı yatay satırlar
+let html='';
+['easy','mid','hard'].forEach(p=>{
+const allCards=[].concat(D.kanban.todo.filter(c=>c.priority===p),D.kanban.doing.filter(c=>c.priority===p),D.kanban.done.filter(c=>c.priority===p));
+html+=`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;">
+<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;"><div style="width:8px;height:8px;border-radius:50%;background:${clr[p]};"></div><span style="font-size:.74rem;font-weight:500;color:${clr[p]};">${lbl[p]}</span><span style="font-size:.56rem;color:var(--text3);font-family:JetBrains Mono,monospace;margin-left:auto;">${allCards.length}</span></div>
+<div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;">`;
+if(!allCards.length)html+='<div style="font-size:.64rem;color:var(--text3);padding:8px;">Boş</div>';
+allCards.forEach(card=>{
+const colId=D.kanban.todo.includes(card)?'todo':D.kanban.doing.includes(card)?'doing':'done';
+const colLbl=colId==='todo'?'Yapılacak':colId==='doing'?'Devam Eden':'Bitti';
+html+=`<div style="min-width:140px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px;flex-shrink:0;">
+<div style="font-size:.68rem;color:var(--text);margin-bottom:4px;">${escHtml(card.text)}</div>
+<div style="font-size:.48rem;color:var(--text3);background:var(--bg2);display:inline-block;padding:1px 5px;border-radius:3px;">${colLbl}</div>
+<div style="display:flex;gap:3px;margin-top:4px;">
+${colId!=='todo'?`<button class="kmb" onclick="moveKanbanCard(${card.id},'${colId}',-1)" style="font-size:.5rem;padding:2px 5px;">←</button>`:''}
+${colId!=='done'?`<button class="kmb" onclick="moveKanbanCard(${card.id},'${colId}',1)" style="font-size:.5rem;padding:2px 5px;">→</button>`:''}
+<button onclick="deleteKanbanCard(${card.id},'${colId}')" style="font-size:.5rem;padding:2px 5px;background:none;border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--text3);margin-left:auto;">✕</button>
+</div></div>`;
+});
+html+='</div></div>';
+});
+document.getElementById('kanbanBoard').innerHTML=html;
+return;
+} else if(vs==='compact'){
+// Kompakt: tek liste
+let html='<div style="display:flex;flex-direction:column;gap:4px;">';
+cols.forEach(col=>{
+D.kanban[col.id].forEach(card=>{
+html+=`<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
+<div style="width:6px;height:6px;border-radius:50%;background:${clr[card.priority]};flex-shrink:0;"></div>
+<span style="flex:1;font-size:.74rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(card.text)}</span>
+<span style="font-size:.48rem;color:var(--text3);background:var(--bg3);padding:1px 5px;border-radius:3px;flex-shrink:0;">${col.label}</span>
+${col.id!=='done'?`<button class="kmb" onclick="moveKanbanCard(${card.id},'${col.id}',1)" style="font-size:.5rem;padding:2px 6px;">→</button>`:''}
+<button onclick="deleteKanbanCard(${card.id},'${col.id}')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:.66rem;padding:2px;">✕</button>
+</div>`;
+});
+});
+html+='</div>';
+if(!(D.kanban.todo.length+D.kanban.doing.length+D.kanban.done.length))html='<div class="empty-state">Kanban boş</div>';
+document.getElementById('kanbanBoard').innerHTML=html;
+return;
+}
+// Default: columns
 document.getElementById('kanbanBoard').innerHTML=cols.map(col=>`
 <div class="kanban-col col-${col.id}">
 <div class="kanban-col-header"><span class="kanban-col-title">${col.label}</span><span class="kanban-count">${D.kanban[col.id].length}</span></div>
@@ -588,6 +634,57 @@ const cols=[
 {key:'done',lbl:'\u2705 '+'Bitti',clr:'var(--easy)'},
 ];
 const typeIco={book:'\ud83d\udcda',article:'\ud83d\udcc4',paper:'\ud83d\udd2c',other:'\ud83d\udcce'};
+const vs=typeof getViewStyle==='function'?getViewStyle('reading'):'grid';
+if(vs==='list'){
+// Liste görünümü
+let html='';
+cols.forEach(col=>{
+const items=D.reading.filter(r=>r.status===col.key);
+if(!items.length)return;
+html+=`<div style="margin-bottom:14px;"><div style="font-size:.72rem;font-weight:500;color:${col.clr};margin-bottom:8px;">${col.lbl} (${items.length})</div>`;
+items.forEach(item=>{
+const ico=typeIco[item.type||'book']||'\ud83d\udcda';
+const pct=item.pages?Math.min(100,Math.round((item.pagesRead||0)/item.pages*100)):0;
+html+=`<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:6px;">
+<span style="font-size:1rem;">${ico}</span>
+<div style="flex:1;min-width:0;">
+<div style="font-size:.78rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(item.title)}</div>
+${item.author?`<div style="font-size:.58rem;color:var(--text3);">${escHtml(item.author)}</div>`:''}
+${item.pages&&col.key==='reading'?`<div style="margin-top:4px;background:var(--bg3);border-radius:3px;height:3px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:var(--accent);border-radius:3px;"></div></div>`:''}
+</div>
+<div style="display:flex;gap:4px;">
+<button onclick="cycleReadingStatus(${item.id})" style="background:none;border:1px solid var(--border);border-radius:5px;cursor:pointer;color:var(--text3);width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.6rem;">↕</button>
+<button onclick="deleteReadingItem(${item.id})" style="background:none;border:1px solid var(--border);border-radius:5px;cursor:pointer;color:var(--text3);width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.6rem;">✕</button>
+</div>
+</div>`;
+});
+html+='</div>';
+});
+if(!D.reading.length)html='<div class="empty-state">Okuma listesi boş</div>';
+document.getElementById('readingList').innerHTML=html;
+updateReadingTodayCard();
+return;
+} else if(vs==='shelf'){
+// Raf görünümü: kitap sırtı tarzı
+let html='<div style="display:flex;flex-wrap:wrap;gap:8px;">';
+D.reading.forEach(item=>{
+const ico=typeIco[item.type||'book']||'\ud83d\udcda';
+const statusClr=item.status==='reading'?'var(--accent2)':item.status==='done'?'var(--easy)':'var(--text3)';
+const pct=item.pages?Math.min(100,Math.round((item.pagesRead||0)/item.pages*100)):0;
+html+=`<div onclick="openReadingEdit(${item.id})" style="width:90px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer;position:relative;overflow:hidden;transition:all .2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+<div style="position:absolute;bottom:0;left:0;right:0;height:${pct}%;background:${statusClr}08;transition:height .3s;"></div>
+<div style="font-size:1.4rem;margin-bottom:6px;">${ico}</div>
+<div style="font-size:.58rem;color:var(--text);line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;margin-bottom:4px;">${escHtml(item.title)}</div>
+<div style="font-size:.44rem;color:${statusClr};font-family:JetBrains Mono,monospace;">${item.status==='reading'?pct+'%':item.status==='done'?'Bitti':'Okunacak'}</div>
+</div>`;
+});
+if(!D.reading.length)html='<div class="empty-state">Okuma listesi boş</div>';
+else html+='</div>';
+document.getElementById('readingList').innerHTML=html;
+updateReadingTodayCard();
+return;
+}
+// Default: grid (3 sütun)
 let html='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;">';
 cols.forEach(col=>{
 const items=D.reading.filter(r=>r.status===col.key);
