@@ -69,7 +69,7 @@
 <div class="page" id="page-todo">
 <div class="todo-add-card" style="padding:14px 14px 12px;margin-bottom:14px;">
 <div class="todo-add-row1" style="margin-bottom:10px;">
-<input type="text" id="todoInput" placeholder="Ne yapacaksın?" style="font-size:.92rem;padding:12px 14px;" onkeydown="if(event.key==='Enter')addTodo()">
+<input type="text" id="todoInput" placeholder="Ne yapacaksın?" data-i18n-placeholder="todoPlaceholder" style="font-size:.92rem;padding:12px 14px;" onkeydown="if(event.key==='Enter')addTodo()">
 </div>
 <div class="todo-add-row2">
 <div class="priority-pills">
@@ -103,7 +103,7 @@ Tarih Seç
 <!-- Hızlı Not -->
 <div id="quickNoteBar" style="margin-bottom:14px;">
 <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:14px;transition:border-color .2s;" onfocusin="this.style.borderColor='rgba(124,111,247,.4)'" onfocusout="this.style.borderColor='var(--border)'">
-<input type="text" id="quickNoteInput" placeholder="Aklına ne geldi? Yaz, kaydet..." style="width:100%;background:none;border:none;outline:none;font-family:'Sora',sans-serif;font-size:.92rem;color:var(--text);margin-bottom:10px;display:block;" onkeydown="if(event.key==='Enter')saveQuickNote()">
+<input type="text" id="quickNoteInput" placeholder="Aklına ne geldi? Yaz, kaydet..." data-i18n-placeholder="quickNotePlaceholder" style="width:100%;background:none;border:none;outline:none;font-family:'Sora',sans-serif;font-size:.92rem;color:var(--text);margin-bottom:10px;display:block;" onkeydown="if(event.key==='Enter')saveQuickNote()">
 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
 <label style="cursor:pointer;display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:9px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:.72rem;font-family:'Sora',sans-serif;transition:background .18s;" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='var(--bg3)'">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px;flex-shrink:0;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
@@ -149,10 +149,10 @@ Yeni Günlük Girişi
 </div>
 <!-- SEARCH (tüm modlarda) -->
 <div class="page" id="page-search">
-<div style="font-size:.52rem;letter-spacing:.2em;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-bottom:12px;">Akıllı Arama</div>
+<div style="font-size:.52rem;letter-spacing:.2em;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-bottom:12px;" data-i18n="smartSearch">Akıllı Arama</div>
 <div class="search-bar-wrap">
 <div class="si-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
-<input type="text" class="search-input" id="searchInput" placeholder="Her şeyde ara: not, görev, kanban, kitap..." oninput="doSearch(this.value)">
+<input type="text" class="search-input" id="searchInput" placeholder="Her şeyde ara: not, görev, kanban, kitap..." data-i18n-placeholder="searchPlaceholder" oninput="doSearch(this.value)">
 </div>
 <div id="search-results"></div>
 </div>
@@ -299,7 +299,7 @@ Yeni Günlük Girişi
 <div class="page" id="page-habits">
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
 <div>
-<div style="font-size:.52rem;letter-spacing:.2em;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;">Alışkanlık Takipçisi</div>
+<div style="font-size:.52rem;letter-spacing:.2em;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;" data-i18n="habitTracker">Alışkanlık Takipçisi</div>
 <div id="habitsStreakInfo" style="font-size:.62rem;color:var(--accent2);margin-top:3px;"></div>
 </div>
 <button onclick="openHabitAdd()" style="background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:9px;padding:8px 16px;cursor:pointer;color:#fff;font-size:.76rem;font-family:'Sora',sans-serif;display:flex;align-items:center;gap:5px;">
@@ -314,7 +314,7 @@ Ekle
 <div class="page" id="page-mood">
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
 <div>
-<div style="font-size:.52rem;letter-spacing:.2em;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;">Ruh Hali Takipçisi</div>
+<div style="font-size:.52rem;letter-spacing:.2em;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;" data-i18n="moodTracker">Ruh Hali Takipçisi</div>
 <div id="moodSummary" style="font-size:.62rem;color:var(--accent2);margin-top:3px;"></div>
 </div>
 </div>
@@ -325,7 +325,7 @@ Ekle
 <!-- PRO QUICK CAPTURE page -->
 <div class="page" id="page-pro">
 <div class="quick-capture">
-<div class="qc-label">Hızlı Not</div>
+<div class="qc-label" data-i18n="quickNote">Hızlı Not</div>
 <textarea id="qcInput" placeholder="Aklına gelen her şeyi yaz, sonra kategorize et..."></textarea>
 <div class="qc-actions">
 <button class="qc-discard-btn" onclick="document.getElementById('qcInput').value=''">Temizle</button>
@@ -369,27 +369,27 @@ Ekle
 </button>
 </div>
 <div class="drawer-menu">
-<button class="drawer-item" onclick="openProfilePage();toggleDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profilim</button>
-<button class="drawer-item" onclick="toggleDrawer();switchPage('stats')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>İstatistikler</button>
-<button class="drawer-item" onclick="toggleDrawer();switchPage('kanban')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="10" rx="1"/><rect x="14" y="17" width="7" height="4" rx="1"/></svg>Kanban</button>
-<button class="drawer-item" onclick="toggleDrawer();switchPage('reading')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Okuma Listesi</button>
-<button class="drawer-item" onclick="toggleDrawer();switchPage('mood')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>Ruh Hali</button>
-<button class="drawer-item" onclick="toggleDrawer();switchPage('habits')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Alışkanlıklar</button>
-<button class="drawer-item" onclick="toggleDrawer();switchPage('pomodoro')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pomodoro</button>
-<button class="drawer-item" onclick="toggleDrawer();switchPage('schedule')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Program</button>
-<button class="drawer-item" id="drawerReminderBtn" onclick="openNotifications()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Bildirimler<span id="drawerReminderBadge" style="display:none;margin-left:auto;min-width:18px;height:18px;font-size:.52rem;border-radius:9px;background:var(--hard);color:#fff;align-items:center;justify-content:center;padding:0 4px;font-family:JetBrains Mono,monospace;"></span></button>
+<button class="drawer-item" onclick="openProfilePage();toggleDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg data-i18n="myProfile">Profilim</button>
+<button class="drawer-item" onclick="toggleDrawer();switchPage('stats')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg data-i18n="statistics">İstatistikler</button>
+<button class="drawer-item" onclick="toggleDrawer();switchPage('kanban')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="10" rx="1"/><rect x="14" y="17" width="7" height="4" rx="1"/></svg data-i18n="pageKanban">Kanban</button>
+<button class="drawer-item" onclick="toggleDrawer();switchPage('reading')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg data-i18n="readingList">Okuma Listesi</button>
+<button class="drawer-item" onclick="toggleDrawer();switchPage('mood')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg data-i18n="mood">Ruh Hali</button>
+<button class="drawer-item" onclick="toggleDrawer();switchPage('habits')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg data-i18n="habits">Alışkanlıklar</button>
+<button class="drawer-item" onclick="toggleDrawer();switchPage('pomodoro')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg data-i18n="pagePomodoro">Pomodoro</button>
+<button class="drawer-item" onclick="toggleDrawer();switchPage('schedule')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg data-i18n="navSchedule">Program</button>
+<button class="drawer-item" id="drawerReminderBtn" onclick="openNotifications()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg data-i18n="notifications">Bildirimler<span id="drawerReminderBadge" style="display:none;margin-left:auto;min-width:18px;height:18px;font-size:.52rem;border-radius:9px;background:var(--hard);color:#fff;align-items:center;justify-content:center;padding:0 4px;font-family:JetBrains Mono,monospace;"></span></button>
 <button class="drawer-item" onclick="openBackupModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Yedekle & Geri Yükle</button>
-<button class="drawer-item" onclick="openSettingsPage();toggleDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Ayarlar</button>
+<button class="drawer-item" onclick="openSettingsPage();toggleDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg data-i18n="settings">Ayarlar</button>
 <div class="drawer-divider"></div>
-<button class="drawer-item" onclick="toggleDrawer();switchPage('diary')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Günlük</button>
-<button class="drawer-item" onclick="openFromDrawer('trash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Çöp Kutusu<span class="trash-badge" id="trashBadge" style="display:none">0</span></button>
+<button class="drawer-item" onclick="toggleDrawer();switchPage('diary')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg data-i18n="diary">Günlük</button>
+<button class="drawer-item" onclick="openFromDrawer('trash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg data-i18n="trashBin">Çöp Kutusu<span class="trash-badge" id="trashBadge" style="display:none">0</span></button>
 <div class="drawer-divider"></div>
-<button class="drawer-item" onclick="openTimeCapsulePage();toggleDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/><path d="M12 22v-2M4.2 4.2l1.4 1.4M18.4 4.2l-1.4 1.4"/></svg>Zaman Kapsülü</button>
-<button class="drawer-item" onclick="openPrivacyModal();toggleDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Gizlilik</button>
-<button class="drawer-item" onclick="openFromDrawer('help')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Yardım</button>
-<button class="drawer-item" onclick="toggleDrawer();setTimeout(openContactModal,300)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Bize Ulaşın</button>
+<button class="drawer-item" onclick="openTimeCapsulePage();toggleDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/><path d="M12 22v-2M4.2 4.2l1.4 1.4M18.4 4.2l-1.4 1.4"/></svg data-i18n="timeCapsule">Zaman Kapsülü</button>
+<button class="drawer-item" onclick="openPrivacyModal();toggleDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg data-i18n="privacy">Gizlilik</button>
+<button class="drawer-item" onclick="openFromDrawer('help')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg data-i18n="help">Yardım</button>
+<button class="drawer-item" onclick="toggleDrawer();setTimeout(openContactModal,300)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg data-i18n="contactUs">Bize Ulaşın</button>
 <div class="drawer-divider"></div>
-<button class="drawer-item danger" onclick="clearAllData()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Tüm Verileri Sil</button>
+<button class="drawer-item danger" onclick="clearAllData()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg data-i18n="deleteAllData">Tüm Verileri Sil</button>
 </div>
 <div class="drawer-footer">Capsula v4 · Pro / Ana / Öğrenci</div>
 </div>
@@ -641,8 +641,8 @@ Ekle
 <input type="text" class="tag-input" id="tagInput" placeholder="#iş #okul" onkeydown="if(event.key==='Enter'||event.key===','){event.preventDefault();addTag();}">
 <div id="tagPreview" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
 </div>
-<input type="text" class="editor-title-input" id="editorTitle" placeholder="Başlık...">
-<textarea class="editor-content-input" id="editorContent" placeholder="Yazmaya başla..." oninput="updateWordCount()"></textarea>
+<input type="text" class="editor-title-input" id="editorTitle" placeholder="Başlık..." data-i18n-placeholder="titlePlaceholder">
+<textarea class="editor-content-input" id="editorContent" placeholder="Yazmaya başla..." data-i18n-placeholder="startWriting" oninput="updateWordCount()"></textarea>
 <div id="editorWordCount" style="font-size:.55rem;font-family:'JetBrains Mono',monospace;color:var(--text3);text-align:right;padding:2px 4px 4px;letter-spacing:.06em;">0 kelime · 0 karakter</div>
 </div>
 <div class="media-preview-area" id="mediaPreview"></div>
@@ -678,7 +678,7 @@ Ekle
 <div class="template-overlay" id="templateOverlay">
 <div class="template-sheet">
 <div class="template-handle"></div>
-<div class="template-header"><span class="template-title-txt">Şablon Seç</span><button class="template-close" onclick="closeTemplates()">✕</button></div>
+<div class="template-header"><span class="template-title-txt" data-i18n="selectTemplate">Şablon Seç</span><button class="template-close" onclick="closeTemplates()">✕</button></div>
 <div class="template-grid">
 <div class="template-card" onclick="useTemplate('meeting')"><div class="template-card-icon">📋</div><div class="template-card-name">Toplantı Notu</div><div class="template-card-desc">Tarih, katılımcılar, kararlar</div></div>
 <div class="template-card" onclick="useTemplate('book')"><div class="template-card-icon">📖</div><div class="template-card-name">Kitap Özeti</div><div class="template-card-desc">Ana fikir, alıntılar, öğrendiklerim</div></div>
@@ -830,7 +830,7 @@ Drive'dan Geri Yükle
 <button class="fullpage-back" onclick="closeTimeCapsulePage()">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><polyline points="15 18 9 12 15 6"/></svg>
 </button>
-<span class="fullpage-title">Zaman Kapsülü</span>
+<span class="fullpage-title" data-i18n="timeCapsule">Zaman Kapsülü</span>
 <button onclick="openNewCapsuleSheet()" style="background:linear-gradient(135deg,var(--accent),var(--diary));border:none;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:.76rem;color:#fff;font-family:'Sora',sans-serif;font-weight:500;min-height:34px;box-shadow:0 2px 12px rgba(124,111,247,.4);">+ Yeni</button>
 </div>
 <div class="fullpage-body">
@@ -876,11 +876,11 @@ Drive'dan Geri Yükle
 <button class="fullpage-back" onclick="closeProfilePage()">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><polyline points="15 18 9 12 15 6"/></svg>
 </button>
-<span class="fullpage-title" id="profilePageTitle">Profil</span>
+<span class="fullpage-title" id="profilePageTitle" data-i18n="profile">Profil</span>
 <button onclick="shareProfileCard()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:.76rem;color:var(--text3);font-family:'Sora',sans-serif;min-height:34px;" title="Paylaş">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
 </button>
-<button onclick="openProfileEditSheet()" style="background:rgba(124,111,247,.15);border:1px solid rgba(124,111,247,.4);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:.76rem;color:var(--accent2);font-family:'Sora',sans-serif;font-weight:500;min-height:34px;min-width:64px;">Düzenle</button>
+<button onclick="openProfileEditSheet()" style="background:rgba(124,111,247,.15);border:1px solid rgba(124,111,247,.4);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:.76rem;color:var(--accent2);font-family:'Sora',sans-serif;font-weight:500;min-height:34px;min-width:64px;" data-i18n="editProfile">Düzenle</button>
 </div>
 <div class="fullpage-body">
 <div id="igProfileContainer"></div>
@@ -953,7 +953,34 @@ Drive'dan Geri Yükle
 </div>
 <div class="sp-body">
 <!-- GÖRÜNÜM -->
-<div class="stt-section-label">Görünüm</div>
+<div class="stt-section-label" data-i18n="language">Dil</div>
+<div class="stt-group">
+<div class="stt-item" onclick="document.getElementById('langExpandArea').style.display=document.getElementById('langExpandArea').style.display==='none'?'block':'none'">
+<div class="stt-icon" style="background:linear-gradient(135deg,#60a5fa,#3b82f6);">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+</div>
+<div class="stt-text">
+<div class="stt-title" data-i18n="language">Dil</div>
+<div class="stt-sub" id="currentLangLabel">Türkçe</div>
+</div>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--text3);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+</div>
+<div id="langExpandArea" style="display:none;padding:14px 16px 16px;border-top:1px solid var(--border);">
+<div style="display:flex;gap:10px;">
+<button onclick="setLang('tr')" id="langBtnTr" style="flex:1;padding:14px;background:var(--bg3);border:2px solid var(--accent);border-radius:12px;cursor:pointer;text-align:center;transition:all .2s;">
+<div style="font-size:1.4rem;margin-bottom:4px;">🇹🇷</div>
+<div style="font-size:.82rem;font-weight:500;color:var(--text);">Türkçe</div>
+<div style="font-size:.52rem;color:var(--text3);margin-top:2px;">Varsayılan</div>
+</button>
+<button onclick="setLang('en')" id="langBtnEn" style="flex:1;padding:14px;background:var(--bg3);border:2px solid transparent;border-radius:12px;cursor:pointer;text-align:center;transition:all .2s;">
+<div style="font-size:1.4rem;margin-bottom:4px;">🇬🇧</div>
+<div style="font-size:.82rem;font-weight:500;color:var(--text);">English</div>
+<div style="font-size:.52rem;color:var(--text3);margin-top:2px;">International</div>
+</button>
+</div>
+</div>
+</div>
+<div class="stt-section-label" data-i18n="appearance">Görünüm</div>
 <div class="stt-group">
 <div class="stt-item" onclick="document.getElementById('themeExpandArea').style.display=document.getElementById('themeExpandArea').style.display==='none'?'block':'none'">
 <div class="stt-icon" style="background:linear-gradient(135deg,#7c6ff7,#f472b6);">
@@ -1038,7 +1065,7 @@ Drive'dan Geri Yükle
 </div>
 </div>
 <!-- GÜVENLİK -->
-<div class="stt-section-label">Güvenlik</div>
+<div class="stt-section-label" data-i18n="security">Güvenlik</div>
 <div class="stt-group">
 <div class="stt-item" onclick="togglePinSetting()">
 <div class="stt-icon" style="background:linear-gradient(135deg,#f87171,#ef4444);">
@@ -1225,7 +1252,7 @@ Drive'dan Geri Yükle
 </div>
 </div>
 <!-- VERİ -->
-<div class="stt-section-label">Veri</div>
+<div class="stt-section-label" data-i18n="data">Veri</div>
 <div class="stt-group">
 <div class="stt-item">
 <div class="stt-icon" style="background:linear-gradient(135deg,#4ade80,#22c55e);">
@@ -1269,7 +1296,7 @@ Drive'dan Geri Yükle
 </div>
 </div>
 <!-- HAKKINDA -->
-<div class="stt-section-label">Hakkında</div>
+<div class="stt-section-label" data-i18n="about">Hakkında</div>
 <div class="stt-group">
 <div class="stt-item" onclick="closeSettingsPage();setTimeout(function(){openModal('privacyModal');},320);">
 <div class="stt-icon" style="background:linear-gradient(135deg,#38bdf8,#0284c7);">
