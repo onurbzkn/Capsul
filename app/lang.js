@@ -6,11 +6,6 @@ _lang=lang;localStorage.setItem('capsula_lang',lang);
 applyLangToDOM();
 if(typeof renderTodos==='function'){renderTodos();renderNotes();renderDiary();renderDashboard();renderKanban();renderReading();renderSchedule();renderExams();renderNotebook();renderHabits();renderPro();buildNav();updateProfileUI();}
 var el=document.getElementById('currentLangLabel');if(el)el.textContent=lang==='en'?'English':'Türkçe';
-var trBtn=document.getElementById('langBtnTr');var enBtn=document.getElementById('langBtnEn');
-if(trBtn)trBtn.style.borderColor=lang==='tr'?'var(--accent)':'transparent';
-if(enBtn)enBtn.style.borderColor=lang==='en'?'var(--accent)':'transparent';
-if(typeof renderMoodTracker==='function')try{renderMoodTracker();}catch(e){}
-if(typeof renderGoals==='function')try{renderGoals();}catch(e){}
 showToast(lang==='en'?'Language changed to English':'Dil Türkçe olarak değiştirildi');
 }
 function applyLangToDOM(){
@@ -80,14 +75,6 @@ tplMeeting:'Toplantı Notu',tplBook:'Kitap Özeti',tplDaily:'Günlük Plan',tplI
 // Days
 dayMon:'Pt',dayTue:'Sa',dayWed:'Ça',dayThu:'Pe',dayFri:'Cu',daySat:'Ct',daySun:'Pz',
 dayFullMon:'Pazartesi',dayFullTue:'Salı',dayFullWed:'Çarşamba',dayFullThu:'Perşembe',dayFullFri:'Cuma',dayFullSat:'Cumartesi',dayFullSun:'Pazar',
-// Mood
-moodTracker:'Ruh Hali Takipçisi',moodGreat:'Harika',moodGood:'İyi',moodNormal:'Normal',moodBad:'Kötü',moodAngry:'Sinirli',moodPeaceful:'Huzurlu',moodThinking:'Düşünceli',moodTired:'Yorgun',howFeelToday:'Bugün nasıl hissediyorsun?',moodDistribution:'Ruh Hali Dağılımı',moodRecorded:'Ruh halin kaydedildi',daysRecorded:'gün kaydedildi',mostCommon:'En çok:',
-// Goals
-myGoals:'Hedeflerim',addGoal:'Hedef Ekle',newGoal:'🎯 Yeni Hedef',goalName:'Hedef adı (örn: 10 kitap oku)',targetNumber:'Hedef sayı',deadline:'Bitiş tarihi',trackType:'Takip türü',trackManual:'Manuel güncelle',trackTasks:'Tamamlanan görevler',trackBooks:'Bitirilen kitaplar',trackNotes:'Yazılan notlar',trackDiary:'Günlük girişleri',trackStreak:'Günlük seri',goalAdded:'Hedef eklendi 🎯',goalDeleted:'Hedef silindi',goalCompleted:'🎉 Hedef tamamlandı:',enterGoalName:'Hedef adı gir',noGoalsYet:'Henüz hedef yok',noGoalsDesc:'"Hedef Ekle" ile başla',autoTrack:'Otomatik takip',
-// Notifications
-notifications:'Bildirimler',clearAllNotifs:'Tümünü Temizle',
-// Misc extra
-pageMood:'Ruh Hali',createFromTemplate:'Şablondan Not Oluştur',titlePlaceholder:'Başlık...',
 },
 en:{
 navNote:'Note',navTask:'Task',navFocus:'Focus',navDiary:'Diary',navSearch:'Search',navSchedule:'Schedule',
@@ -120,13 +107,5 @@ writeFirst:'Write something first',deleteAllConfirm:'All data will be deleted. A
 tplMeeting:'Meeting Note',tplBook:'Book Summary',tplDaily:'Daily Plan',tplIdea:'Idea Note',tplTravel:'Travel',tplGoal:'Goal',tplLecture:'Lecture Note',tplBlank:'Blank Note',
 dayMon:'Mon',dayTue:'Tue',dayWed:'Wed',dayThu:'Thu',dayFri:'Fri',daySat:'Sat',daySun:'Sun',
 dayFullMon:'Monday',dayFullTue:'Tuesday',dayFullWed:'Wednesday',dayFullThu:'Thursday',dayFullFri:'Friday',dayFullSat:'Saturday',dayFullSun:'Sunday',
-// Mood
-moodTracker:'Mood Tracker',moodGreat:'Great',moodGood:'Good',moodNormal:'Normal',moodBad:'Bad',moodAngry:'Angry',moodPeaceful:'Peaceful',moodThinking:'Thinking',moodTired:'Tired',howFeelToday:'How do you feel today?',moodDistribution:'Mood Distribution',moodRecorded:'Mood recorded',daysRecorded:'days recorded',mostCommon:'Most common:',
-// Goals
-myGoals:'My Goals',addGoal:'Add Goal',newGoal:'🎯 New Goal',goalName:'Goal name (e.g: Read 10 books)',targetNumber:'Target number',deadline:'Deadline',trackType:'Track type',trackManual:'Update manually',trackTasks:'Completed tasks',trackBooks:'Finished books',trackNotes:'Written notes',trackDiary:'Diary entries',trackStreak:'Daily streak',goalAdded:'Goal added 🎯',goalDeleted:'Goal deleted',goalCompleted:'🎉 Goal completed:',enterGoalName:'Enter goal name',noGoalsYet:'No goals yet',noGoalsDesc:'Start with "Add Goal" above',autoTrack:'Auto tracking',
-// Notifications
-notifications:'Notifications',clearAllNotifs:'Clear All',
-// Misc extra
-pageMood:'Mood',createFromTemplate:'Create from Template',titlePlaceholder:'Title...',
 }
 };
