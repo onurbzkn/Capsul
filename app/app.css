@@ -32,3 +32,8 @@ body.theme-light-warm .splash-name-text,body.theme-light-warm .splash-tagline{co
 body.theme-light-warm input,body.theme-light-warm textarea,body.theme-light-warm select{color:var(--text);background:var(--bg3);border-color:var(--border)}
 body.theme-light-warm .pin-key{background:var(--bg3);color:var(--text);border-color:var(--border)}
 body.theme-light-warm .toast{background:var(--bg2);color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,.1)}
+
+.ct-btn{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);transition:all .15s;flex-shrink:0}
+.ct-btn:hover,.ct-active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.ct-color{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;flex-shrink:0;transition:all .15s}
+.ct-color:hover,.ct-color-active{border-color:#fff;transform:scale(1.15)}
