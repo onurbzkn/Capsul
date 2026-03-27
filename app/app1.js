@@ -253,10 +253,14 @@ b.onclick=()=>switchPage(item.id);ng.appendChild(b);
 }
 });
 }
-function switchPage(page){
+function switchPage(page,skipHistory){
 document.querySelector('.page.active')?.classList.remove('active');
 const el=document.getElementById('page-'+page);if(el)el.classList.add('active');
+var prevPage=curPage;
 curPage=page;
+if(!skipHistory&&page!==prevPage){
+try{history.pushState({page:page},'',null);}catch(e){}
+}
 document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.pid===page));
 const titleEl=document.getElementById('pageTitle');
 if(titleEl)titleEl.textContent=getPageTitles()[page]||'Capsula';
