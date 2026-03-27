@@ -2419,6 +2419,10 @@ sealEntry('note', nid);
 });
 card.addEventListener('click', function(e) {
 if (e.target.closest('[data-seal]')) return;
+if (n.content==='[Çizim Notu]'&&n.media&&n.media.length) {
+openCanvasNote(nid);
+return;
+}
 if (n.sealed) {
 viewSealedEntry('note', nid);
 } else {
@@ -3038,12 +3042,16 @@ _updateFsPlayIcon();
 // ══════════════════════════════════════════════════════
 // CANVAS NOTE (Tablet kalemle yazma)
 // ══════════════════════════════════════════════════════
-var _canvasTool='pen',_canvasColor='#f0eeff',_canvasBrush=3,_canvasDrawing=false,_canvasHistory=[],_canvasCtx=null;
-function openCanvasNote(){
+var _canvasTool='pen',_canvasColor='#f0eeff',_canvasDrawing=false,_canvasHistory=[],_canvasCtx=null;
+var _canvasInputMode='stylus'; // 'stylus' veya 'finger'
+var _canvasBrushSizes={pen:3,highlighter:12,eraser:15}; // her araç kendi boyutunu hatırlar
+var _canvasEditingNoteId=null; // düzenleme modunda not id'si
+function _getCanvasBrush(){return _canvasBrushSizes[_canvasTool]||3;}
+function openCanvasNote(editNoteId){
 var ov=document.getElementById('canvasNoteOverlay');
 if(!ov)return;
 ov.style.display='flex';
-document.getElementById('canvasNoteTitle').value='';
+_canvasEditingNoteId=editNoteId||null;
 var canvas=document.getElementById('canvasNote');
 canvas.width=canvas.offsetWidth*2;
 canvas.height=canvas.offsetHeight*2;
@@ -3052,20 +3060,49 @@ _canvasCtx=canvas.getContext('2d');
 _canvasCtx.scale(2,2);
 _canvasCtx.lineCap='round';_canvasCtx.lineJoin='round';
 _canvasHistory=[];
+// Düzenleme moduysa mevcut çizimi yükle
+if(editNoteId){
+var note=D.notes.find(function(n){return n.id===editNoteId;});
+if(note){
+document.getElementById('canvasNoteTitle').value=note.title||'';
+if(note.media&&note.media.length&&note.media[0].data){
+var img=new Image();
+img.onload=function(){
+_canvasCtx.drawImage(img,0,0,canvas.width/2,canvas.height/2);
+_saveCanvasState();
+};
+img.src=note.media[0].data;
+}
+}
+} else {
+document.getElementById('canvasNoteTitle').value='';
+}
 _setupCanvasEvents(canvas);
+// Input mode butonunu güncelle
+_updateInputModeBtn();
+// Brush size slider'ı güncelle
+var slider=document.getElementById('canvasBrushSize');
+if(slider){slider.value=_getCanvasBrush();document.getElementById('canvasSizeLbl').textContent=_getCanvasBrush();}
 try{history.pushState({page:curPage,overlay:'canvas'},'',null);}catch(e){}
 }
 function closeCanvasNote(){
 var ov=document.getElementById('canvasNoteOverlay');
 if(ov)ov.style.display='none';
+_canvasEditingNoteId=null;
 }
 function _setupCanvasEvents(canvas){
+// Önce eski listener'ları temizle (clone ile)
+var newCanvas=canvas.cloneNode(true);
+canvas.parentNode.replaceChild(newCanvas,canvas);
+var c=newCanvas;
+_canvasCtx=c.getContext('2d');
 var getPos=function(e){
-var rect=canvas.getBoundingClientRect();
-var touch=e.touches?e.touches[0]:e;
-return{x:touch.clientX-rect.left,y:touch.clientY-rect.top};
+var rect=c.getBoundingClientRect();
+return{x:e.clientX-rect.left,y:e.clientY-rect.top};
 };
 var onStart=function(e){
+// Stylus modunda parmağı engelle
+if(_canvasInputMode==='stylus'&&e.pointerType==='touch')return;
 e.preventDefault();
 _canvasDrawing=true;
 _saveCanvasState();
@@ -3075,84 +3112,123 @@ _canvasCtx.moveTo(pos.x,pos.y);
 };
 var onMove=function(e){
 if(!_canvasDrawing)return;
+if(_canvasInputMode==='stylus'&&e.pointerType==='touch')return;
 e.preventDefault();
 var pos=getPos(e);
+var brush=_getCanvasBrush();
 if(_canvasTool==='eraser'){
 _canvasCtx.globalCompositeOperation='destination-out';
-_canvasCtx.lineWidth=_canvasBrush*4;
+_canvasCtx.lineWidth=brush;
 _canvasCtx.strokeStyle='rgba(0,0,0,1)';
 } else if(_canvasTool==='highlighter'){
 _canvasCtx.globalCompositeOperation='source-over';
-_canvasCtx.lineWidth=_canvasBrush*3;
+_canvasCtx.lineWidth=brush;
 _canvasCtx.strokeStyle=_canvasColor+'44';
 } else {
 _canvasCtx.globalCompositeOperation='source-over';
-_canvasCtx.lineWidth=_canvasBrush;
+_canvasCtx.lineWidth=brush;
 _canvasCtx.strokeStyle=_canvasColor;
+}
+// Basınç desteği (stylus)
+if(e.pressure&&e.pressure>0&&e.pointerType==='pen'){
+_canvasCtx.lineWidth=brush*e.pressure*2;
 }
 _canvasCtx.lineTo(pos.x,pos.y);
 _canvasCtx.stroke();
 _canvasCtx.beginPath();
 _canvasCtx.moveTo(pos.x,pos.y);
 };
-var onEnd=function(){_canvasDrawing=false;_canvasCtx.beginPath();};
-canvas.addEventListener('pointerdown',onStart);
-canvas.addEventListener('pointermove',onMove);
-canvas.addEventListener('pointerup',onEnd);
-canvas.addEventListener('pointerleave',onEnd);
+var onEnd=function(e){
+if(_canvasInputMode==='stylus'&&e.pointerType==='touch')return;
+_canvasDrawing=false;_canvasCtx.beginPath();
+};
+c.addEventListener('pointerdown',onStart);
+c.addEventListener('pointermove',onMove);
+c.addEventListener('pointerup',onEnd);
+c.addEventListener('pointerleave',onEnd);
+}
+function toggleCanvasInputMode(){
+_canvasInputMode=_canvasInputMode==='stylus'?'finger':'stylus';
+_updateInputModeBtn();
+showToast(_canvasInputMode==='stylus'?'Sadece kalem modu ✏️':'Parmak + kalem modu 👆');
+}
+function _updateInputModeBtn(){
+var btn=document.getElementById('ct-inputmode');
+if(btn)btn.innerHTML=_canvasInputMode==='stylus'?'✏️':'👆';
 }
 function setCanvasTool(tool){
 _canvasTool=tool;
-document.querySelectorAll('.ct-btn').forEach(function(b){b.classList.remove('ct-active');});
+document.querySelectorAll('#canvasToolbar .ct-btn[id^="ct-"]').forEach(function(b){
+if(b.id==='ct-pen'||b.id==='ct-highlighter'||b.id==='ct-eraser')b.classList.remove('ct-active');
+});
 var btn=document.getElementById('ct-'+tool);
 if(btn)btn.classList.add('ct-active');
+// Araç boyutunu slider'a yansıt
+var slider=document.getElementById('canvasBrushSize');
+if(slider){slider.value=_getCanvasBrush();document.getElementById('canvasSizeLbl').textContent=_getCanvasBrush();}
 }
 function setCanvasColor(color){
 _canvasColor=color;
 document.querySelectorAll('.ct-color').forEach(function(b){b.classList.toggle('ct-color-active',b.dataset.color===color);});
 }
 function updateCanvasBrush(){
-_canvasBrush=parseInt(document.getElementById('canvasBrushSize').value)||3;
-document.getElementById('canvasSizeLbl').textContent=_canvasBrush;
+var val=parseInt(document.getElementById('canvasBrushSize').value)||3;
+_canvasBrushSizes[_canvasTool]=val;
+document.getElementById('canvasSizeLbl').textContent=val;
 }
 function _saveCanvasState(){
 var canvas=document.getElementById('canvasNote');
+if(!canvas){canvas=document.querySelector('#canvasNoteOverlay canvas');}
 if(canvas)_canvasHistory.push(canvas.toDataURL());
 if(_canvasHistory.length>30)_canvasHistory.shift();
 }
 function canvasUndo(){
 if(!_canvasHistory.length)return;
 var canvas=document.getElementById('canvasNote');
-var ctx=_canvasCtx;
-var img=new Image();
-var data=_canvasHistory.pop();
-img.onload=function(){
-ctx.clearRect(0,0,canvas.width/2,canvas.height/2);
-ctx.drawImage(img,0,0,canvas.width/2,canvas.height/2);
-};
+if(!canvas)canvas=document.querySelector('#canvasNoteOverlay canvas');
+_canvasHistory.pop();
 if(_canvasHistory.length){
+var img=new Image();
+img.onload=function(){
+_canvasCtx.clearRect(0,0,canvas.width/2,canvas.height/2);
+_canvasCtx.drawImage(img,0,0,canvas.width/2,canvas.height/2);
+};
 img.src=_canvasHistory[_canvasHistory.length-1];
 } else {
-ctx.clearRect(0,0,canvas.width/2,canvas.height/2);
+_canvasCtx.clearRect(0,0,canvas.width/2,canvas.height/2);
 }
 }
 function canvasClear(){
 if(!_canvasCtx)return;
 _saveCanvasState();
 var canvas=document.getElementById('canvasNote');
+if(!canvas)canvas=document.querySelector('#canvasNoteOverlay canvas');
 _canvasCtx.clearRect(0,0,canvas.width/2,canvas.height/2);
 }
 function saveCanvasNote(){
 var canvas=document.getElementById('canvasNote');
+if(!canvas)canvas=document.querySelector('#canvasNoteOverlay canvas');
 if(!canvas)return;
 var title=document.getElementById('canvasNoteTitle').value.trim()||'Çizim Notu';
 var dataUrl=canvas.toDataURL('image/png',0.8);
+if(_canvasEditingNoteId){
+// Mevcut notu güncelle
+var note=D.notes.find(function(n){return n.id===_canvasEditingNoteId;});
+if(note){
+note.title=title;
+note.media=[{type:'image',name:'canvas.png',data:dataUrl}];
+note.updatedAt=new Date().toISOString();
+}
+showToast('Çizim güncellendi ✓');
+} else {
+// Yeni not
 D.notes.unshift({
 id:Date.now(),title:title,content:'[Çizim Notu]',
 media:[{type:'image',name:'canvas.png',data:dataUrl}],
 tags:['çizim'],createdAt:new Date().toISOString()
 });
+showToast('Çizim kaydedildi ✏️');
+}
 saveData();renderNotes();
 closeCanvasNote();
-showToast('Çizim kaydedildi ✏️');
 }
