@@ -168,8 +168,7 @@ Yeni Günlük Girişi
 <div class="pomo-card">
 <div class="pomo-modes">
 <button class="pomo-mode-btn active" id="pomoBtnWork" onclick="setPomoMode('work')">Çalışma · <span id="pomoWorkLbl">25</span>dk</button>
-<button class="pomo-mode-btn" id="pomoBtnShort" onclick="setPomoMode('short')">Kısa · <span id="pomoShortLbl">5</span>dk</button>
-<button class="pomo-mode-btn" id="pomoBtnLong" onclick="setPomoMode('long')">Uzun · <span id="pomoLongLbl">15</span>dk</button>
+<button class="pomo-mode-btn" id="pomoBtnShort" onclick="setPomoMode('short')">Mola · <span id="pomoShortLbl">5</span>dk</button>
 </div>
 <div class="pomo-ring" id="pomoRingWrap" ondblclick="openPomoDurEdit()">
 <svg class="pomo-svg" viewBox="0 0 140 140" id="pomoRingSVG" style="display:block;">
@@ -231,6 +230,48 @@ Küçült
 </div>
 </div>
 
+</div>
+<!-- CANVAS NOTE -->
+<div id="canvasNoteOverlay" style="display:none;position:fixed;inset:0;z-index:600;background:var(--bg);flex-direction:column;">
+<div style="display:flex;align-items:center;padding:10px 14px;background:var(--bg2);border-bottom:1px solid var(--border);gap:8px;flex-shrink:0;">
+<button onclick="closeCanvasNote()" style="background:none;border:none;cursor:pointer;color:var(--text2);width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><polyline points="15 18 9 12 15 6"/></svg>
+</button>
+<input type="text" id="canvasNoteTitle" placeholder="Not başlığı..." style="flex:1;background:none;border:none;outline:none;font-family:'Sora',sans-serif;font-size:.88rem;color:var(--text);">
+<button onclick="saveCanvasNote()" style="background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:8px;padding:7px 14px;cursor:pointer;color:#fff;font-size:.76rem;font-family:'Sora',sans-serif;">Kaydet</button>
+</div>
+<!-- Araç çubuğu -->
+<div id="canvasToolbar" style="display:flex;align-items:center;gap:4px;padding:8px 14px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;">
+<button onclick="setCanvasTool('pen')" id="ct-pen" class="ct-btn ct-active" title="Kalem">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+</button>
+<button onclick="setCanvasTool('highlighter')" id="ct-highlighter" class="ct-btn" title="Vurgulayıcı">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M9 11l-6 6v3h9l3-3"/><path d="M22 12l-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>
+</button>
+<button onclick="setCanvasTool('eraser')" id="ct-eraser" class="ct-btn" title="Silgi">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M20 20H7L3 16c-.8-.8-.8-2 0-2.8L14.8 1.4c.8-.8 2-.8 2.8 0l5 5c.8.8.8 2 0 2.8L11 20"/></svg>
+</button>
+<div style="width:1px;height:24px;background:var(--border);margin:0 4px;flex-shrink:0;"></div>
+<!-- Renk seçici -->
+<button onclick="setCanvasColor('#f0eeff')" class="ct-color ct-color-active" style="background:#f0eeff;" data-color="#f0eeff"></button>
+<button onclick="setCanvasColor('#f87171')" class="ct-color" style="background:#f87171;" data-color="#f87171"></button>
+<button onclick="setCanvasColor('#60a5fa')" class="ct-color" style="background:#60a5fa;" data-color="#60a5fa"></button>
+<button onclick="setCanvasColor('#4ade80')" class="ct-color" style="background:#4ade80;" data-color="#4ade80"></button>
+<button onclick="setCanvasColor('#fbbf24')" class="ct-color" style="background:#fbbf24;" data-color="#fbbf24"></button>
+<button onclick="setCanvasColor('#f472b6')" class="ct-color" style="background:#f472b6;" data-color="#f472b6"></button>
+<div style="width:1px;height:24px;background:var(--border);margin:0 4px;flex-shrink:0;"></div>
+<!-- Boyut -->
+<input type="range" id="canvasBrushSize" min="1" max="20" value="3" style="width:80px;" oninput="updateCanvasBrush()" title="Kalem boyutu">
+<span id="canvasSizeLbl" style="font-size:.56rem;color:var(--text3);font-family:'JetBrains Mono',monospace;min-width:20px;">3</span>
+<div style="width:1px;height:24px;background:var(--border);margin:0 4px;flex-shrink:0;"></div>
+<button onclick="canvasUndo()" class="ct-btn" title="Geri Al">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-2.84"/></svg>
+</button>
+<button onclick="canvasClear()" class="ct-btn" title="Temizle" style="color:var(--hard);">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+</button>
+</div>
+<canvas id="canvasNote" style="flex:1;touch-action:none;cursor:crosshair;"></canvas>
 </div>
 <!-- KANBAN (Pro) -->
 <div class="page" id="page-kanban">
@@ -714,6 +755,7 @@ Ekle
 <div class="template-card" onclick="useTemplate('goal')"><div class="template-card-icon">🎯</div><div class="template-card-name">Hedef</div><div class="template-card-desc">Hedef, neden, nasıl</div></div>
 <div class="template-card" onclick="useTemplate('lecture')"><div class="template-card-icon">🎓</div><div class="template-card-name">Ders Notu</div><div class="template-card-desc">Konu, formüller, sorular</div></div>
 <div class="template-card" onclick="useTemplate('blank')"><div class="template-card-icon">✦</div><div class="template-card-name">Boş Not</div><div class="template-card-desc">Şablonsuz, özgürce yaz</div></div>
+<div class="template-card" onclick="closeTemplates();openCanvasNote()" style="border:1px solid rgba(124,111,247,.3);"><div class="template-card-icon">✏️</div><div class="template-card-name">Tabletten Not</div><div class="template-card-desc">Kalemle çiz, yaz, eskiz yap</div></div>
 </div>
 </div>
 </div>
@@ -1065,31 +1107,6 @@ Drive'dan Geri Yükle
 </div>
 <!-- GÜVENLİK -->
 <!-- DİL -->
-<div class="stt-section-label" data-i18n="language">Dil</div>
-<div class="stt-group">
-<div class="stt-item" onclick="document.getElementById('langExpandArea').style.display=document.getElementById('langExpandArea').style.display==='none'?'block':'none'">
-<div class="stt-icon" style="background:linear-gradient(135deg,#60a5fa,#3b82f6);">
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-</div>
-<div class="stt-text">
-<div class="stt-title" data-i18n="language">Dil</div>
-<div class="stt-sub" id="currentLangLabel">Türkçe</div>
-</div>
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--text3);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
-</div>
-<div id="langExpandArea" style="display:none;padding:14px 16px 16px;border-top:1px solid var(--border);">
-<div style="display:flex;gap:8px;">
-<button onclick="setLang('tr')" style="flex:1;padding:12px;background:var(--bg3);border:2px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .2s;" id="langBtnTr">
-<div style="font-size:1.2rem;margin-bottom:4px;">🇹🇷</div>
-<div style="font-size:.76rem;font-weight:500;color:var(--text);">Türkçe</div>
-</button>
-<button onclick="setLang('en')" style="flex:1;padding:12px;background:var(--bg3);border:2px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .2s;" id="langBtnEn">
-<div style="font-size:1.2rem;margin-bottom:4px;">🇬🇧</div>
-<div style="font-size:.76rem;font-weight:500;color:var(--text);">English</div>
-</button>
-</div>
-</div>
-</div>
 <!-- GÜVENLİK -->
 <div class="stt-section-label" data-i18n="security">Güvenlik</div>
 <div class="stt-group">

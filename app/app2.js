@@ -222,7 +222,7 @@ setTimeout(_initGdriveOnLoad,1000);
 function setPomoMode(m){
 pomoMode=m;clearInterval(pomoInterval);pomoRunning=false;pomoSecs=POMO_DUR[m];
 ['work','short','long'].forEach(k=>document.getElementById('pomoBtn'+k.charAt(0).toUpperCase()+k.slice(1))?.classList.toggle('active',k===m));
-const labels={work:'Çalışma Seansı',short:'Kısa Mola',long:'Uzun Mola'};
+const labels={work:'Çalışma Seansı',short:'Mola',long:'Mola'};
 document.getElementById('pomoLabel').textContent=labels[m];
 document.getElementById('pomoRing').className='pomo-prog '+m;
 document.getElementById('pomoIcon').innerHTML='<polygon points="5 3 19 12 5 21 5 3" fill="currentColor"/>';
@@ -270,28 +270,34 @@ if(minimalWrap){minimalWrap.style.display='flex';const deg=prog*360;minimalWrap.
 if(timeEl){timeEl.style.display='block';timeEl.textContent=timeStr;}
 }
 }
+function _fmtDurInput(mins){var h=Math.floor(mins/60);var m=mins%60;return h>0?h+'s '+m+'dk':m+'dk';}
 function openPomoDurEdit(){
 const existing=document.getElementById('pomoDurModal');
 if(existing){existing.remove();return;}
-const w=POMO_DUR_CUSTOM.work,sh=POMO_DUR_CUSTOM.short,lo=POMO_DUR_CUSTOM.long;
+const w=POMO_DUR_CUSTOM.work,sh=POMO_DUR_CUSTOM.short;
+const wH=Math.floor(w/60),wM=w%60,sH=Math.floor(sh/60),sM=sh%60;
 const modal=document.createElement('div');
 modal.id='pomoDurModal';
 modal.style.cssText='position:fixed;inset:0;z-index:3500;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px;';
 modal.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:22px;width:100%;max-width:320px;position:relative;">
 <button onclick="document.getElementById('pomoDurModal').remove()" style="position:absolute;top:10px;right:12px;background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--text3);">✕</button>
 <div style="font-size:.86rem;font-weight:500;color:var(--text);margin-bottom:16px;">⏱ Süre Ayarla</div>
-<div style="display:flex;flex-direction:column;gap:14px;">
+<div style="display:flex;flex-direction:column;gap:16px;">
 <div>
-<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:.74rem;color:var(--text2);">\ud83c\udf45 Çalışma</span><span id="pdr-work-val" style="font-size:.8rem;font-family:JetBrains Mono,monospace;color:var(--accent2);">${w} dk</span></div>
-<input type="range" min="5" max="90" value="${w}" id="pdr-work" style="width:100%;" oninput="document.getElementById('pdr-work-val').textContent=this.value+' dk'">
+<div style="font-size:.74rem;color:var(--accent2);margin-bottom:8px;">🍅 Çalışma Süresi</div>
+<div style="display:flex;gap:8px;align-items:center;">
+<div style="flex:1;"><div style="font-size:.56rem;color:var(--text3);margin-bottom:3px;">Saat</div><input type="number" id="pdr-work-h" min="0" max="12" value="${wH}" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;font-family:JetBrains Mono,monospace;font-size:1.1rem;color:var(--text);text-align:center;outline:none;box-sizing:border-box;"></div>
+<div style="font-size:1.2rem;color:var(--text3);padding-top:14px;">:</div>
+<div style="flex:1;"><div style="font-size:.56rem;color:var(--text3);margin-bottom:3px;">Dakika</div><input type="number" id="pdr-work-m" min="0" max="59" value="${wM}" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;font-family:JetBrains Mono,monospace;font-size:1.1rem;color:var(--text);text-align:center;outline:none;box-sizing:border-box;"></div>
+</div>
 </div>
 <div>
-<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:.74rem;color:var(--text2);">☕ Kısa Mola</span><span id="pdr-short-val" style="font-size:.8rem;font-family:JetBrains Mono,monospace;color:var(--easy);">${sh} dk</span></div>
-<input type="range" min="1" max="30" value="${sh}" id="pdr-short" style="width:100%;" oninput="document.getElementById('pdr-short-val').textContent=this.value+' dk'">
+<div style="font-size:.74rem;color:var(--easy);margin-bottom:8px;">☕ Mola Süresi</div>
+<div style="display:flex;gap:8px;align-items:center;">
+<div style="flex:1;"><div style="font-size:.56rem;color:var(--text3);margin-bottom:3px;">Saat</div><input type="number" id="pdr-short-h" min="0" max="12" value="${sH}" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;font-family:JetBrains Mono,monospace;font-size:1.1rem;color:var(--text);text-align:center;outline:none;box-sizing:border-box;"></div>
+<div style="font-size:1.2rem;color:var(--text3);padding-top:14px;">:</div>
+<div style="flex:1;"><div style="font-size:.56rem;color:var(--text3);margin-bottom:3px;">Dakika</div><input type="number" id="pdr-short-m" min="0" max="59" value="${sM}" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;font-family:JetBrains Mono,monospace;font-size:1.1rem;color:var(--text);text-align:center;outline:none;box-sizing:border-box;"></div>
 </div>
-<div>
-<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:.74rem;color:var(--text2);">\ud83c\udf3f Uzun Mola</span><span id="pdr-long-val" style="font-size:.8rem;font-family:JetBrains Mono,monospace;color:var(--note);">${lo} dk</span></div>
-<input type="range" min="5" max="45" value="${lo}" id="pdr-long" style="width:100%;" oninput="document.getElementById('pdr-long-val').textContent=this.value+' dk'">
 </div>
 </div>
 <button onclick="savePomoDur()" style="width:100%;margin-top:16px;padding:11px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:10px;color:#fff;font-family:'Sora',sans-serif;font-size:.84rem;cursor:pointer;">Kaydet</button>
@@ -300,18 +306,20 @@ document.body.appendChild(modal);
 modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
 }
 function savePomoDur(){
-const wEl=document.getElementById('pdr-work');
-const sEl=document.getElementById('pdr-short');
-const lEl=document.getElementById('pdr-long');
-if(!wEl||!sEl||!lEl){showToast('Hata: Slider bulunamadı');return;}
-POMO_DUR_CUSTOM.work=parseInt(wEl.value);
-POMO_DUR_CUSTOM.short=parseInt(sEl.value);
-POMO_DUR_CUSTOM.long=parseInt(lEl.value);
+const wH=parseInt(document.getElementById('pdr-work-h')?.value)||0;
+const wM=parseInt(document.getElementById('pdr-work-m')?.value)||0;
+const sH=parseInt(document.getElementById('pdr-short-h')?.value)||0;
+const sM=parseInt(document.getElementById('pdr-short-m')?.value)||0;
+const workTotal=wH*60+wM;const shortTotal=sH*60+sM;
+if(workTotal<1){showToast('Çalışma en az 1 dk olmalı');return;}
+if(shortTotal<1){showToast('Mola en az 1 dk olmalı');return;}
+POMO_DUR_CUSTOM.work=workTotal;
+POMO_DUR_CUSTOM.short=shortTotal;
+POMO_DUR_CUSTOM.long=shortTotal;
 localStorage.setItem('capsula_pomo_dur',JSON.stringify(POMO_DUR_CUSTOM));
-const wl=document.getElementById('pomoWorkLbl');const sl=document.getElementById('pomoShortLbl');const ll=document.getElementById('pomoLongLbl');
-if(wl)wl.textContent=POMO_DUR_CUSTOM.work;
-if(sl)sl.textContent=POMO_DUR_CUSTOM.short;
-if(ll)ll.textContent=POMO_DUR_CUSTOM.long;
+const wl=document.getElementById('pomoWorkLbl');const sl=document.getElementById('pomoShortLbl');
+if(wl)wl.textContent=workTotal;
+if(sl)sl.textContent=shortTotal;
 const durModal=document.getElementById('pomoDurModal');
 if(durModal)durModal.remove();
 setPomoMode(pomoMode);
@@ -2982,7 +2990,7 @@ if(!ov)return;
 ov.style.display='flex';
 var label=document.getElementById('fsTimerLabel');
 if(mode==='pomo'){
-if(label)label.textContent=pomoMode==='work'?'Çalışma Seansı':pomoMode==='short'?'Kısa Mola':'Uzun Mola';
+if(label)label.textContent=pomoMode==='work'?'Çalışma Seansı':'Mola';
 _updateFsPomoDisplay();
 } else {
 if(label)label.textContent='Kronometre';
@@ -3025,4 +3033,126 @@ _ouPD();
 _updateFsPomoDisplay();
 _updateFsPlayIcon();
 };
+}
+
+// ══════════════════════════════════════════════════════
+// CANVAS NOTE (Tablet kalemle yazma)
+// ══════════════════════════════════════════════════════
+var _canvasTool='pen',_canvasColor='#f0eeff',_canvasBrush=3,_canvasDrawing=false,_canvasHistory=[],_canvasCtx=null;
+function openCanvasNote(){
+var ov=document.getElementById('canvasNoteOverlay');
+if(!ov)return;
+ov.style.display='flex';
+document.getElementById('canvasNoteTitle').value='';
+var canvas=document.getElementById('canvasNote');
+canvas.width=canvas.offsetWidth*2;
+canvas.height=canvas.offsetHeight*2;
+canvas.style.background='#1a1a2e';
+_canvasCtx=canvas.getContext('2d');
+_canvasCtx.scale(2,2);
+_canvasCtx.lineCap='round';_canvasCtx.lineJoin='round';
+_canvasHistory=[];
+_setupCanvasEvents(canvas);
+try{history.pushState({page:curPage,overlay:'canvas'},'',null);}catch(e){}
+}
+function closeCanvasNote(){
+var ov=document.getElementById('canvasNoteOverlay');
+if(ov)ov.style.display='none';
+}
+function _setupCanvasEvents(canvas){
+var getPos=function(e){
+var rect=canvas.getBoundingClientRect();
+var touch=e.touches?e.touches[0]:e;
+return{x:touch.clientX-rect.left,y:touch.clientY-rect.top};
+};
+var onStart=function(e){
+e.preventDefault();
+_canvasDrawing=true;
+_saveCanvasState();
+var pos=getPos(e);
+_canvasCtx.beginPath();
+_canvasCtx.moveTo(pos.x,pos.y);
+};
+var onMove=function(e){
+if(!_canvasDrawing)return;
+e.preventDefault();
+var pos=getPos(e);
+if(_canvasTool==='eraser'){
+_canvasCtx.globalCompositeOperation='destination-out';
+_canvasCtx.lineWidth=_canvasBrush*4;
+_canvasCtx.strokeStyle='rgba(0,0,0,1)';
+} else if(_canvasTool==='highlighter'){
+_canvasCtx.globalCompositeOperation='source-over';
+_canvasCtx.lineWidth=_canvasBrush*3;
+_canvasCtx.strokeStyle=_canvasColor+'44';
+} else {
+_canvasCtx.globalCompositeOperation='source-over';
+_canvasCtx.lineWidth=_canvasBrush;
+_canvasCtx.strokeStyle=_canvasColor;
+}
+_canvasCtx.lineTo(pos.x,pos.y);
+_canvasCtx.stroke();
+_canvasCtx.beginPath();
+_canvasCtx.moveTo(pos.x,pos.y);
+};
+var onEnd=function(){_canvasDrawing=false;_canvasCtx.beginPath();};
+canvas.addEventListener('pointerdown',onStart);
+canvas.addEventListener('pointermove',onMove);
+canvas.addEventListener('pointerup',onEnd);
+canvas.addEventListener('pointerleave',onEnd);
+}
+function setCanvasTool(tool){
+_canvasTool=tool;
+document.querySelectorAll('.ct-btn').forEach(function(b){b.classList.remove('ct-active');});
+var btn=document.getElementById('ct-'+tool);
+if(btn)btn.classList.add('ct-active');
+}
+function setCanvasColor(color){
+_canvasColor=color;
+document.querySelectorAll('.ct-color').forEach(function(b){b.classList.toggle('ct-color-active',b.dataset.color===color);});
+}
+function updateCanvasBrush(){
+_canvasBrush=parseInt(document.getElementById('canvasBrushSize').value)||3;
+document.getElementById('canvasSizeLbl').textContent=_canvasBrush;
+}
+function _saveCanvasState(){
+var canvas=document.getElementById('canvasNote');
+if(canvas)_canvasHistory.push(canvas.toDataURL());
+if(_canvasHistory.length>30)_canvasHistory.shift();
+}
+function canvasUndo(){
+if(!_canvasHistory.length)return;
+var canvas=document.getElementById('canvasNote');
+var ctx=_canvasCtx;
+var img=new Image();
+var data=_canvasHistory.pop();
+img.onload=function(){
+ctx.clearRect(0,0,canvas.width/2,canvas.height/2);
+ctx.drawImage(img,0,0,canvas.width/2,canvas.height/2);
+};
+if(_canvasHistory.length){
+img.src=_canvasHistory[_canvasHistory.length-1];
+} else {
+ctx.clearRect(0,0,canvas.width/2,canvas.height/2);
+}
+}
+function canvasClear(){
+if(!_canvasCtx)return;
+_saveCanvasState();
+var canvas=document.getElementById('canvasNote');
+_canvasCtx.clearRect(0,0,canvas.width/2,canvas.height/2);
+}
+function saveCanvasNote(){
+var canvas=document.getElementById('canvasNote');
+if(!canvas)return;
+var title=document.getElementById('canvasNoteTitle').value.trim()||'Çizim Notu';
+var dataUrl=canvas.toDataURL('image/png',0.8);
+D.notes.unshift({
+id:Date.now(),title:title,content:'[Çizim Notu]',
+media:[{type:'image',name:'canvas.png',data:dataUrl}],
+tags:['çizim'],createdAt:new Date().toISOString()
+});
+saveData();renderNotes();
+closeCanvasNote();
+showToast('Çizim kaydedildi ✏️');
 }
