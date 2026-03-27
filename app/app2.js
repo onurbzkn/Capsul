@@ -3052,28 +3052,12 @@ var ov=document.getElementById('canvasNoteOverlay');
 if(!ov)return;
 ov.style.display='flex';
 _canvasEditingNoteId=editNoteId||null;
-var canvas=document.getElementById('canvasNote');
-canvas.width=canvas.offsetWidth*2;
-canvas.height=canvas.offsetHeight*2;
-canvas.style.background='#1a1a2e';
-_canvasCtx=canvas.getContext('2d');
-_canvasCtx.scale(2,2);
-_canvasCtx.lineCap='round';_canvasCtx.lineJoin='round';
 _canvasHistory=[];
-// Düzenleme moduysa mevcut çizimi yükle
+var canvas=document.getElementById('canvasNote');
+canvas.style.background='#1a1a2e';
 if(editNoteId){
 var note=D.notes.find(function(n){return n.id===editNoteId;});
-if(note){
-document.getElementById('canvasNoteTitle').value=note.title||'';
-if(note.media&&note.media.length&&note.media[0].data){
-var img=new Image();
-img.onload=function(){
-_canvasCtx.drawImage(img,0,0,canvas.width/2,canvas.height/2);
-_saveCanvasState();
-};
-img.src=note.media[0].data;
-}
-}
+if(note)document.getElementById('canvasNoteTitle').value=note.title||'';
 } else {
 document.getElementById('canvasNoteTitle').value='';
 }
@@ -3095,10 +3079,26 @@ function _setupCanvasEvents(canvas){
 var newCanvas=canvas.cloneNode(true);
 canvas.parentNode.replaceChild(newCanvas,canvas);
 var c=newCanvas;
+// Canvas boyutunu ayarla
+c.width=c.offsetWidth*2;
+c.height=c.offsetHeight*2;
 _canvasCtx=c.getContext('2d');
+_canvasCtx.scale(2,2);
+_canvasCtx.lineCap='round';_canvasCtx.lineJoin='round';
+// Düzenleme moduysa mevcut çizimi yükle
+if(_canvasEditingNoteId){
+var note=D.notes.find(function(n){return n.id===_canvasEditingNoteId;});
+if(note&&note.media&&note.media.length&&note.media[0].data){
+var loadImg=new Image();
+loadImg.onload=function(){_canvasCtx.drawImage(loadImg,0,0,c.offsetWidth,c.offsetHeight);_saveCanvasState();};
+loadImg.src=note.media[0].data;
+}
+}
 var getPos=function(e){
 var rect=c.getBoundingClientRect();
-return{x:e.clientX-rect.left,y:e.clientY-rect.top};
+var scaleX=c.offsetWidth/rect.width;
+var scaleY=c.offsetHeight/rect.height;
+return{x:(e.clientX-rect.left)*scaleX,y:(e.clientY-rect.top)*scaleY};
 };
 var onStart=function(e){
 // Stylus modunda parmağı engelle
