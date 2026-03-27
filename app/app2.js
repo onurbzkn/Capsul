@@ -1331,18 +1331,29 @@ if(drawerBadge)drawerBadge.style.display='none';
 }
 function checkAndFireNotifications(){
 if(!('Notification' in window)||Notification.permission!=='granted')return;
-const now=new Date();if(now.getHours()!==9)return;
+const now=new Date();
 const todayKey=now.toISOString().split('T')[0];
 if(localStorage.getItem('capsula_notif_fired')===todayKey)return;
+// Sadece 7-22 arası bildirim gönder
+if(now.getHours()<7||now.getHours()>22)return;
+const streak=calcStreak();
 const todayTodos=D.todos.filter(t=>t.dueDate===todayKey);
 const overdue=D.todos.filter(t=>{if(!t.dueDate)return false;const d=new Date(t.dueDate);d.setHours(0,0,0,0);return d<new Date().setHours(0,0,0,0);});
-if(todayTodos.length||overdue.length){
-let body='';
-if(todayTodos.length)body+=`Bugün: ${todayTodos.length} görev. `;
-if(overdue.length)body+=`Gecikmiş: ${overdue.length} görev.`;
-try{new Notification('Capsula \ud83d\udccb',{body:body.trim()});}catch(e){}
+const totalActive=D.todos.length;
+const habitsToday=(D.habits||[]).length;
+const habitsDone=(D.habits||[]).filter(function(h){return h.log&&h.log[todayKey];}).length;
+const hr=now.getHours();
+const greet=hr<12?'Günaydın':'İyi günler';
+let body=greet+' '+D.profile.name.split(' ')[0]+'! ';
+if(streak>=3)body+=streak+' günlük serin devam ediyor 🔥 ';
+if(todayTodos.length)body+=todayTodos.length+' görev bugün bitmeli. ';
+if(overdue.length)body+=overdue.length+' gecikmiş görev var! ';
+if(!todayTodos.length&&!overdue.length&&totalActive)body+=totalActive+' aktif görevin var. ';
+if(habitsToday&&habitsDone<habitsToday)body+=(habitsToday-habitsDone)+' alışkanlık seni bekliyor 💪';
+if(!totalActive&&!habitsToday)body+='Bugün harika bir gün! Yeni bir görev ekle ✨';
+try{new Notification('Capsula ✦',{body:body.trim(),icon:'/app/icon-192.png',badge:'/app/icon-192.png'});}catch(e){}
 localStorage.setItem('capsula_notif_fired',todayKey);
-}
+addNotification(body.trim(),'daily');
 }
 function openReminderModal(){
 if(document.getElementById('drawer').classList.contains('open'))toggleDrawer();
@@ -1643,6 +1654,8 @@ if(!D.contentTrash)D.contentTrash=[];
 if(!D.trash)D.trash=[];
 if(!D.timeCapsules)D.timeCapsules=[];
 if(!D.habits)D.habits=[];
+if(!D.moodLog)D.moodLog={};
+if(!D.goals)D.goals=[];
 }
 initTheme();
 localStorage.setItem('capsula_visited','1');
@@ -2462,6 +2475,189 @@ viewEntry('diary', eid);
 // ══════════════════════════════════════════════════════
 // HABIT TRACKER
 // ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
+// MOOD TRACKER
+// ══════════════════════════════════════════════════════
+var MOOD_OPTIONS=[
+{emoji:'😊',label:'Harika',color:'#4ade80'},
+{emoji:'🙂',label:'İyi',color:'#60a5fa'},
+{emoji:'😐',label:'Normal',color:'#fbbf24'},
+{emoji:'😔',label:'Kötü',color:'#fb923c'},
+{emoji:'😤',label:'Sinirli',color:'#f87171'},
+{emoji:'😌',label:'Huzurlu',color:'#a78bfa'},
+{emoji:'🤔',label:'Düşünceli',color:'#818cf8'},
+{emoji:'😴',label:'Yorgun',color:'#94a3b8'},
+];
+function setMood(emoji){
+if(!D.moodLog)D.moodLog={};
+var today=new Date().toISOString().split('T')[0];
+D.moodLog[today]=emoji;
+saveData();renderMoodTracker();
+showToast('Ruh halin kaydedildi '+emoji);
+}
+function renderMoodTracker(){
+if(!D.moodLog)D.moodLog={};
+var today=new Date().toISOString().split('T')[0];
+var todayMood=D.moodLog[today];
+var todayCard=document.getElementById('moodTodayCard');
+var calEl=document.getElementById('moodCalendar');
+var statsEl=document.getElementById('moodStats');
+var summaryEl=document.getElementById('moodSummary');
+// Bugünkü mod seçici
+if(todayCard){
+todayCard.innerHTML='<div style="background:linear-gradient(135deg,rgba(124,111,247,.08),rgba(168,157,254,.04));border:1px solid rgba(124,111,247,.2);border-radius:14px;padding:16px;">'
++'<div style="font-size:.72rem;color:var(--text2);margin-bottom:10px;">'+(todayMood?'Bugün nasıl hissediyorsun? (Değiştir)':'Bugün nasıl hissediyorsun?')+'</div>'
++'<div style="display:flex;gap:6px;flex-wrap:wrap;">'+MOOD_OPTIONS.map(function(m){
+var sel=todayMood===m.emoji;
+return '<button onclick="setMood(\''+m.emoji+'\')" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 10px;border-radius:12px;border:2px solid '+(sel?m.color:'transparent')+';background:'+(sel?m.color+'18':'var(--bg3)')+';cursor:pointer;transition:all .15s;">'
++'<span style="font-size:1.4rem;">'+m.emoji+'</span>'
++'<span style="font-size:.5rem;color:'+(sel?m.color:'var(--text3)')+';">'+m.label+'</span>'
++'</button>';
+}).join('')+'</div>'
++'</div>';
+}
+// Aylık takvim grid
+if(calEl){
+var now=new Date();var year=now.getFullYear();var month=now.getMonth();
+var firstDay=new Date(year,month,1).getDay();var daysInMonth=new Date(year,month+1,0).getDate();
+var monthNames=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+var html='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;">'
++'<div style="font-size:.78rem;font-weight:500;color:var(--text);margin-bottom:10px;">'+monthNames[month]+' '+year+'</div>'
++'<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;">';
+['Pt','Sa','Ça','Pe','Cu','Ct','Pz'].forEach(function(d){html+='<div style="font-size:.48rem;color:var(--text3);padding:2px;">'+d+'</div>';});
+var startDay=(firstDay+6)%7;
+for(var i=0;i<startDay;i++)html+='<div></div>';
+for(var d=1;d<=daysInMonth;d++){
+var dk=year+'-'+String(month+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+var mood=D.moodLog[dk];
+var isToday=dk===today;
+var moodObj=mood?MOOD_OPTIONS.find(function(m){return m.emoji===mood;}):null;
+html+='<div style="aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:'+(mood?'.9rem':'.56rem')+';'
++'background:'+(mood&&moodObj?moodObj.color+'18':isToday?'rgba(124,111,247,.1)':'transparent')+';'
++'border:1px solid '+(isToday?'var(--accent)':'transparent')+';'
++'color:'+(mood?'inherit':'var(--text3)')+';cursor:default;">'
++(mood||d)+'</div>';
+}
+html+='</div></div>';
+calEl.innerHTML=html;
+}
+// İstatistikler
+if(statsEl){
+var entries=Object.keys(D.moodLog);
+if(entries.length<2){statsEl.innerHTML='';if(summaryEl)summaryEl.textContent=entries.length+' gün kaydedildi';return;}
+var counts={};MOOD_OPTIONS.forEach(function(m){counts[m.emoji]=0;});
+entries.forEach(function(k){var e=D.moodLog[k];if(counts[e]!==undefined)counts[e]++;});
+var topMood=MOOD_OPTIONS.reduce(function(a,b){return counts[a.emoji]>=counts[b.emoji]?a:b;});
+if(summaryEl)summaryEl.textContent=entries.length+' gün kaydedildi · En çok: '+topMood.emoji+' '+topMood.label;
+var sHtml='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;">'
++'<div style="font-size:.68rem;font-weight:500;color:var(--text);margin-bottom:10px;">Ruh Hali Dağılımı</div>'
++'<div style="display:flex;flex-direction:column;gap:6px;">';
+MOOD_OPTIONS.forEach(function(m){
+var c=counts[m.emoji]||0;var pct=entries.length?Math.round(c/entries.length*100):0;
+if(!c)return;
+sHtml+='<div style="display:flex;align-items:center;gap:8px;">'
++'<span style="font-size:.9rem;width:24px;text-align:center;">'+m.emoji+'</span>'
++'<div style="flex:1;background:var(--bg3);border-radius:4px;height:8px;overflow:hidden;">'
++'<div style="height:100%;width:'+pct+'%;background:'+m.color+';border-radius:4px;transition:width .4s;"></div></div>'
++'<span style="font-size:.58rem;font-family:JetBrains Mono,monospace;color:'+m.color+';width:28px;text-align:right;">'+c+'</span>'
++'</div>';
+});
+sHtml+='</div></div>';
+statsEl.innerHTML=sHtml;
+}
+}
+// ══════════════════════════════════════════════════════
+// GOALS (Hedef Belirleme)
+// ══════════════════════════════════════════════════════
+function openGoalAdd(){
+document.getElementById('goalAddModal')&&document.getElementById('goalAddModal').remove();
+var m=document.createElement('div');m.id='goalAddModal';
+m.style.cssText='position:fixed;inset:0;z-index:3500;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;padding:20px;';
+m.innerHTML='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:22px;width:100%;max-width:360px;">'
++'<button onclick="document.getElementById(\'goalAddModal\').remove()" style="position:absolute;top:10px;right:12px;background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--text3);">✕</button>'
++'<div style="font-size:.86rem;font-weight:500;color:var(--text);margin-bottom:14px;">🎯 Yeni Hedef</div>'
++'<input type="text" id="goalTitleInput" placeholder="Hedef adı (örn: 10 kitap oku)" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:Sora,sans-serif;font-size:.84rem;color:var(--text);outline:none;margin-bottom:10px;box-sizing:border-box;">'
++'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">'
++'<div><div style="font-size:.62rem;color:var(--text3);margin-bottom:3px;">Hedef sayı</div><input type="number" id="goalTargetInput" min="1" value="10" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:Sora,sans-serif;font-size:.82rem;color:var(--text);outline:none;box-sizing:border-box;"></div>'
++'<div><div style="font-size:.62rem;color:var(--text3);margin-bottom:3px;">Bitiş tarihi</div><input type="date" id="goalDeadlineInput" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:Sora,sans-serif;font-size:.82rem;color:var(--text);outline:none;box-sizing:border-box;"></div>'
++'</div>'
++'<div style="font-size:.62rem;color:var(--text3);margin-bottom:3px;">Takip türü</div>'
++'<select id="goalTypeInput" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:Sora,sans-serif;font-size:.8rem;color:var(--text);outline:none;margin-bottom:14px;box-sizing:border-box;">'
++'<option value="manual">Manuel güncelle</option>'
++'<option value="tasks">Tamamlanan görevler</option>'
++'<option value="books">Bitirilen kitaplar</option>'
++'<option value="notes">Yazılan notlar</option>'
++'<option value="diary">Günlük girişleri</option>'
++'<option value="streak">Günlük seri</option>'
++'</select>'
++'<button onclick="saveGoal()" style="width:100%;padding:11px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:10px;color:#fff;font-family:Sora,sans-serif;font-size:.84rem;cursor:pointer;">Ekle</button>'
++'</div>';
+document.body.appendChild(m);
+m.addEventListener('click',function(e){if(e.target===m)m.remove();});
+}
+function saveGoal(){
+var title=document.getElementById('goalTitleInput').value.trim();
+if(!title){showToast('Hedef adı gir');return;}
+if(!D.goals)D.goals=[];
+D.goals.push({
+id:Date.now(),title:title,
+target:parseInt(document.getElementById('goalTargetInput').value)||10,
+current:0,
+type:document.getElementById('goalTypeInput').value,
+deadline:document.getElementById('goalDeadlineInput').value||null,
+createdAt:new Date().toISOString()
+});
+saveData();document.getElementById('goalAddModal').remove();renderGoals();showToast('Hedef eklendi 🎯');
+}
+function updateGoalProgress(id,val){
+var g=(D.goals||[]).find(function(x){return x.id===id;});if(!g)return;
+g.current=Math.max(0,Math.min(g.target,val));
+if(g.current>=g.target){showToast('🎉 Hedef tamamlandı: '+g.title);addNotification('🎯 "'+g.title+'" hedefini tamamladın!','goal');}
+saveData();renderGoals();
+}
+function deleteGoal(id){
+showConfirm('Bu hedefi silmek istiyor musun?',function(){
+D.goals=(D.goals||[]).filter(function(x){return x.id!==id;});
+saveData();renderGoals();showToast('Hedef silindi');
+});
+}
+function _autoCalcGoal(g){
+if(g.type==='tasks')return D.completedTodos.length;
+if(g.type==='books')return D.reading.filter(function(r){return r.status==='done';}).length;
+if(g.type==='notes')return D.notes.length;
+if(g.type==='diary')return D.diary.length;
+if(g.type==='streak')return calcStreak();
+return g.current;
+}
+function renderGoals(){
+if(!D.goals)D.goals=[];
+var cont=document.getElementById('goalsList');if(!cont)return;
+if(!D.goals.length){
+cont.innerHTML='<div style="text-align:center;padding:30px 20px;"><div style="font-size:2rem;margin-bottom:8px;">🎯</div><div style="font-size:.82rem;color:var(--text2);margin-bottom:4px;">Henüz hedef yok</div><div style="font-size:.68rem;color:var(--text3);">Yukarıdaki "Hedef Ekle" ile başla</div></div>';
+return;}
+var html='';
+D.goals.forEach(function(g){
+var cur=g.type==='manual'?g.current:_autoCalcGoal(g);
+if(g.type!=='manual')g.current=cur;
+var pct=g.target?Math.min(100,Math.round(cur/g.target*100)):0;
+var done=pct>=100;
+var daysLeft=g.deadline?Math.ceil((new Date(g.deadline)-new Date())/(1000*60*60*24)):null;
+html+='<div style="background:var(--bg2);border:1px solid '+(done?'rgba(74,222,128,.3)':'var(--border)')+';border-radius:14px;padding:14px;margin-bottom:10px;">'
++'<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">'
++'<div style="font-size:1.3rem;">'+(done?'✅':'🎯')+'</div>'
++'<div style="flex:1;"><div style="font-size:.82rem;font-weight:500;color:var(--text);">'+escHtml(g.title)+'</div>'
++'<div style="font-size:.58rem;color:var(--text3);margin-top:2px;">'+cur+' / '+g.target+(daysLeft!==null?' · '+(daysLeft>0?daysLeft+' gün kaldı':'Süre doldu!'):'')+'</div></div>'
++'<button onclick="deleteGoal('+g.id+')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:.7rem;padding:2px;">✕</button>'
++'</div>'
++'<div style="background:var(--bg3);border-radius:6px;height:10px;overflow:hidden;margin-bottom:6px;">'
++'<div style="height:100%;width:'+pct+'%;background:'+(done?'var(--easy)':'linear-gradient(90deg,var(--accent),var(--accent2))')+';border-radius:6px;transition:width .4s;"></div></div>'
++'<div style="display:flex;align-items:center;justify-content:space-between;">'
++'<span style="font-size:.64rem;font-family:JetBrains Mono,monospace;color:'+(done?'var(--easy)':'var(--accent2)')+';">'+pct+'%</span>'
++(g.type==='manual'?'<div style="display:flex;gap:4px;"><button onclick="updateGoalProgress('+g.id+','+(cur-1)+')" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:3px 8px;cursor:pointer;color:var(--text3);font-size:.7rem;">−</button><button onclick="updateGoalProgress('+g.id+','+(cur+1)+')" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:3px 8px;cursor:pointer;color:var(--accent2);font-size:.7rem;">+</button></div>':'<span style="font-size:.52rem;color:var(--text3);">Otomatik takip</span>')
++'</div></div>';
+});
+cont.innerHTML=html;
+}
 var HABIT_ICONS=['💪','📚','🏃','💧','🧘','🎯','✍️','🎵','🌅','💤','🥗','📵','🚶','💊','🧹','🌿'];
 function _todayKey(){return new Date().toISOString().split('T')[0];}
 function _getWeekDays(){

@@ -232,7 +232,7 @@ uni:[
 {id:'search',lbl:'Ara',ico:ICO_SEARCH},
 ],
 };
-function getPageTitles(){return{home:t('pageHome'),stats:t('pageStats'),todo:t('pageTodo'),notes:t('pageNotes'),diary:t('pageDiary'),search:t('pageSearch'),pomodoro:t('pagePomodoro'),kanban:t('pageKanban'),weekly:t('pageWeekly'),reading:t('pageReading'),pro:t('pagePro'),schedule:t('pageSchedule'),exams:t('pageExams'),notebook:t('pageNotebook'),habits:t('pageHabits')};}
+function getPageTitles(){return{home:t('pageHome'),stats:t('pageStats'),todo:t('pageTodo'),notes:t('pageNotes'),diary:t('pageDiary'),search:t('pageSearch'),pomodoro:t('pagePomodoro'),kanban:t('pageKanban'),weekly:t('pageWeekly'),reading:t('pageReading'),pro:t('pagePro'),schedule:t('pageSchedule'),exams:t('pageExams'),notebook:t('pageNotebook'),habits:t('pageHabits'),mood:t('pageMood')||'Ruh Hali'};}
 function setMode(mode){
 curMode=mode;
 buildNav();
@@ -277,6 +277,7 @@ if(page==='stats')renderStats();
 if(page==='search'){document.getElementById('search-results').innerHTML='';setTimeout(()=>{const inp=document.getElementById('searchInput');if(inp){inp.value='';inp.focus();}},200);}
 if(page==='pro')renderPro();
 if(page==='habits')renderHabits();
+if(page==='mood')renderMoodTracker();
 }
 const THEMES=['default','midnight','forest','sunset','ocean','sand','light','light-warm'];
 function applyTheme(name,el){
@@ -1591,10 +1592,27 @@ document.getElementById('dashGrid').innerHTML=`
 <div class="dash-card" onclick="switchPage('diary')"><div class="dash-card-icon">\ud83d\udcd6</div><div class="dash-card-num">${D.diary.length}</div><div class="dash-card-label">Günlük</div></div>
 <div class="dash-card" onclick="switchPage('todo')" style="${overdue.length?'border-color:rgba(248,113,113,.3);':''}"><div class="dash-card-icon">${overdue.length?'⚠️':'✅'}</div><div class="dash-card-num" style="${overdue.length?'color:var(--hard)':''}">${overdue.length}</div><div class="dash-card-label" style="${overdue.length?'color:var(--hard)':''}">Gecikmiş</div></div>
 `;
+const streak=calcStreak();
+const habitsDoneToday=(D.habits||[]).filter(h=>h.log&&h.log[todayKey]).length;
+const habitsTotal=(D.habits||[]).length;
+const motivHtml=`<div style="background:linear-gradient(135deg,rgba(124,111,247,.1),rgba(244,114,182,.06));border:1px solid rgba(124,111,247,.2);border-radius:14px;padding:14px;margin-bottom:14px;">
+<div style="display:flex;align-items:center;gap:12px;">
+<div style="font-size:1.8rem;line-height:1;">${streak>=7?'\ud83d\udd25':streak>=3?'⚡':'✨'}</div>
+<div style="flex:1;">
+<div style="font-size:.82rem;font-weight:500;color:var(--text);">${streak} günlük seri</div>
+<div style="font-size:.62rem;color:var(--text3);margin-top:2px;">${streak>=7?'Müthiş gidiyorsun!':streak>=3?'Momentum yakaladın!':'Her gün bir adım at'}</div>
+</div>
+${habitsTotal?`<div style="text-align:center;padding-left:12px;border-left:1px solid var(--border);">
+<div style="font-size:1.1rem;font-weight:600;color:${habitsDoneToday===habitsTotal?'var(--easy)':'var(--accent2)'};font-family:'JetBrains Mono',monospace;">${habitsDoneToday}/${habitsTotal}</div>
+<div style="font-size:.5rem;color:var(--text3);">alışkanlık</div>
+</div>`:''}
+</div>
+</div>`;
 const tl=todayTodos.length?todayTodos.map(t=>`<div class="dash-todo-row"><div class="dash-todo-dot" style="background:${t.priority==='hard'?'var(--hard)':t.priority==='mid'?'var(--mid)':'var(--easy)'}"></div><div class="dash-todo-text">${escHtml(t.text)}</div></div>`).join(''):'<div style="color:var(--text3);font-size:.74rem;font-weight:300;font-style:italic;padding:6px 0;">'+'Bugün için görev yok.'+'</div>';
-document.getElementById('dashTodayList').innerHTML=tl;
+document.getElementById('dashTodayList').innerHTML=motivHtml+tl;
 const q=getDayQuote(now.getFullYear(),now.getMonth(),now.getDate());
 document.getElementById('dashQuote').innerHTML=`<div class="dash-quote-text">"${escHtml(q.text)}"</div><div class="dash-quote-author">— ${escHtml(q.author)}</div>`;
+if(typeof renderGoals==='function')renderGoals();
 }
 function renderStudentDashboard(now){
 const todayKey=now.toISOString().split('T')[0];
