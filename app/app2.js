@@ -1432,6 +1432,12 @@ if(tog)tog.classList.toggle('on',!cur);
 showToast(cur?'Otomatik senkronizasyon kapatıldı':'Otomatik senkronizasyon açıldı');
 }
 function initSettingsToggles(){
+var curLang=getLang();
+var trBtn=document.getElementById('langBtnTr');var enBtn=document.getElementById('langBtnEn');
+if(trBtn)trBtn.style.borderColor=curLang==='tr'?'var(--accent)':'transparent';
+if(enBtn)enBtn.style.borderColor=curLang==='en'?'var(--accent)':'transparent';
+var lngLbl=document.getElementById('currentLangLabel');if(lngLbl)lngLbl.textContent=curLang==='en'?'English':'Türkçe';
+if(typeof applyLangToDOM==='function')applyLangToDOM();
 const kd=document.getElementById('kanbanAutoDelete');
 const ra=document.getElementById('readingAutoArchive');
 const sw=document.getElementById('schedWeeklyToggle');
@@ -1658,6 +1664,7 @@ if(!D.moodLog)D.moodLog={};
 if(!D.goals)D.goals=[];
 }
 initTheme();
+if(typeof applyLangToDOM==='function')applyLangToDOM();
 localStorage.setItem('capsula_visited','1');
 if(!D.todos.length&&!D.notes.length&&!D.diary.length){
 var tmr=new Date();tmr.setDate(tmr.getDate()+1);
