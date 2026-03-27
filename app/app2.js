@@ -3044,7 +3044,8 @@ _updateFsPlayIcon();
 // ══════════════════════════════════════════════════════
 var _canvasTool='pen',_canvasColor='#f0eeff',_canvasDrawing=false,_canvasHistory=[],_canvasCtx=null;
 var _canvasInputMode='stylus'; // 'stylus' veya 'finger'
-var _canvasBrushSizes={pen:3,highlighter:12,eraser:15}; // her araç kendi boyutunu hatırlar
+var _canvasBrushSizes={fountain:2,ballpoint:3,pencil:1,highlighter:14,tape:20,laser:4,lasso:1,eraser:18};
+var _laserTimeout=null; // her araç kendi boyutunu hatırlar
 var _canvasEditingNoteId=null; // düzenleme modunda not id'si
 function _getCanvasBrush(){return _canvasBrushSizes[_canvasTool]||3;}
 function openCanvasNote(editNoteId){
@@ -3116,22 +3117,48 @@ if(_canvasInputMode==='stylus'&&e.pointerType==='touch')return;
 e.preventDefault();
 var pos=getPos(e);
 var brush=_getCanvasBrush();
-if(_canvasTool==='eraser'){
+var tool=_canvasTool;
+_canvasCtx.globalCompositeOperation='source-over';
+if(tool==='eraser'){
 _canvasCtx.globalCompositeOperation='destination-out';
 _canvasCtx.lineWidth=brush;
 _canvasCtx.strokeStyle='rgba(0,0,0,1)';
-} else if(_canvasTool==='highlighter'){
-_canvasCtx.globalCompositeOperation='source-over';
+} else if(tool==='highlighter'){
 _canvasCtx.lineWidth=brush;
 _canvasCtx.strokeStyle=_canvasColor+'44';
+} else if(tool==='tape'){
+_canvasCtx.lineWidth=brush;
+_canvasCtx.strokeStyle=_canvasColor+'28';
+} else if(tool==='fountain'){
+_canvasCtx.lineWidth=brush;
+_canvasCtx.strokeStyle=_canvasColor;
+// Dolma kalem: basınca göre kalınlık değişir
+if(e.pressure&&e.pressure>0)_canvasCtx.lineWidth=brush+brush*e.pressure*3;
+} else if(tool==='ballpoint'){
+_canvasCtx.lineWidth=brush;
+_canvasCtx.strokeStyle=_canvasColor;
+} else if(tool==='pencil'){
+// Kurşun kalem: hafif saydamlık ve ince çizgi
+_canvasCtx.lineWidth=brush;
+_canvasCtx.strokeStyle=_canvasColor+'bb';
+} else if(tool==='laser'){
+// Lazer: kırmızı nokta, çizim yok, 1.5sn sonra kaybolur
+_canvasCtx.lineWidth=brush;
+_canvasCtx.strokeStyle='#ff0000';
+clearTimeout(_laserTimeout);
+_laserTimeout=setTimeout(function(){canvasUndo();},1500);
+} else if(tool==='lasso'){
+_canvasCtx.lineWidth=1;
+_canvasCtx.strokeStyle=_canvasColor;
+_canvasCtx.setLineDash([4,4]);
 } else {
-_canvasCtx.globalCompositeOperation='source-over';
 _canvasCtx.lineWidth=brush;
 _canvasCtx.strokeStyle=_canvasColor;
 }
-// Basınç desteği (stylus)
-if(e.pressure&&e.pressure>0&&e.pointerType==='pen'){
-_canvasCtx.lineWidth=brush*e.pressure*2;
+if(tool!=='lasso')_canvasCtx.setLineDash([]);
+// Basınç desteği (stylus - tüm kalemler için)
+if(e.pressure&&e.pressure>0&&e.pointerType==='pen'&&tool!=='eraser'&&tool!=='laser'){
+_canvasCtx.lineWidth=Math.max(1,brush*e.pressure*2);
 }
 _canvasCtx.lineTo(pos.x,pos.y);
 _canvasCtx.stroke();
@@ -3158,9 +3185,8 @@ if(btn)btn.innerHTML=_canvasInputMode==='stylus'?'✏️':'👆';
 }
 function setCanvasTool(tool){
 _canvasTool=tool;
-document.querySelectorAll('#canvasToolbar .ct-btn[id^="ct-"]').forEach(function(b){
-if(b.id==='ct-pen'||b.id==='ct-highlighter'||b.id==='ct-eraser')b.classList.remove('ct-active');
-});
+var toolBtns=['ct-fountain','ct-ballpoint','ct-pencil','ct-highlighter','ct-tape','ct-laser','ct-lasso','ct-eraser'];
+toolBtns.forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('ct-active');});
 var btn=document.getElementById('ct-'+tool);
 if(btn)btn.classList.add('ct-active');
 // Araç boyutunu slider'a yansıt
@@ -3204,6 +3230,36 @@ _saveCanvasState();
 var canvas=document.getElementById('canvasNote');
 if(!canvas)canvas=document.querySelector('#canvasNoteOverlay canvas');
 _canvasCtx.clearRect(0,0,canvas.width/2,canvas.height/2);
+}
+function canvasAddImage(){
+var inp=document.getElementById('canvasImageInput');
+if(!inp){inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.id='canvasImageInput';inp.style.display='none';inp.onchange=function(e){canvasInsertImage(e);};document.body.appendChild(inp);}
+inp.click();
+}
+function canvasTakePhoto(){
+var inp=document.getElementById('canvasCameraInput');
+if(!inp){inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.capture='environment';inp.id='canvasCameraInput';inp.style.display='none';inp.onchange=function(e){canvasInsertImage(e);};document.body.appendChild(inp);}
+inp.click();
+}
+function canvasInsertImage(e){
+var file=e.target.files[0];if(!file)return;
+var reader=new FileReader();
+reader.onload=function(ev){
+var img=new Image();
+img.onload=function(){
+_saveCanvasState();
+var canvas=document.querySelector('#canvasNoteOverlay canvas');
+var maxW=canvas.offsetWidth*0.6;var maxH=canvas.offsetHeight*0.4;
+var scale=Math.min(maxW/img.width,maxH/img.height,1);
+var w=img.width*scale;var h=img.height*scale;
+var x=(canvas.offsetWidth-w)/2;var y=(canvas.offsetHeight-h)/2;
+_canvasCtx.drawImage(img,x,y,w,h);
+showToast('Resim eklendi');
+};
+img.src=ev.target.result;
+};
+reader.readAsDataURL(file);
+e.target.value='';
 }
 function saveCanvasNote(){
 var canvas=document.getElementById('canvasNote');
