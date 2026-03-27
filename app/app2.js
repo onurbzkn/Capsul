@@ -2789,3 +2789,102 @@ cards+='<div style="background:var(--bg2);border:1px solid '+(todayDone?'rgba(74
 });
 cont.innerHTML=cards;
 }
+
+// ══════════════════════════════════════════════════════
+// BACK BUTTON / HISTORY NAVIGATION
+// ══════════════════════════════════════════════════════
+(function(){
+// İlk state
+try{history.replaceState({page:'home'},'',null);}catch(e){}
+
+window.addEventListener('popstate',function(e){
+// 1. Açık overlay/modal varsa kapat
+var closed=false;
+
+// Fullpage overlay'lar
+var overlays=['profilePage','settingsPage','timeCapsulePage','profileEditSheet'];
+for(var i=0;i<overlays.length;i++){
+var el=document.getElementById(overlays[i]);
+if(el&&el.classList.contains('open')){
+el.classList.remove('open');
+closed=true;
+break;
+}
+}
+
+// Modal overlay'lar
+if(!closed){
+var modals=document.querySelectorAll('.modal-overlay.open');
+if(modals.length){
+modals[modals.length-1].classList.remove('open');
+closed=true;
+}
+}
+
+// Editor/View overlay
+if(!closed){
+var editor=document.getElementById('editorOverlay');
+if(editor&&editor.classList.contains('open')){editor.classList.remove('open');closed=true;}
+}
+if(!closed){
+var view=document.getElementById('viewOverlay');
+if(view&&view.classList.contains('open')){view.classList.remove('open');closed=true;}
+}
+
+// Template overlay
+if(!closed){
+var tmpl=document.getElementById('templateOverlay');
+if(tmpl&&tmpl.classList.contains('open')){tmpl.classList.remove('open');closed=true;}
+}
+
+// Drawer açıksa kapat
+if(!closed){
+var drawer=document.getElementById('drawer');
+if(drawer&&drawer.classList.contains('open')){toggleDrawer();closed=true;}
+}
+
+// Dinamik modal'lar (JS ile oluşturulanlar)
+if(!closed){
+var dynModals=['helpPageModal','noteEditModal','diaryEditModal','todoEditModal','schedEditModal','readingEditModal','readingPageModal','contactModal','kanbanImportModal','resetConfirmModal','pomoDurModal','sealPinModal','sealViewModal','goalAddModal','habitAddModal','gdriveRestoreModal'];
+for(var j=0;j<dynModals.length;j++){
+var dm=document.getElementById(dynModals[j]);
+if(dm){dm.remove();closed=true;break;}
+}
+}
+
+if(closed){
+// Kapattık, state'i geri koy ki tekrar geri basınca çalışsın
+try{history.pushState({page:curPage},'',null);}catch(ex){}
+return;
+}
+
+// 2. Sayfa navigasyonu - home'da değilsek home'a git
+if(e.state&&e.state.page){
+switchPage(e.state.page,true);
+} else if(curPage!=='home'){
+switchPage('home',true);
+try{history.pushState({page:'home'},'',null);}catch(ex){}
+} else {
+// Ana ekrandayız ve hiçbir şey açık değil - uygulamadan çıkmayı engelle
+try{history.pushState({page:'home'},'',null);}catch(ex){}
+}
+});
+
+// Overlay/modal açılınca history state ekle
+var _origOpenModal=window.openModal||function(){};
+window.openModal=function(id){
+_origOpenModal(id);
+try{history.pushState({page:curPage,modal:id},'',null);}catch(e){}
+};
+
+// Fullpage overlay'lar açılınca
+['openProfilePage','openSettingsPage','openTimeCapsulePage','openProfileEditSheet'].forEach(function(fnName){
+var orig=window[fnName];
+if(orig){
+window[fnName]=function(){
+orig.apply(this,arguments);
+try{history.pushState({page:curPage,overlay:fnName},'',null);}catch(e){}
+};
+}
+});
+})();
