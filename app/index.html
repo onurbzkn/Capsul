@@ -56,6 +56,13 @@
 <div class="dash-grid" id="dashGrid"></div>
 <div class="dash-section"><div class="dash-section-title">Bugünün Görevleri</div><div id="dashTodayList"></div></div>
 <div class="dash-quote" id="dashQuote"></div>
+<div style="margin-top:14px;">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+<div class="dash-section-title">🎯 Hedeflerim</div>
+<button onclick="openGoalAdd()" style="background:none;border:1px solid var(--border);border-radius:7px;padding:4px 10px;cursor:pointer;font-size:.62rem;color:var(--accent2);font-family:'Sora',sans-serif;">+ Hedef Ekle</button>
+</div>
+<div id="goalsList"></div>
+</div>
 </div>
 <!-- TODO -->
 <div class="page" id="page-todo">
@@ -302,6 +309,18 @@ Ekle
 <div id="habitsWeekGrid" style="margin-bottom:16px;"></div>
 <div id="habitsList"></div>
 </div>
+<!-- MOOD TRACKER -->
+<div class="page" id="page-mood">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+<div>
+<div style="font-size:.52rem;letter-spacing:.2em;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;">Ruh Hali Takipçisi</div>
+<div id="moodSummary" style="font-size:.62rem;color:var(--accent2);margin-top:3px;"></div>
+</div>
+</div>
+<div id="moodTodayCard" style="margin-bottom:16px;"></div>
+<div id="moodCalendar" style="margin-bottom:16px;"></div>
+<div id="moodStats"></div>
+</div>
 <!-- PRO QUICK CAPTURE page -->
 <div class="page" id="page-pro">
 <div class="quick-capture">
@@ -353,6 +372,7 @@ Ekle
 <button class="drawer-item" onclick="toggleDrawer();switchPage('stats')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>İstatistikler</button>
 <button class="drawer-item" onclick="toggleDrawer();switchPage('kanban')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="10" rx="1"/><rect x="14" y="17" width="7" height="4" rx="1"/></svg>Kanban</button>
 <button class="drawer-item" onclick="toggleDrawer();switchPage('reading')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Okuma Listesi</button>
+<button class="drawer-item" onclick="toggleDrawer();switchPage('mood')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>Ruh Hali</button>
 <button class="drawer-item" onclick="toggleDrawer();switchPage('habits')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Alışkanlıklar</button>
 <button class="drawer-item" onclick="toggleDrawer();switchPage('pomodoro')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pomodoro</button>
 <button class="drawer-item" onclick="toggleDrawer();switchPage('schedule')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Program</button>
