@@ -3111,14 +3111,21 @@ e.preventDefault();
 _canvasDrawing=true;
 _saveCanvasState();
 var pos=getPos(e);
+_lastCanvasPos=pos;
 _canvasCtx.beginPath();
 _canvasCtx.moveTo(pos.x,pos.y);
 };
+var _lastCanvasPos=null;
 var onMove=function(e){
 if(!_canvasDrawing)return;
 if(_canvasInputMode==='stylus'&&e.pointerType==='touch')return;
 e.preventDefault();
-var pos=getPos(e);
+// Coalesced events kullan (ara noktalar)
+var events=e.getCoalescedEvents?e.getCoalescedEvents():[];
+if(!events.length)events=[e];
+for(var ei=0;ei<events.length;ei++){
+var ce=events[ei];
+var pos=getPos(ce);
 var brush=_getCanvasBrush();
 var tool=_canvasTool;
 var pr=e.pressure||0.5;
@@ -3174,6 +3181,8 @@ _canvasCtx.strokeStyle=_canvasColor;
 _canvasCtx.lineTo(pos.x,pos.y);
 _canvasCtx.stroke();
 _canvasCtx.globalAlpha=1;
+_lastCanvasPos=pos;
+}// end for loop
 };
 var onEnd=function(e){
 if(_canvasInputMode==='stylus'&&e.pointerType==='touch')return;
