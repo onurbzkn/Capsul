@@ -255,7 +255,7 @@ b.onclick=()=>switchPage(item.id);ng.appendChild(b);
 }
 function switchPage(page,skipHistory){
 document.querySelector('.page.active')?.classList.remove('active');
-const el=document.getElementById('page-'+page);if(el)el.classList.add('active');
+const el=document.getElementById('page-'+page);if(el){el.classList.add('active');el.scrollTop=0;}
 var prevPage=curPage;
 curPage=page;
 if(!skipHistory&&page!==prevPage){
