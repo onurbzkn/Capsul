@@ -60,6 +60,11 @@ D.habits=_mergeArrayById(D.habits||[],imported.habits||[]);
 D.timeCapsules=_mergeArrayById(D.timeCapsules||[],imported.timeCapsules||[]);
 D.trash=_mergeArrayById(D.trash||[],imported.trash||[]);
 D.contentTrash=_mergeArrayById(D.contentTrash||[],imported.contentTrash||[]);
+D.goals=_mergeArrayById(D.goals||[],imported.goals||[]);
+// moodLog birleştir (obje)
+if(imported.moodLog){if(!D.moodLog)D.moodLog={};Object.keys(imported.moodLog).forEach(function(k){if(!D.moodLog[k])D.moodLog[k]=imported.moodLog[k];});}
+// scheduleWeeks birleştir
+if(imported.scheduleWeeks){if(!D.scheduleWeeks)D.scheduleWeeks={};Object.keys(imported.scheduleWeeks).forEach(function(k){if(!D.scheduleWeeks[k])D.scheduleWeeks[k]=imported.scheduleWeeks[k];});}
 // Kanban birleştir
 if(imported.kanban){
 ['todo','doing','done'].forEach(function(col){
@@ -76,6 +81,12 @@ D.calPlans[k]=D.calPlans[k].concat(imported.calPlans[k]||[]);
 D.profile=profile;
 saveData();
 renderTodos();renderNotes();renderDiary();renderDashboard();renderKanban();renderReading();updTrashBadge();updateReminderBadge();
+if(typeof renderSchedule==='function')renderSchedule();
+if(typeof renderExams==='function')renderExams();
+if(typeof renderNotebook==='function')renderNotebook();
+if(typeof renderHabits==='function')renderHabits();
+if(typeof renderMoodTracker==='function')renderMoodTracker();
+if(typeof renderGoals==='function')renderGoals();
 _updateGdriveUI('connected','Birleştirme tamamlandı ✓');
 showToast(t('gdriveMerged'));
 }
@@ -91,8 +102,20 @@ if(!D.trash)D.trash=[];
 if(!D.contentTrash)D.contentTrash=[];
 if(!D.habits)D.habits=[];
 if(!D.timeCapsules)D.timeCapsules=[];
+if(!D.moodLog)D.moodLog={};
+if(!D.goals)D.goals=[];
+if(!D.schedule)D.schedule=[];
+if(!D.scheduleWeeks)D.scheduleWeeks={};
+if(!D.exams)D.exams=[];
+if(!D.notebook)D.notebook=[];
 saveData();
 renderTodos();renderNotes();renderDiary();renderDashboard();renderKanban();renderReading();updTrashBadge();updateReminderBadge();
+if(typeof renderSchedule==='function')renderSchedule();
+if(typeof renderExams==='function')renderExams();
+if(typeof renderNotebook==='function')renderNotebook();
+if(typeof renderHabits==='function')renderHabits();
+if(typeof renderMoodTracker==='function')renderMoodTracker();
+if(typeof renderGoals==='function')renderGoals();
 _updateGdriveUI('connected','Üzerine yazma tamamlandı ✓');
 showToast(t('gdriveOverwritten'));
 }
