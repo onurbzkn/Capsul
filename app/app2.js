@@ -1234,20 +1234,76 @@ tourActive=false;
 localStorage.setItem('capsula_toured','1');
 }
 function showWelcomeCard(){
-const card=document.createElement('div');
-card.className='tour-welcome';
-card.id='tourWelcome';
-card.innerHTML=`
-<div class="tour-welcome-card">
-<div class="tour-welcome-icon">✦</div>
-<div class="tour-welcome-title">Capsula'ya Hoş Geldin!</div>
-<div class="tour-welcome-sub">Görevler, notlar, günlük ve daha fazlası — hepsi burada.<br>Sana kısa bir tur yapalım mı?</div>
-<div class="tour-welcome-btns">
-<button class="tour-welcome-skip" onclick="document.getElementById('tourWelcome').remove();localStorage.setItem('capsula_toured','1');">Geç</button>
-<button class="tour-welcome-start" onclick="document.getElementById('tourWelcome').remove();startTour();">Turu Başlat →</button>
-</div>
-</div>`;
-document.body.appendChild(card);
+var step=0;
+var overlay=document.createElement('div');
+overlay.id='onboardingOverlay';
+overlay.style.cssText='position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;';
+function renderStep(){
+var steps=[
+// Step 0: Hoş geldin
+'<div style="text-align:center;max-width:340px;">'
++'<div style="font-size:3rem;margin-bottom:16px;">✦</div>'
++'<div style="font-size:1.4rem;font-weight:600;color:var(--text);margin-bottom:8px;">Capsula\'ya Hoş Geldin!</div>'
++'<div style="font-size:.82rem;color:var(--text2);line-height:1.7;margin-bottom:24px;">Görevler, notlar, günlük, pomodoro, alışkanlıklar ve daha fazlası — hepsi burada.</div>'
++'<button onclick="onboardNext()" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:12px;color:#fff;font-family:Sora,sans-serif;font-size:.9rem;cursor:pointer;">Başlayalım →</button>'
++'</div>',
+// Step 1: İsim
+'<div style="text-align:center;max-width:340px;">'
++'<div style="font-size:2.5rem;margin-bottom:16px;">👋</div>'
++'<div style="font-size:1.1rem;font-weight:500;color:var(--text);margin-bottom:6px;">Adın ne?</div>'
++'<div style="font-size:.72rem;color:var(--text3);margin-bottom:16px;">Sana nasıl hitap edelim?</div>'
++'<input type="text" id="obName" placeholder="Adın..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;font-family:Sora,sans-serif;font-size:.92rem;color:var(--text);outline:none;text-align:center;margin-bottom:16px;box-sizing:border-box;">'
++'<button onclick="onboardSaveName()" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:12px;color:#fff;font-family:Sora,sans-serif;font-size:.9rem;cursor:pointer;">Devam →</button>'
++'</div>',
+// Step 2: Tema seç
+'<div style="text-align:center;max-width:360px;">'
++'<div style="font-size:2.5rem;margin-bottom:16px;">🎨</div>'
++'<div style="font-size:1.1rem;font-weight:500;color:var(--text);margin-bottom:6px;">Tema seç</div>'
++'<div style="font-size:.72rem;color:var(--text3);margin-bottom:16px;">İstediğin zaman değiştirebilirsin</div>'
++'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;">'
++'<div onclick="applyTheme(\'default\');this.parentElement.querySelectorAll(\'div\').forEach(d=>d.style.borderColor=\'transparent\');this.style.borderColor=\'var(--accent)\'" style="height:48px;border-radius:10px;background:linear-gradient(135deg,#0d0d12,#7c6ff7);cursor:pointer;border:2px solid var(--accent);"></div>'
++'<div onclick="applyTheme(\'midnight\');this.parentElement.querySelectorAll(\'div\').forEach(d=>d.style.borderColor=\'transparent\');this.style.borderColor=\'var(--accent)\'" style="height:48px;border-radius:10px;background:linear-gradient(135deg,#050508,#818cf8);cursor:pointer;border:2px solid transparent;"></div>'
++'<div onclick="applyTheme(\'forest\');this.parentElement.querySelectorAll(\'div\').forEach(d=>d.style.borderColor=\'transparent\');this.style.borderColor=\'var(--accent)\'" style="height:48px;border-radius:10px;background:linear-gradient(135deg,#060e08,#4ade80);cursor:pointer;border:2px solid transparent;"></div>'
++'<div onclick="applyTheme(\'sunset\');this.parentElement.querySelectorAll(\'div\').forEach(d=>d.style.borderColor=\'transparent\');this.style.borderColor=\'var(--accent)\'" style="height:48px;border-radius:10px;background:linear-gradient(135deg,#12080a,#f472b6);cursor:pointer;border:2px solid transparent;"></div>'
++'<div onclick="applyTheme(\'ocean\');this.parentElement.querySelectorAll(\'div\').forEach(d=>d.style.borderColor=\'transparent\');this.style.borderColor=\'var(--accent)\'" style="height:48px;border-radius:10px;background:linear-gradient(135deg,#030d14,#38bdf8);cursor:pointer;border:2px solid transparent;"></div>'
++'<div onclick="applyTheme(\'sand\');this.parentElement.querySelectorAll(\'div\').forEach(d=>d.style.borderColor=\'transparent\');this.style.borderColor=\'var(--accent)\'" style="height:48px;border-radius:10px;background:linear-gradient(135deg,#0f0d08,#fbbf24);cursor:pointer;border:2px solid transparent;"></div>'
++'<div onclick="applyTheme(\'light\');this.parentElement.querySelectorAll(\'div\').forEach(d=>d.style.borderColor=\'transparent\');this.style.borderColor=\'var(--accent)\'" style="height:48px;border-radius:10px;background:linear-gradient(135deg,#f8f9fa,#7c6ff7);cursor:pointer;border:2px solid transparent;"></div>'
++'<div onclick="applyTheme(\'light-warm\');this.parentElement.querySelectorAll(\'div\').forEach(d=>d.style.borderColor=\'transparent\');this.style.borderColor=\'var(--accent)\'" style="height:48px;border-radius:10px;background:linear-gradient(135deg,#fffbeb,#f59e0b);cursor:pointer;border:2px solid transparent;"></div>'
++'</div>'
++'<button onclick="onboardNext()" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:12px;color:#fff;font-family:Sora,sans-serif;font-size:.9rem;cursor:pointer;">Devam →</button>'
++'</div>',
+// Step 3: İlk görev
+'<div style="text-align:center;max-width:340px;">'
++'<div style="font-size:2.5rem;margin-bottom:16px;">✅</div>'
++'<div style="font-size:1.1rem;font-weight:500;color:var(--text);margin-bottom:6px;">İlk görevini yaz</div>'
++'<div style="font-size:.72rem;color:var(--text3);margin-bottom:16px;">Bugün ne yapmak istiyorsun?</div>'
++'<input type="text" id="obTask" placeholder="örn: Kitap oku, spor yap..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;font-family:Sora,sans-serif;font-size:.92rem;color:var(--text);outline:none;text-align:center;margin-bottom:16px;box-sizing:border-box;">'
++'<button onclick="onboardSaveTask()" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:12px;color:#fff;font-family:Sora,sans-serif;font-size:.9rem;cursor:pointer;">Tamamla ✦</button>'
++'<button onclick="onboardFinish()" style="width:100%;padding:10px;background:none;border:none;color:var(--text3);font-size:.72rem;cursor:pointer;margin-top:8px;">Atla</button>'
++'</div>',
+];
+overlay.innerHTML='<div style="position:absolute;top:20px;right:20px;"><button onclick="onboardFinish()" style="background:none;border:none;color:var(--text3);font-size:.72rem;cursor:pointer;font-family:Sora,sans-serif;">Geç</button></div>'
++'<div style="position:absolute;bottom:30px;display:flex;gap:6px;">'+[0,1,2,3].map(function(i){return '<div style="width:'+(i===step?'20':'8')+'px;height:4px;border-radius:2px;background:'+(i===step?'var(--accent)':'var(--border2)')+';transition:all .3s;"></div>';}).join('')+'</div>'
++steps[step];
+}
+renderStep();
+document.body.appendChild(overlay);
+window.onboardNext=function(){step++;if(step>3)onboardFinish();else renderStep();};
+window.onboardSaveName=function(){
+var name=document.getElementById('obName')?.value.trim();
+if(name){D.profile.name=name;saveData();updateProfileUI();}
+step++;renderStep();
+};
+window.onboardSaveTask=function(){
+var task=document.getElementById('obTask')?.value.trim();
+if(task){D.todos.push({id:Date.now(),text:task,priority:'easy',subtasks:[],createdAt:new Date().toISOString()});saveData();}
+onboardFinish();
+};
+window.onboardFinish=function(){
+overlay.remove();
+localStorage.setItem('capsula_toured','1');
+renderDashboard();renderTodos();
+};
 }
 function openBackupModal(){
 if(document.getElementById('drawer').classList.contains('open'))toggleDrawer();
@@ -1297,6 +1353,33 @@ ${'-'.repeat(40)}
 `);}
 const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
 const a=document.createElement('a');const _u3=URL.createObjectURL(blob);a.href=_u3;a.download=`capsula_notlar_${new Date().toISOString().split('T')[0]}.txt`;a.click();URL.revokeObjectURL(_u3);
+}
+if(format==='csv'){
+var csvRows=[];
+// Görevler
+csvRows.push('TÜR,BAŞLIK,ÖNCELİK,TARİH,DURUM,TEKRAR');
+D.todos.forEach(function(t){csvRows.push('Görev,"'+escCsv(t.text)+'",'+t.priority+','+(t.dueDate||'')+',Aktif,'+(t.repeat||''));});
+D.completedTodos.forEach(function(t){csvRows.push('Görev,"'+escCsv(t.text)+'",'+t.priority+','+(t.completedAt?.split('T')[0]||'')+',Tamamlandı,'+(t.repeat||''));});
+csvRows.push('');
+// Notlar
+csvRows.push('TÜR,BAŞLIK,ETİKETLER,TARİH,İÇERİK');
+D.notes.forEach(function(n){csvRows.push('Not,"'+escCsv(n.title||'')+'","'+(n.tags||[]).join('; ')+'",'+fmtDate(n.createdAt)+',"'+escCsv((n.content||'').slice(0,200))+'#');});
+csvRows.push('');
+// Günlük
+csvRows.push('TÜR,BAŞLIK,RUH HALİ,TARİH,İÇERİK');
+D.diary.forEach(function(e){csvRows.push('Günlük,"'+escCsv(e.title||'')+'",'+( e.mood||'')+','+fmtDate(e.createdAt)+',"'+escCsv((e.content||'').slice(0,200))+'"');});
+csvRows.push('');
+// Alışkanlıklar
+csvRows.push('ALIŞKANLIK,SERİ');
+(D.habits||[]).forEach(function(h){csvRows.push('"'+escCsv(h.name)+'",'+getHabitStreak(h));});
+csvRows.push('');
+// Okuma
+csvRows.push('KİTAP,YAZAR,DURUM,SAYFA,TOPLAM');
+D.reading.forEach(function(r){csvRows.push('"'+escCsv(r.title)+'","'+(r.author||'')+'",'+r.status+','+(r.pagesRead||0)+','+(r.pages||0));});
+var csvStr=csvRows.join('\n');
+var bom='\uFEFF';
+var blob=new Blob([bom+csvStr],{type:'text/csv;charset=utf-8'});
+var a=document.createElement('a');var u=URL.createObjectURL(blob);a.href=u;a.download='capsula_'+new Date().toISOString().split('T')[0]+'.csv';a.click();URL.revokeObjectURL(u);
 }
 localStorage.setItem('capsula_last_backup',new Date().toISOString());
 updateLastBackupUI();showToast('Dışa aktarıldı \ud83d\udcc1');
@@ -1426,6 +1509,7 @@ else showToast('İzin reddedildi');
 }
 function requestNotif(){requestAndSetupNotif();}
 function escHtml(s){if(!s)return'';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escCsv(s){if(!s)return'';return s.replace(/"/g,'""').replace(/\n/g,' ');}
 function fmtDate(iso){try{return new Date(iso).toLocaleDateString('tr-TR',{day:'numeric',month:'short',year:'numeric'});}catch{return iso||'';}}
 function fmtDateFull(iso){try{return new Date(iso).toLocaleDateString('tr-TR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});}catch{return iso||'';}}
 function fmtTime(iso){try{return new Date(iso).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});}catch{return '';}}
@@ -3613,3 +3697,125 @@ closeCanvasNote();
 renderNotes();
 switchPage('notes');
 }
+
+// ══════════════════════════════════════════════════════
+// CALENDAR VIEW
+// ══════════════════════════════════════════════════════
+var _calYear=new Date().getFullYear(),_calMonth=new Date().getMonth();
+function changeCalMonth(dir){
+_calMonth+=dir;
+if(_calMonth>11){_calMonth=0;_calYear++;}
+if(_calMonth<0){_calMonth=11;_calYear--;}
+renderCalendar();
+}
+function renderCalendar(){
+var months=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+document.getElementById('calMonthTitle').textContent=months[_calMonth]+' '+_calYear;
+var firstDay=new Date(_calYear,_calMonth,1).getDay();
+var daysInMonth=new Date(_calYear,_calMonth+1,0).getDate();
+var startDay=(firstDay+6)%7;
+var today=new Date();var todayKey=today.toISOString().split('T')[0];
+var html='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;">';
+['Pt','Sa','Ça','Pe','Cu','Ct','Pz'].forEach(function(d){
+html+='<div style="text-align:center;font-size:.52rem;color:var(--text3);padding:4px;font-family:JetBrains Mono,monospace;">'+d+'</div>';
+});
+for(var i=0;i<startDay;i++)html+='<div></div>';
+for(var d=1;d<=daysInMonth;d++){
+var dk=_calYear+'-'+String(_calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+var isToday=dk===todayKey;
+var todos=D.todos.filter(function(t){return t.dueDate===dk;});
+var completed=D.completedTodos.filter(function(t){return t.completedAt&&t.completedAt.startsWith(dk);});
+var diary=D.diary.filter(function(e){return e.createdAt&&e.createdAt.startsWith(dk);});
+var mood=D.moodLog?D.moodLog[dk]:null;
+var hasEvent=todos.length||completed.length||diary.length||mood;
+html+='<div onclick="showCalDay(\''+dk+'\')" style="aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;'
++'background:'+(isToday?'rgba(124,111,247,.15)':hasEvent?'var(--bg2)':'transparent')+';'
++'border:1px solid '+(isToday?'var(--accent)':'transparent')+';'
++'transition:all .15s;"'
++' onmouseover="this.style.background=\'var(--bg3)\'" onmouseout="this.style.background=\''+(isToday?'rgba(124,111,247,.15)':hasEvent?'var(--bg2)':'transparent')+'\'">'
++'<div style="font-size:.72rem;color:'+(isToday?'var(--accent2)':'var(--text)')+';font-weight:'+(isToday?'600':'400')+';">'+d+'</div>';
+if(hasEvent){
+var dots='';
+if(todos.length)dots+='<div style="width:4px;height:4px;border-radius:50%;background:var(--mid);"></div>';
+if(completed.length)dots+='<div style="width:4px;height:4px;border-radius:50%;background:var(--easy);"></div>';
+if(diary.length)dots+='<div style="width:4px;height:4px;border-radius:50%;background:var(--diary);"></div>';
+if(mood)dots+='<div style="font-size:.4rem;">'+mood+'</div>';
+html+='<div style="display:flex;gap:2px;margin-top:2px;">'+dots+'</div>';
+}
+html+='</div>';
+}
+html+='</div>';
+document.getElementById('calGrid').innerHTML=html;
+document.getElementById('calDayDetail').innerHTML='';
+}
+function showCalDay(dk){
+var todos=D.todos.filter(function(t){return t.dueDate===dk;});
+var completed=D.completedTodos.filter(function(t){return t.completedAt&&t.completedAt.startsWith(dk);});
+var diary=D.diary.filter(function(e){return e.createdAt&&e.createdAt.startsWith(dk);});
+var mood=D.moodLog?D.moodLog[dk]:null;
+var html='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;">';
+html+='<div style="font-size:.78rem;font-weight:500;color:var(--text);margin-bottom:10px;">'+fmtDate(dk)+(mood?' · '+mood:'')+'</div>';
+if(todos.length){
+html+='<div style="font-size:.56rem;color:var(--mid);font-family:JetBrains Mono,monospace;margin-bottom:4px;">GÖREVLER</div>';
+todos.forEach(function(t){html+='<div style="display:flex;align-items:center;gap:6px;padding:4px 0;"><div style="width:6px;height:6px;border-radius:50%;background:var(--'+t.priority+');"></div><span style="font-size:.74rem;color:var(--text2);">'+escHtml(t.text)+'</span></div>';});
+}
+if(completed.length){
+html+='<div style="font-size:.56rem;color:var(--easy);font-family:JetBrains Mono,monospace;margin:8px 0 4px;">TAMAMLANAN</div>';
+completed.forEach(function(t){html+='<div style="display:flex;align-items:center;gap:6px;padding:4px 0;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--easy)" stroke-width="2.5" style="width:10px;height:10px;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size:.74rem;color:var(--text3);text-decoration:line-through;">'+escHtml(t.text)+'</span></div>';});
+}
+if(diary.length){
+html+='<div style="font-size:.56rem;color:var(--diary);font-family:JetBrains Mono,monospace;margin:8px 0 4px;">GÜNLÜK</div>';
+diary.forEach(function(e){html+='<div style="padding:4px 0;"><span style="font-size:.74rem;color:var(--text2);">'+(e.mood||'📖')+' '+escHtml(e.title||'Günlük')+'</span></div>';});
+}
+if(!todos.length&&!completed.length&&!diary.length){
+html+='<div style="font-size:.72rem;color:var(--text3);font-style:italic;">Bu günde kayıt yok</div>';
+}
+html+='</div>';
+document.getElementById('calDayDetail').innerHTML=html;
+}
+
+// ══════════════════════════════════════════════════════
+// FOCUS MODE
+// ══════════════════════════════════════════════════════
+var _focusStartTime=null,_focusInterval=null;
+function openFocusMode(){
+var ov=document.createElement('div');
+ov.id='focusModeOverlay';
+ov.style.cssText='position:fixed;inset:0;z-index:8000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;';
+_focusStartTime=Date.now();
+ov.innerHTML='<div style="text-align:center;max-width:340px;padding:20px;">'
++'<div style="font-size:.52rem;letter-spacing:.25em;color:var(--text3);font-family:JetBrains Mono,monospace;text-transform:uppercase;margin-bottom:20px;">Odak Modu</div>'
++'<div id="focusTimer" style="font-family:JetBrains Mono,monospace;font-size:4rem;font-weight:200;color:var(--text);letter-spacing:.05em;margin-bottom:8px;">00:00</div>'
++'<div id="focusLabel" style="font-size:.78rem;color:var(--text3);margin-bottom:40px;">Odaklan, telefonu bırak</div>'
++'<div style="display:flex;gap:16px;justify-content:center;margin-bottom:30px;">'
++'<button onclick="toggleFocusPomodoro()" style="width:56px;height:56px;border-radius:50%;border:1px solid var(--border);background:var(--bg3);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--accent2);font-size:1.2rem;" title="Pomodoro">🍅</button>'
++'<button onclick="toggleFocusStopwatch()" style="width:56px;height:56px;border-radius:50%;border:1px solid var(--border);background:var(--bg3);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--accent2);font-size:1.2rem;" title="Kronometre">⏱</button>'
++'</div>'
++'<div id="focusQuote" style="font-size:.76rem;color:var(--text2);font-style:italic;line-height:1.7;margin-bottom:40px;padding:0 10px;"></div>'
++'<button onclick="closeFocusMode()" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);border-radius:12px;padding:12px 32px;cursor:pointer;color:var(--hard);font-family:Sora,sans-serif;font-size:.82rem;">Odak Modundan Çık</button>'
++'<div id="focusStats" style="margin-top:20px;font-size:.62rem;color:var(--text3);font-family:JetBrains Mono,monospace;"></div>'
++'</div>';
+document.body.appendChild(ov);
+// Quote
+var quotes=typeof getQuotes==='function'?getQuotes():QUOTES||[];
+if(quotes.length){var q=quotes[Math.floor(Math.random()*quotes.length)];document.getElementById('focusQuote').innerHTML='"'+escHtml(q.text)+'"<br><span style="font-size:.62rem;color:var(--text3);">— '+escHtml(q.author)+'</span>';}
+// Timer
+_focusInterval=setInterval(function(){
+var elapsed=Date.now()-_focusStartTime;
+var s=Math.floor(elapsed/1000);var m=Math.floor(s/60);var h=Math.floor(m/60);
+s=s%60;m=m%60;
+var el=document.getElementById('focusTimer');
+if(el)el.textContent=(h?String(h).padStart(2,'0')+':':'')+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+},1000);
+try{history.pushState({page:curPage,overlay:'focus'},'',null);}catch(e){}
+}
+function closeFocusMode(){
+if(_focusInterval)clearInterval(_focusInterval);
+var elapsed=_focusStartTime?Math.round((Date.now()-_focusStartTime)/60000):0;
+var ov=document.getElementById('focusModeOverlay');
+if(ov)ov.remove();
+_focusStartTime=null;
+if(elapsed>0)showToast(elapsed+' dakika odaklandın 🎯');
+}
+function toggleFocusPomodoro(){switchTimerTab('pomo');closeFocusMode();switchPage('pomodoro');toggleFullscreenTimer('pomo');}
+function toggleFocusStopwatch(){switchTimerTab('stopwatch');closeFocusMode();switchPage('pomodoro');toggleFullscreenTimer('stopwatch');}

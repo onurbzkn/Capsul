@@ -42,4 +42,4 @@ body.theme-light .fullpage-header{background:rgba(248,249,250,.95);color:var(--t
 body.theme-light .fullpage-overlay{background:var(--bg)}
 body.theme-light-warm .fullpage-header{background:rgba(255,251,235,.95);color:var(--text)}
 body.theme-light-warm .fullpage-overlay{background:var(--bg)}
-#page-stats,#page-kanban,#page-reading,#page-schedule,#page-exams,#page-notebook,#page-weekly,#page-habits,#page-mood,#page-pro{padding-top:70px}
+#page-stats,#page-kanban,#page-reading,#page-schedule,#page-exams,#page-notebook,#page-weekly,#page-habits,#page-mood,#page-pro,#page-calendar{padding-top:70px}
