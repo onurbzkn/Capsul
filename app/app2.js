@@ -3173,8 +3173,6 @@ _canvasCtx.strokeStyle=_canvasColor;
 }
 _canvasCtx.lineTo(pos.x,pos.y);
 _canvasCtx.stroke();
-_canvasCtx.beginPath();
-_canvasCtx.moveTo(pos.x,pos.y);
 _canvasCtx.globalAlpha=1;
 };
 var onEnd=function(e){
