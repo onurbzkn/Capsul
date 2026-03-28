@@ -238,6 +238,9 @@ Küçült
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><polyline points="15 18 9 12 15 6"/></svg>
 </button>
 <input type="text" id="canvasNoteTitle" placeholder="Not başlığı..." style="flex:1;background:none;border:none;outline:none;font-family:'Sora',sans-serif;font-size:.88rem;color:var(--text);">
+<button onclick="scrollToCanvasPage(-1)" style="background:none;border:1px solid var(--border);border-radius:6px;padding:5px 8px;cursor:pointer;color:var(--text3);font-size:.6rem;font-family:'JetBrains Mono',monospace;" title="Önceki sayfa">▲</button>
+<span id="canvasPageIndicator" style="font-size:.56rem;color:var(--text3);font-family:'JetBrains Mono',monospace;min-width:24px;text-align:center;">1</span>
+<button onclick="scrollToCanvasPage(1)" style="background:none;border:1px solid var(--border);border-radius:6px;padding:5px 8px;cursor:pointer;color:var(--text3);font-size:.6rem;font-family:'JetBrains Mono',monospace;" title="Sonraki sayfa">▼</button>
 <button onclick="saveCanvasNote()" style="background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:8px;padding:7px 14px;cursor:pointer;color:#fff;font-size:.76rem;font-family:'Sora',sans-serif;">Kaydet</button>
 <div style="position:relative;">
 <button onclick="toggleCanvasPageMenu()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:7px 8px;cursor:pointer;color:var(--text3);display:flex;align-items:center;" id="canvasMenuBtn">

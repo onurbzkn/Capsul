@@ -3046,6 +3046,7 @@ var _canvasTool='pen',_canvasColor='#f0eeff',_canvasDrawing=false,_canvasHistory
 var _canvasInputMode='stylus'; // 'stylus' veya 'finger'
 var _canvasBrushSizes={fountain:2,ballpoint:3,pencil:1,highlighter:14,tape:20,laser:4,lasso:1,eraser:18};
 var _laserTimeout=null;
+var _laserSnapshot=null;
 var _canvasRedoStack=[];
 var _lassoPath=[];
 var _lassoActive=false; // her araç kendi boyutunu hatırlar
@@ -3109,7 +3110,13 @@ var onStart=function(e){
 if(_canvasInputMode==='stylus'&&e.pointerType==='touch')return;
 e.preventDefault();
 _canvasDrawing=true;
+if(_canvasTool==='laser'){
+// Lazer başlamadan önce canvas'ın anlık görüntüsünü al
+var _lc=document.querySelector('#canvasNoteOverlay canvas');
+if(_lc)_laserSnapshot=_lc.toDataURL();
+} else {
 _saveCanvasState();
+}
 var pos=getPos(e);
 _lastCanvasPos=pos;
 _canvasCtx.beginPath();
@@ -3189,29 +3196,18 @@ if(_canvasInputMode==='stylus'&&e.pointerType==='touch')return;
 if(_canvasTool==='lasso'&&_lassoPath.length>5){
 _showLassoMenu();
 }
-if(_canvasTool==='laser'){
-// 1.5sn sonra lazer çiziminin tamamını sil
+if(_canvasTool==='laser'&&_laserSnapshot){
 clearTimeout(_laserTimeout);
 _laserTimeout=setTimeout(function(){
-if(_canvasHistory.length){
-// Lazer başlamadan önceki state'e dön
 var canvas=document.querySelector('#canvasNoteOverlay canvas');
-if(!canvas)return;
-// History'den lazer öncesine dön (en son save lazer başıydı)
-if(_canvasHistory.length>=2){
-var preState=_canvasHistory[_canvasHistory.length-2];
+if(!canvas||!_laserSnapshot)return;
 var img=new Image();
 img.onload=function(){
 _canvasCtx.clearRect(0,0,canvas.width/2,canvas.height/2);
 _canvasCtx.drawImage(img,0,0,canvas.width/2,canvas.height/2);
-_canvasHistory.pop();// lazer state'ini sil
+_laserSnapshot=null;
 };
-img.src=preState;
-} else {
-_canvasCtx.clearRect(0,0,canvas.width/2,canvas.height/2);
-_canvasHistory.pop();
-}
-}
+img.src=_laserSnapshot;
 },1500);
 }
 _canvasDrawing=false;_canvasCtx.beginPath();
@@ -3401,59 +3397,68 @@ _canvasCtx.drawImage(tempCanvas2,-w2/2,-h2/2,w2,h2);
 _canvasCtx.restore();
 showToast('Sola döndürüldü');
 } else if(action==='new'){
+// Yeni sayfa: yeni canvas div olarak altına ekle
+var wrap=document.getElementById('canvasScrollWrap');
+if(!wrap)return;
+var pageNum=wrap.querySelectorAll('canvas').length+1;
+// Ayırıcı
+var sep=document.createElement('div');
+sep.style.cssText='height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);margin:4px 0;opacity:.4;';
+wrap.appendChild(sep);
+// Sayfa numarası
+var pLbl=document.createElement('div');
+pLbl.style.cssText='text-align:right;font-size:.48rem;color:var(--text3);font-family:JetBrains Mono,monospace;padding:2px 8px;';
+pLbl.textContent=pageNum+'/'+pageNum;
+wrap.appendChild(pLbl);
+// Yeni canvas
+var nc=document.createElement('canvas');
+nc.id='canvasNote';
+nc.style.cssText='width:100%;touch-action:none;cursor:crosshair;display:block;background:#1a1a2e;';
+wrap.appendChild(nc);
+nc.width=nc.offsetWidth*2;
+nc.height=Math.round(nc.offsetWidth*1.414)*2;// A4 dikey default
+nc.style.height=(nc.height/2)+'px';
+_canvasCtx=nc.getContext('2d');
+_canvasCtx.scale(2,2);
+_canvasCtx.lineCap='round';_canvasCtx.lineJoin='round';
+_canvasHistory=[];_canvasRedoStack=[];
+_setupCanvasEvents(nc);
+wrap.scrollTop=wrap.scrollHeight;
+showToast('Sayfa '+pageNum+' eklendi');
+} else if(action==='delete'){
+var wrap2=document.getElementById('canvasScrollWrap');
+var canvases=wrap2?wrap2.querySelectorAll('canvas'):[];
+if(canvases.length<=1){
+_canvasCtx.clearRect(0,0,canvas.width/2,canvas.height/2);
+_canvasHistory=[];
+showToast('Sayfa temizlendi');
+} else {
+// Son canvas'ı ve ayırıcılarını kaldır
+var last=canvases[canvases.length-1];
+if(last.previousElementSibling)last.previousElementSibling.remove();// sayfa no
+if(last.previousElementSibling)last.previousElementSibling.remove();// ayırıcı
+last.remove();
+// Önceki canvas'a geç
+var prev=wrap2.querySelector('canvas:last-of-type');
+if(prev){_canvasCtx=prev.getContext('2d');_setupCanvasEvents(prev);}
+showToast('Sayfa silindi');
+}
+} else if(action==='a4portrait'||action==='a4landscape'||action==='square'){
 _saveCanvasState();
-// Canvas'ı aşağıya doğru genişlet (yeni sayfa ekle)
-var oldH=canvas.height;
-var pageH=canvas.offsetHeight;
-var imgData=_canvasCtx.getImageData(0,0,canvas.width,oldH);
-canvas.height=oldH+pageH*2;
-canvas.style.height=(canvas.height/2)+'px';
+var cw=canvas.offsetWidth;
+var newH=action==='a4portrait'?Math.round(cw*1.414):action==='a4landscape'?Math.round(cw*0.707):cw;
+// Mevcut çizimi koru
+var tmpImg=new Image();
+var tmpData=canvas.toDataURL();
+canvas.height=newH*2;
+canvas.style.height=newH+'px';
 _canvasCtx=canvas.getContext('2d');
 _canvasCtx.scale(2,2);
 _canvasCtx.lineCap='round';_canvasCtx.lineJoin='round';
-_canvasCtx.putImageData(imgData,0,0);
-// Sayfa ayırıcı çizgi
-_canvasCtx.save();
-_canvasCtx.setLineDash([8,8]);
-_canvasCtx.strokeStyle='rgba(124,111,247,0.3)';
-_canvasCtx.lineWidth=1;
-_canvasCtx.beginPath();
-_canvasCtx.moveTo(20,oldH/2);
-_canvasCtx.lineTo(canvas.width/2-20,oldH/2);
-_canvasCtx.stroke();
-_canvasCtx.restore();
-_canvasPages.push({offset:oldH/2});
-// Aşağı scroll et
-canvas.parentElement.scrollTop=canvas.parentElement.scrollHeight;
-showToast('Yeni sayfa eklendi');
-} else if(action==='duplicate'){
-_saveCanvasState();
-showToast('Sayfa kopyalandı');
-} else if(action==='delete'){
-_canvasCtx.clearRect(0,0,canvas.width/2,canvas.height/2);
-_canvasHistory=[];
-showToast('Sayfa silindi');
-} else if(action==='a4portrait'){
-_saveCanvasState();
-var w3=canvas.offsetWidth;
-canvas.height=Math.round(w3*1.414)*2;
-canvas.style.height=(canvas.height/2)+'px';
-_canvasCtx=canvas.getContext('2d');_canvasCtx.scale(2,2);_canvasCtx.lineCap='round';_canvasCtx.lineJoin='round';
-showToast('A4 Dikey');
-} else if(action==='a4landscape'){
-_saveCanvasState();
-var w4=canvas.offsetWidth;
-canvas.height=Math.round(w4*0.707)*2;
-canvas.style.height=(canvas.height/2)+'px';
-_canvasCtx=canvas.getContext('2d');_canvasCtx.scale(2,2);_canvasCtx.lineCap='round';_canvasCtx.lineJoin='round';
-showToast('A4 Yatay');
-} else if(action==='square'){
-_saveCanvasState();
-var w5=canvas.offsetWidth;
-canvas.height=w5*2;
-canvas.style.height=w5+'px';
-_canvasCtx=canvas.getContext('2d');_canvasCtx.scale(2,2);_canvasCtx.lineCap='round';_canvasCtx.lineJoin='round';
-showToast('Kare');
+tmpImg.onload=function(){_canvasCtx.drawImage(tmpImg,0,0,cw,newH);};
+tmpImg.src=tmpData;
+var labels={a4portrait:'A4 Dikey',a4landscape:'A4 Yatay',square:'Kare'};
+showToast(labels[action]);
 }
 }
 // Pinch zoom desteği
@@ -3513,12 +3518,40 @@ img.src=ev.target.result;
 reader.readAsDataURL(file);
 e.target.value='';
 }
+function scrollToCanvasPage(dir){
+var wrap=document.getElementById('canvasScrollWrap');
+if(!wrap)return;
+var canvases=wrap.querySelectorAll('canvas');
+if(canvases.length<=1)return;
+var scrollH=wrap.scrollTop;
+var target=null;
+for(var i=0;i<canvases.length;i++){
+if(dir>0&&canvases[i].offsetTop>scrollH+10){target=canvases[i];break;}
+if(dir<0&&i>0&&canvases[i].offsetTop>=scrollH-10){target=canvases[i-1];break;}
+}
+if(target)wrap.scrollTo({top:target.offsetTop,behavior:'smooth'});
+}
 function saveCanvasNote(){
-var canvas=document.getElementById('canvasNote');
-if(!canvas)canvas=document.querySelector('#canvasNoteOverlay canvas');
+// Tüm canvas'ları birleştirerek kaydet
+var wrap=document.getElementById('canvasScrollWrap');
+var canvases=wrap?wrap.querySelectorAll('canvas'):[];
+var canvas=canvases.length?canvases[0]:document.querySelector('#canvasNoteOverlay canvas');
 if(!canvas)return;
 var title=document.getElementById('canvasNoteTitle').value.trim()||'Çizim Notu';
-var dataUrl=canvas.toDataURL('image/png',0.8);
+var dataUrl;
+if(canvases.length>1){
+// Çoklu sayfa: hepsini birleştir
+var totalH=0;
+canvases.forEach(function(c){totalH+=c.height;});
+var merged=document.createElement('canvas');
+merged.width=canvases[0].width;merged.height=totalH;
+var mCtx=merged.getContext('2d');
+var y=0;
+canvases.forEach(function(c){mCtx.drawImage(c,0,y);y+=c.height;});
+dataUrl=merged.toDataURL('image/png',0.8);
+} else {
+dataUrl=canvas.toDataURL('image/png',0.8);
+}
 if(_canvasEditingNoteId){
 // Mevcut notu güncelle
 var note=D.notes.find(function(n){return n.id===_canvasEditingNoteId;});
