@@ -282,6 +282,8 @@ if(page==='search'){document.getElementById('search-results').innerHTML='';setTi
 if(page==='pro')renderPro();
 if(page==='habits')renderHabits();
 if(page==='mood')renderMoodTracker();
+// Render sonrası scroll sıfırla
+setTimeout(function(){var pg=document.getElementById('page-'+page);if(pg)pg.scrollTop=0;},50);
 }
 const THEMES=['default','midnight','forest','sunset','ocean','sand','light','light-warm'];
 function applyTheme(name,el){
