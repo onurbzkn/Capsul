@@ -232,7 +232,7 @@ uni:[
 {id:'search',lbl:'Ara',ico:ICO_SEARCH},
 ],
 };
-function getPageTitles(){return{home:t('pageHome'),stats:t('pageStats'),todo:t('pageTodo'),notes:t('pageNotes'),diary:t('pageDiary'),search:t('pageSearch'),pomodoro:t('pagePomodoro'),kanban:t('pageKanban'),weekly:t('pageWeekly'),reading:t('pageReading'),pro:t('pagePro'),schedule:t('pageSchedule'),exams:t('pageExams'),notebook:t('pageNotebook'),habits:t('pageHabits'),mood:t('pageMood')||'Ruh Hali'};}
+function getPageTitles(){return{home:t('pageHome'),stats:t('pageStats'),todo:t('pageTodo'),notes:t('pageNotes'),diary:t('pageDiary'),search:t('pageSearch'),pomodoro:t('pagePomodoro'),kanban:t('pageKanban'),weekly:t('pageWeekly'),reading:t('pageReading'),pro:t('pagePro'),schedule:t('pageSchedule'),exams:t('pageExams'),notebook:t('pageNotebook'),habits:t('pageHabits'),mood:t('pageMood')||'Ruh Hali',calendar:'Takvim'};}
 function setMode(mode){
 curMode=mode;
 buildNav();
@@ -282,6 +282,7 @@ if(page==='search'){document.getElementById('search-results').innerHTML='';setTi
 if(page==='pro')renderPro();
 if(page==='habits')renderHabits();
 if(page==='mood')renderMoodTracker();
+if(page==='calendar')renderCalendar();
 // Render sonrası scroll sıfırla
 setTimeout(function(){var pg=document.getElementById('page-'+page);if(pg)pg.scrollTop=0;},50);
 }
