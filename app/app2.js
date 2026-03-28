@@ -46,7 +46,6 @@ incoming.forEach(function(item){if(!ids.has(item.id)){existing.push(item);ids.ad
 return existing;
 }
 function _gdriveDoMerge(imported){
-var profile=D.profile;
 // Array alanlarını birleştir (ID'ye göre, duplicate olmaz)
 D.todos=_mergeArrayById(D.todos,imported.todos||[]);
 D.completedTodos=_mergeArrayById(D.completedTodos,imported.completedTodos||[]);
@@ -78,8 +77,11 @@ if(!D.calPlans[k])D.calPlans[k]=[];
 D.calPlans[k]=D.calPlans[k].concat(imported.calPlans[k]||[]);
 });
 }
-D.profile=profile;
+if(imported.profile){
+D.profile=Object.assign({},D.profile,imported.profile);
+}
 saveData();
+updateProfileUI();
 renderTodos();renderNotes();renderDiary();renderDashboard();renderKanban();renderReading();updTrashBadge();updateReminderBadge();
 if(typeof renderSchedule==='function')renderSchedule();
 if(typeof renderExams==='function')renderExams();
@@ -91,9 +93,10 @@ _updateGdriveUI('connected','Birleştirme tamamlandı ✓');
 showToast(t('gdriveMerged'));
 }
 function _gdriveDoOverwrite(imported){
-var profile=D.profile;
 Object.assign(D,imported);
-D.profile=profile;
+if(imported.profile){
+D.profile=Object.assign({},D.profile,imported.profile);
+}
 if(!D.calPlans)D.calPlans={};
 if(!D.kanban)D.kanban={todo:[],doing:[],done:[]};
 if(!D.reading)D.reading=[];
@@ -149,7 +152,6 @@ _updateGdriveUI('loading','Bağlanılıyor...');
 var token=await _getGdriveToken();
 _updateGdriveUI('loading','Yedekleniyor...');
 var backupData=JSON.parse(JSON.stringify(D));
-delete backupData.profile.avatar;
 var payload=JSON.stringify({
 meta:{exportedAt:new Date().toISOString(),version:'capsula-v4',source:'gdrive'},
 data:backupData
