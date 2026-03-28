@@ -3045,7 +3045,10 @@ _updateFsPlayIcon();
 var _canvasTool='pen',_canvasColor='#f0eeff',_canvasDrawing=false,_canvasHistory=[],_canvasCtx=null;
 var _canvasInputMode='stylus'; // 'stylus' veya 'finger'
 var _canvasBrushSizes={fountain:2,ballpoint:3,pencil:1,highlighter:14,tape:20,laser:4,lasso:1,eraser:18};
-var _laserTimeout=null; // her araç kendi boyutunu hatırlar
+var _laserTimeout=null;
+var _canvasRedoStack=[];
+var _lassoPath=[];
+var _lassoActive=false; // her araç kendi boyutunu hatırlar
 var _canvasEditingNoteId=null; // düzenleme modunda not id'si
 function _getCanvasBrush(){return _canvasBrushSizes[_canvasTool]||3;}
 function openCanvasNote(editNoteId){
@@ -3118,55 +3121,67 @@ e.preventDefault();
 var pos=getPos(e);
 var brush=_getCanvasBrush();
 var tool=_canvasTool;
+var pr=e.pressure||0.5;
 _canvasCtx.globalCompositeOperation='source-over';
+_canvasCtx.setLineDash([]);
 if(tool==='eraser'){
 _canvasCtx.globalCompositeOperation='destination-out';
 _canvasCtx.lineWidth=brush;
 _canvasCtx.strokeStyle='rgba(0,0,0,1)';
-} else if(tool==='highlighter'){
-_canvasCtx.lineWidth=brush;
-_canvasCtx.strokeStyle=_canvasColor+'44';
-} else if(tool==='tape'){
-_canvasCtx.lineWidth=brush;
-_canvasCtx.strokeStyle=_canvasColor+'28';
 } else if(tool==='fountain'){
-_canvasCtx.lineWidth=brush;
+// Dolma kalem: basınca çok duyarlı, kalın-ince geçişli
+var fw=e.pointerType==='pen'?brush*0.5+brush*pr*2.5:brush;
+_canvasCtx.lineWidth=Math.max(0.5,fw);
 _canvasCtx.strokeStyle=_canvasColor;
-// Dolma kalem: basınca göre kalınlık değişir
-if(e.pressure&&e.pressure>0)_canvasCtx.lineWidth=brush+brush*e.pressure*3;
+_canvasCtx.globalAlpha=0.85;
 } else if(tool==='ballpoint'){
+// Tükenmez: sabit kalınlık, tam opak
 _canvasCtx.lineWidth=brush;
 _canvasCtx.strokeStyle=_canvasColor;
+_canvasCtx.globalAlpha=1;
 } else if(tool==='pencil'){
-// Kurşun kalem: hafif saydamlık ve ince çizgi
+// Kurşun kalem: ince, gri-ımsı, hafif pürüzlü
+var pw=e.pointerType==='pen'?brush*0.3+brush*pr*0.7:brush*0.7;
+_canvasCtx.lineWidth=Math.max(0.3,pw);
+_canvasCtx.strokeStyle=_canvasColor;
+_canvasCtx.globalAlpha=0.45;
+} else if(tool==='highlighter'){
+// Vurgulayıcı: düz geniş çizgi, yarı saydam
 _canvasCtx.lineWidth=brush;
-_canvasCtx.strokeStyle=_canvasColor+'bb';
+_canvasCtx.strokeStyle=_canvasColor;
+_canvasCtx.globalAlpha=0.3;
+} else if(tool==='tape'){
+// Bant: tam mat, üstünü kapatır (silici gibi ama bg rengi)
+_canvasCtx.globalCompositeOperation='destination-out';
+_canvasCtx.lineWidth=brush;
+_canvasCtx.strokeStyle='rgba(0,0,0,1)';
 } else if(tool==='laser'){
-// Lazer: kırmızı nokta, çizim yok, 1.5sn sonra kaybolur
 _canvasCtx.lineWidth=brush;
 _canvasCtx.strokeStyle='#ff0000';
+_canvasCtx.globalAlpha=0.8;
 clearTimeout(_laserTimeout);
 _laserTimeout=setTimeout(function(){canvasUndo();},1500);
 } else if(tool==='lasso'){
-_canvasCtx.lineWidth=1;
-_canvasCtx.strokeStyle=_canvasColor;
-_canvasCtx.setLineDash([4,4]);
+_canvasCtx.lineWidth=1.5;
+_canvasCtx.strokeStyle='var(--accent)';
+_canvasCtx.setLineDash([6,4]);
+_canvasCtx.globalAlpha=1;
+_lassoPath.push(pos);
 } else {
 _canvasCtx.lineWidth=brush;
 _canvasCtx.strokeStyle=_canvasColor;
-}
-if(tool!=='lasso')_canvasCtx.setLineDash([]);
-// Basınç desteği (stylus - tüm kalemler için)
-if(e.pressure&&e.pressure>0&&e.pointerType==='pen'&&tool!=='eraser'&&tool!=='laser'){
-_canvasCtx.lineWidth=Math.max(1,brush*e.pressure*2);
 }
 _canvasCtx.lineTo(pos.x,pos.y);
 _canvasCtx.stroke();
 _canvasCtx.beginPath();
 _canvasCtx.moveTo(pos.x,pos.y);
+_canvasCtx.globalAlpha=1;
 };
 var onEnd=function(e){
 if(_canvasInputMode==='stylus'&&e.pointerType==='touch')return;
+if(_canvasTool==='lasso'&&_lassoPath.length>5){
+_showLassoMenu();
+}
 _canvasDrawing=false;_canvasCtx.beginPath();
 };
 c.addEventListener('pointerdown',onStart);
@@ -3203,15 +3218,54 @@ _canvasBrushSizes[_canvasTool]=val;
 document.getElementById('canvasSizeLbl').textContent=val;
 }
 function _saveCanvasState(){
+_canvasRedoStack=[];
 var canvas=document.getElementById('canvasNote');
 if(!canvas){canvas=document.querySelector('#canvasNoteOverlay canvas');}
 if(canvas)_canvasHistory.push(canvas.toDataURL());
 if(_canvasHistory.length>30)_canvasHistory.shift();
 }
+function _showLassoMenu(){
+if(!_lassoPath.length)return;
+var minX=Infinity,minY=Infinity,maxX=0,maxY=0;
+_lassoPath.forEach(function(p){minX=Math.min(minX,p.x);minY=Math.min(minY,p.y);maxX=Math.max(maxX,p.x);maxY=Math.max(maxY,p.y);});
+var cx=(minX+maxX)/2;var cy=minY-30;
+var m=document.createElement('div');m.id='lassoMenu';
+m.style.cssText='position:absolute;left:'+cx+'px;top:'+Math.max(10,cy)+'px;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:6px;display:flex;gap:4px;z-index:10;box-shadow:0 4px 16px rgba(0,0,0,.4);';
+m.innerHTML='<button onclick="lassoDelete()" style="background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.3);border-radius:7px;padding:5px 10px;cursor:pointer;color:var(--hard);font-size:.62rem;font-family:Sora,sans-serif;">Sil</button>'
++'<button onclick="lassoCancel()" style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:5px 10px;cursor:pointer;color:var(--text3);font-size:.62rem;font-family:Sora,sans-serif;">İptal</button>';
+var canvasWrap=document.getElementById('canvasNoteOverlay');
+if(canvasWrap)canvasWrap.style.position='relative';
+canvasWrap.appendChild(m);
+}
+function lassoDelete(){
+if(_lassoPath.length<3)return;
+_saveCanvasState();
+_canvasCtx.save();
+_canvasCtx.beginPath();
+_lassoPath.forEach(function(p,i){i===0?_canvasCtx.moveTo(p.x,p.y):_canvasCtx.lineTo(p.x,p.y);});
+_canvasCtx.closePath();
+_canvasCtx.clip();
+var canvas=document.querySelector('#canvasNoteOverlay canvas');
+_canvasCtx.clearRect(0,0,canvas.width,canvas.height);
+_canvasCtx.restore();
+_canvasCtx.setLineDash([]);
+_lassoPath=[];
+var lm=document.getElementById('lassoMenu');if(lm)lm.remove();
+canvasUndo();// lasso çizgisini de geri al (sadece silinen alan kalsın)
+_saveCanvasState();
+showToast('Seçili alan silindi');
+}
+function lassoCancel(){
+_lassoPath=[];
+canvasUndo();// lasso çizgisini geri al
+var lm=document.getElementById('lassoMenu');if(lm)lm.remove();
+}
 function canvasUndo(){
 if(!_canvasHistory.length)return;
 var canvas=document.getElementById('canvasNote');
 if(!canvas)canvas=document.querySelector('#canvasNoteOverlay canvas');
+var current=canvas.toDataURL();
+_canvasRedoStack.push(current);
 _canvasHistory.pop();
 if(_canvasHistory.length){
 var img=new Image();
@@ -3223,6 +3277,19 @@ img.src=_canvasHistory[_canvasHistory.length-1];
 } else {
 _canvasCtx.clearRect(0,0,canvas.width/2,canvas.height/2);
 }
+}
+function canvasRedo(){
+if(!_canvasRedoStack.length)return;
+var canvas=document.getElementById('canvasNote');
+if(!canvas)canvas=document.querySelector('#canvasNoteOverlay canvas');
+var data=_canvasRedoStack.pop();
+_canvasHistory.push(data);
+var img=new Image();
+img.onload=function(){
+_canvasCtx.clearRect(0,0,canvas.width/2,canvas.height/2);
+_canvasCtx.drawImage(img,0,0,canvas.width/2,canvas.height/2);
+};
+img.src=data;
 }
 function canvasClear(){
 if(!_canvasCtx)return;
