@@ -3167,7 +3167,6 @@ _canvasCtx.lineWidth=brush;
 _canvasCtx.strokeStyle=_canvasColor;
 _canvasCtx.globalAlpha=0.8;
 clearTimeout(_laserTimeout);
-_laserTimeout=setTimeout(function(){canvasUndo();},1500);
 } else if(tool==='lasso'){
 _canvasCtx.lineWidth=1.5;
 _canvasCtx.strokeStyle='var(--accent)';
@@ -3184,10 +3183,36 @@ _canvasCtx.globalAlpha=1;
 _lastCanvasPos=pos;
 }// end for loop
 };
+var _laserBaseState=null;
 var onEnd=function(e){
 if(_canvasInputMode==='stylus'&&e.pointerType==='touch')return;
 if(_canvasTool==='lasso'&&_lassoPath.length>5){
 _showLassoMenu();
+}
+if(_canvasTool==='laser'){
+// 1.5sn sonra lazer çiziminin tamamını sil
+clearTimeout(_laserTimeout);
+_laserTimeout=setTimeout(function(){
+if(_canvasHistory.length){
+// Lazer başlamadan önceki state'e dön
+var canvas=document.querySelector('#canvasNoteOverlay canvas');
+if(!canvas)return;
+// History'den lazer öncesine dön (en son save lazer başıydı)
+if(_canvasHistory.length>=2){
+var preState=_canvasHistory[_canvasHistory.length-2];
+var img=new Image();
+img.onload=function(){
+_canvasCtx.clearRect(0,0,canvas.width/2,canvas.height/2);
+_canvasCtx.drawImage(img,0,0,canvas.width/2,canvas.height/2);
+_canvasHistory.pop();// lazer state'ini sil
+};
+img.src=preState;
+} else {
+_canvasCtx.clearRect(0,0,canvas.width/2,canvas.height/2);
+_canvasHistory.pop();
+}
+}
+},1500);
 }
 _canvasDrawing=false;_canvasCtx.beginPath();
 };
@@ -3377,10 +3402,30 @@ _canvasCtx.restore();
 showToast('Sola döndürüldü');
 } else if(action==='new'){
 _saveCanvasState();
-_canvasPages.push(canvas.toDataURL());
-_canvasCtx.clearRect(0,0,canvas.width/2,canvas.height/2);
-_canvasHistory=[];
-showToast('Yeni sayfa eklendi (Sayfa '+ (_canvasPages.length+1) +')');
+// Canvas'ı aşağıya doğru genişlet (yeni sayfa ekle)
+var oldH=canvas.height;
+var pageH=canvas.offsetHeight;
+var imgData=_canvasCtx.getImageData(0,0,canvas.width,oldH);
+canvas.height=oldH+pageH*2;
+canvas.style.height=(canvas.height/2)+'px';
+_canvasCtx=canvas.getContext('2d');
+_canvasCtx.scale(2,2);
+_canvasCtx.lineCap='round';_canvasCtx.lineJoin='round';
+_canvasCtx.putImageData(imgData,0,0);
+// Sayfa ayırıcı çizgi
+_canvasCtx.save();
+_canvasCtx.setLineDash([8,8]);
+_canvasCtx.strokeStyle='rgba(124,111,247,0.3)';
+_canvasCtx.lineWidth=1;
+_canvasCtx.beginPath();
+_canvasCtx.moveTo(20,oldH/2);
+_canvasCtx.lineTo(canvas.width/2-20,oldH/2);
+_canvasCtx.stroke();
+_canvasCtx.restore();
+_canvasPages.push({offset:oldH/2});
+// Aşağı scroll et
+canvas.parentElement.scrollTop=canvas.parentElement.scrollHeight;
+showToast('Yeni sayfa eklendi');
 } else if(action==='duplicate'){
 _saveCanvasState();
 showToast('Sayfa kopyalandı');
@@ -3388,6 +3433,27 @@ showToast('Sayfa kopyalandı');
 _canvasCtx.clearRect(0,0,canvas.width/2,canvas.height/2);
 _canvasHistory=[];
 showToast('Sayfa silindi');
+} else if(action==='a4portrait'){
+_saveCanvasState();
+var w3=canvas.offsetWidth;
+canvas.height=Math.round(w3*1.414)*2;
+canvas.style.height=(canvas.height/2)+'px';
+_canvasCtx=canvas.getContext('2d');_canvasCtx.scale(2,2);_canvasCtx.lineCap='round';_canvasCtx.lineJoin='round';
+showToast('A4 Dikey');
+} else if(action==='a4landscape'){
+_saveCanvasState();
+var w4=canvas.offsetWidth;
+canvas.height=Math.round(w4*0.707)*2;
+canvas.style.height=(canvas.height/2)+'px';
+_canvasCtx=canvas.getContext('2d');_canvasCtx.scale(2,2);_canvasCtx.lineCap='round';_canvasCtx.lineJoin='round';
+showToast('A4 Yatay');
+} else if(action==='square'){
+_saveCanvasState();
+var w5=canvas.offsetWidth;
+canvas.height=w5*2;
+canvas.style.height=w5+'px';
+_canvasCtx=canvas.getContext('2d');_canvasCtx.scale(2,2);_canvasCtx.lineCap='round';_canvasCtx.lineJoin='round';
+showToast('Kare');
 }
 }
 // Pinch zoom desteği
@@ -3471,6 +3537,8 @@ tags:['çizim'],createdAt:new Date().toISOString()
 });
 showToast('Çizim kaydedildi ✏️');
 }
-saveData();renderNotes();
+saveData();
 closeCanvasNote();
+renderNotes();
+switchPage('notes');
 }

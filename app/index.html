@@ -259,6 +259,11 @@ Küçült
 <button onclick="canvasPageAction('resetZoom')" style="width:100%;display:flex;align-items:center;gap:8px;padding:10px 12px;background:none;border:none;cursor:pointer;color:var(--text2);font-size:.76rem;font-family:'Sora',sans-serif;border-radius:8px;transition:background .15s;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>Sığdır</button>
 <div style="height:1px;background:var(--border);margin:4px 0;"></div>
+<div style="font-size:.56rem;color:var(--text3);padding:4px 12px;font-family:'JetBrains Mono',monospace;">SAYFA BOYUTU</div>
+<button onclick="canvasPageAction('a4portrait')" style="width:100%;display:flex;align-items:center;gap:8px;padding:8px 12px;background:none;border:none;cursor:pointer;color:var(--text2);font-size:.72rem;font-family:'Sora',sans-serif;border-radius:8px;transition:background .15s;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">📄 A4 Dikey</button>
+<button onclick="canvasPageAction('a4landscape')" style="width:100%;display:flex;align-items:center;gap:8px;padding:8px 12px;background:none;border:none;cursor:pointer;color:var(--text2);font-size:.72rem;font-family:'Sora',sans-serif;border-radius:8px;transition:background .15s;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">📃 A4 Yatay</button>
+<button onclick="canvasPageAction('square')" style="width:100%;display:flex;align-items:center;gap:8px;padding:8px 12px;background:none;border:none;cursor:pointer;color:var(--text2);font-size:.72rem;font-family:'Sora',sans-serif;border-radius:8px;transition:background .15s;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">⬜ Kare</button>
+<div style="height:1px;background:var(--border);margin:4px 0;"></div>
 <button onclick="canvasPageAction('delete')" style="width:100%;display:flex;align-items:center;gap:8px;padding:10px 12px;background:none;border:none;cursor:pointer;color:var(--hard);font-size:.76rem;font-family:'Sora',sans-serif;border-radius:8px;transition:background .15s;" onmouseover="this.style.background='rgba(248,113,113,.08)'" onmouseout="this.style.background='none'">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>Sayfayı Sil</button>
 </div>
@@ -299,7 +304,9 @@ Küçült
 </div>
 <input type="file" id="canvasImageInput" accept="image/*" style="display:none;" onchange="canvasInsertImage(event)">
 <input type="file" id="canvasCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="canvasInsertImage(event)">
-<canvas id="canvasNote" style="flex:1;touch-action:none;cursor:crosshair;"></canvas>
+<div id="canvasScrollWrap" style="flex:1;overflow:auto;position:relative;">
+<canvas id="canvasNote" style="width:100%;touch-action:none;cursor:crosshair;display:block;"></canvas>
+</div>
 </div>
 <!-- KANBAN (Pro) -->
 <div class="page" id="page-kanban">
