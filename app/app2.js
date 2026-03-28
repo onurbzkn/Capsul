@@ -1313,6 +1313,14 @@ function startReminderInterval(){
 if(reminderCheckInterval)clearInterval(reminderCheckInterval);
 reminderCheckInterval=setInterval(checkAndFireNotifications,60*1000);
 checkAndFireNotifications();
+// Periodic Background Sync kaydı (PWA arka plan bildirimi)
+if('serviceWorker' in navigator&&'periodicSync' in (navigator.serviceWorker.controller||{})){
+navigator.serviceWorker.ready.then(function(reg){
+if(reg.periodicSync){
+reg.periodicSync.register('capsula-daily-check',{minInterval:12*60*60*1000}).catch(function(){});
+}
+});
+}
 }
 function getReminders(){
 const today=new Date();today.setHours(0,0,0,0);
@@ -1688,6 +1696,11 @@ saveData();
 runSplash(function(){
 initApp();
 if(localStorage.getItem('capsula_pin')){showPinScreen();}
+// Shortcut hash navigasyonu
+var hash=window.location.hash.replace('#','');
+if(hash&&typeof switchPage==='function'){
+setTimeout(function(){switchPage(hash);},500);
+}
 });
 };
 if ('serviceWorker' in navigator) {
