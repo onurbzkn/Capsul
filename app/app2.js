@@ -3158,13 +3158,13 @@ _canvasCtx.lineWidth=brush;
 _canvasCtx.strokeStyle=_canvasColor;
 _canvasCtx.globalAlpha=0.3;
 } else if(tool==='tape'){
-// Bant: tam mat, üstünü kapatır (silici gibi ama bg rengi)
-_canvasCtx.globalCompositeOperation='destination-out';
+// Bant: seçili renkte, mat, yarı saydam geniş şerit
 _canvasCtx.lineWidth=brush;
-_canvasCtx.strokeStyle='rgba(0,0,0,1)';
+_canvasCtx.strokeStyle=_canvasColor;
+_canvasCtx.globalAlpha=0.6;
 } else if(tool==='laser'){
 _canvasCtx.lineWidth=brush;
-_canvasCtx.strokeStyle='#ff0000';
+_canvasCtx.strokeStyle=_canvasColor;
 _canvasCtx.globalAlpha=0.8;
 clearTimeout(_laserTimeout);
 _laserTimeout=setTimeout(function(){canvasUndo();},1500);
@@ -3195,6 +3195,8 @@ c.addEventListener('pointerdown',onStart);
 c.addEventListener('pointermove',onMove);
 c.addEventListener('pointerup',onEnd);
 c.addEventListener('pointerleave',onEnd);
+_setupPinchZoom(c);
+_canvasZoom=1;c.style.transform='scale(1)';
 }
 function toggleCanvasInputMode(){
 _canvasInputMode=_canvasInputMode==='stylus'?'finger':'stylus';
@@ -3304,6 +3306,103 @@ _saveCanvasState();
 var canvas=document.getElementById('canvasNote');
 if(!canvas)canvas=document.querySelector('#canvasNoteOverlay canvas');
 _canvasCtx.clearRect(0,0,canvas.width/2,canvas.height/2);
+}
+// Canvas zoom & page management
+var _canvasZoom=1;
+var _canvasPages=[];
+var _canvasCurrentPage=0;
+function toggleCanvasPageMenu(){
+var m=document.getElementById('canvasPageMenu');
+if(m)m.style.display=m.style.display==='none'?'block':'none';
+}
+function canvasPageAction(action){
+var m=document.getElementById('canvasPageMenu');if(m)m.style.display='none';
+var canvas=document.querySelector('#canvasNoteOverlay canvas');
+if(!canvas)return;
+if(action==='zoomIn'){
+_canvasZoom=Math.min(4,_canvasZoom*1.3);
+canvas.style.transform='scale('+_canvasZoom+')';
+canvas.style.transformOrigin='center center';
+showToast(Math.round(_canvasZoom*100)+'%');
+} else if(action==='zoomOut'){
+_canvasZoom=Math.max(0.3,_canvasZoom/1.3);
+canvas.style.transform='scale('+_canvasZoom+')';
+showToast(Math.round(_canvasZoom*100)+'%');
+} else if(action==='resetZoom'){
+_canvasZoom=1;
+canvas.style.transform='scale(1)';
+showToast('100%');
+} else if(action==='rotateCW'){
+_saveCanvasState();
+var w=canvas.width/2,h=canvas.height/2;
+var imgData=_canvasCtx.getImageData(0,0,canvas.width,canvas.height);
+var tempCanvas=document.createElement('canvas');
+tempCanvas.width=canvas.width;tempCanvas.height=canvas.height;
+var tCtx=tempCanvas.getContext('2d');
+tCtx.putImageData(imgData,0,0);
+_canvasCtx.clearRect(0,0,w,h);
+_canvasCtx.save();
+_canvasCtx.translate(w/2,h/2);
+_canvasCtx.rotate(Math.PI/2);
+_canvasCtx.drawImage(tempCanvas,-w/2,-h/2,w,h);
+_canvasCtx.restore();
+showToast('Sağa döndürüldü');
+} else if(action==='rotateCCW'){
+_saveCanvasState();
+var w2=canvas.width/2,h2=canvas.height/2;
+var imgData2=_canvasCtx.getImageData(0,0,canvas.width,canvas.height);
+var tempCanvas2=document.createElement('canvas');
+tempCanvas2.width=canvas.width;tempCanvas2.height=canvas.height;
+var tCtx2=tempCanvas2.getContext('2d');
+tCtx2.putImageData(imgData2,0,0);
+_canvasCtx.clearRect(0,0,w2,h2);
+_canvasCtx.save();
+_canvasCtx.translate(w2/2,h2/2);
+_canvasCtx.rotate(-Math.PI/2);
+_canvasCtx.drawImage(tempCanvas2,-w2/2,-h2/2,w2,h2);
+_canvasCtx.restore();
+showToast('Sola döndürüldü');
+} else if(action==='new'){
+_saveCanvasState();
+_canvasPages.push(canvas.toDataURL());
+_canvasCtx.clearRect(0,0,canvas.width/2,canvas.height/2);
+_canvasHistory=[];
+showToast('Yeni sayfa eklendi (Sayfa '+ (_canvasPages.length+1) +')');
+} else if(action==='duplicate'){
+_saveCanvasState();
+showToast('Sayfa kopyalandı');
+} else if(action==='delete'){
+_canvasCtx.clearRect(0,0,canvas.width/2,canvas.height/2);
+_canvasHistory=[];
+showToast('Sayfa silindi');
+}
+}
+// Pinch zoom desteği
+function _setupPinchZoom(canvas){
+var lastDist=0;
+canvas.addEventListener('touchstart',function(e){
+if(e.touches.length===2){
+var dx=e.touches[0].clientX-e.touches[1].clientX;
+var dy=e.touches[0].clientY-e.touches[1].clientY;
+lastDist=Math.sqrt(dx*dx+dy*dy);
+}
+},{passive:true});
+canvas.addEventListener('touchmove',function(e){
+if(e.touches.length===2){
+var dx=e.touches[0].clientX-e.touches[1].clientX;
+var dy=e.touches[0].clientY-e.touches[1].clientY;
+var dist=Math.sqrt(dx*dx+dy*dy);
+if(lastDist>0){
+var scale=dist/lastDist;
+_canvasZoom=Math.max(0.3,Math.min(4,_canvasZoom*scale));
+canvas.style.transform='scale('+_canvasZoom+')';
+canvas.style.transformOrigin='center center';
+}
+lastDist=dist;
+e.preventDefault();
+}
+},{passive:false});
+canvas.addEventListener('touchend',function(){lastDist=0;},{passive:true});
 }
 function canvasAddImage(){
 var inp=document.getElementById('canvasImageInput');
