@@ -239,12 +239,11 @@ Küçült
 </button>
 <input type="text" id="canvasNoteTitle" placeholder="Not başlığı..." style="flex:1;background:none;border:none;outline:none;font-family:'Sora',sans-serif;font-size:.88rem;color:var(--text);">
 <button onclick="saveCanvasNote()" style="background:linear-gradient(135deg,var(--accent),rgba(124,111,247,.8));border:none;border-radius:8px;padding:7px 14px;cursor:pointer;color:#fff;font-size:.76rem;font-family:'Sora',sans-serif;">Kaydet</button>
-<button onclick="toggleCanvasPageMenu()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:7px 8px;cursor:pointer;color:var(--text3);display:flex;align-items:center;">
+<div style="position:relative;">
+<button onclick="toggleCanvasPageMenu()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:7px 8px;cursor:pointer;color:var(--text3);display:flex;align-items:center;" id="canvasMenuBtn">
 <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
 </button>
-</div>
-<!-- Sayfa menüsü -->
-<div id="canvasPageMenu" style="display:none;position:absolute;top:54px;right:10px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:6px;z-index:10;box-shadow:0 8px 24px rgba(0,0,0,.5);min-width:160px;">
+<div id="canvasPageMenu" style="display:none;position:absolute;top:40px;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:6px;z-index:10;box-shadow:0 8px 24px rgba(0,0,0,.5);min-width:160px;">
 <button onclick="canvasPageAction('new')" style="width:100%;display:flex;align-items:center;gap:8px;padding:10px 12px;background:none;border:none;cursor:pointer;color:var(--text2);font-size:.76rem;font-family:'Sora',sans-serif;border-radius:8px;transition:background .15s;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Yeni Sayfa</button>
 <button onclick="canvasPageAction('duplicate')" style="width:100%;display:flex;align-items:center;gap:8px;padding:10px 12px;background:none;border:none;cursor:pointer;color:var(--text2);font-size:.76rem;font-family:'Sora',sans-serif;border-radius:8px;transition:background .15s;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">
@@ -263,6 +262,8 @@ Küçült
 <button onclick="canvasPageAction('delete')" style="width:100%;display:flex;align-items:center;gap:8px;padding:10px 12px;background:none;border:none;cursor:pointer;color:var(--hard);font-size:.76rem;font-family:'Sora',sans-serif;border-radius:8px;transition:background .15s;" onmouseover="this.style.background='rgba(248,113,113,.08)'" onmouseout="this.style.background='none'">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>Sayfayı Sil</button>
 </div>
+</div><!-- relative wrapper end -->
+</div><!-- header end -->
 <!-- Araç çubuğu -->
 <div id="canvasToolbar" style="display:flex;align-items:center;gap:3px;padding:6px 8px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;">
 <button onclick="setCanvasTool('fountain')" id="ct-fountain" class="ct-btn ct-active" title="Dolma Kalem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:16px;height:16px;"><path d="M17 3l4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/><path d="M15 5l4 4"/></svg></button>
@@ -287,9 +288,7 @@ Küçült
 <button onclick="setCanvasColor('#fbbf24')" class="ct-color" style="background:#fbbf24;" data-color="#fbbf24"></button>
 <button onclick="setCanvasColor('#f472b6')" class="ct-color" style="background:#f472b6;" data-color="#f472b6"></button>
 <button onclick="setCanvasColor('#a78bfa')" class="ct-color" style="background:#a78bfa;" data-color="#a78bfa"></button>
-<label style="width:24px;height:24px;border-radius:50%;overflow:hidden;cursor:pointer;flex-shrink:0;border:2px solid var(--border);background:conic-gradient(red,yellow,lime,aqua,blue,magenta,red);display:flex;align-items:center;justify-content:center;" title="Renk Seç">
-<input type="color" id="canvasColorPicker" value="#f0eeff" style="opacity:0;width:0;height:0;position:absolute;" onchange="setCanvasColor(this.value);this.parentElement.style.background=this.value;">
-</label>
+<input type="color" id="canvasColorPicker" value="#f0eeff" style="width:28px;height:28px;border:none;border-radius:50%;cursor:pointer;background:none;padding:0;flex-shrink:0;" onchange="setCanvasColor(this.value)" oninput="setCanvasColor(this.value)" title="Renk Seç">
 <div style="width:1px;height:24px;background:var(--border);margin:0 1px;flex-shrink:0;"></div>
 <input type="range" id="canvasBrushSize" min="1" max="30" value="3" style="width:55px;" oninput="updateCanvasBrush()">
 <span id="canvasSizeLbl" style="font-size:.46rem;color:var(--text3);font-family:JetBrains Mono,monospace;min-width:12px;">3</span>

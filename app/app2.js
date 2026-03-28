@@ -3313,7 +3313,20 @@ var _canvasPages=[];
 var _canvasCurrentPage=0;
 function toggleCanvasPageMenu(){
 var m=document.getElementById('canvasPageMenu');
-if(m)m.style.display=m.style.display==='none'?'block':'none';
+if(!m)return;
+var isOpen=m.style.display!=='none';
+m.style.display=isOpen?'none':'block';
+if(!isOpen){
+setTimeout(function(){
+var closer=function(e){
+if(!m.contains(e.target)&&e.target.id!=='canvasMenuBtn'&&!e.target.closest('#canvasMenuBtn')){
+m.style.display='none';
+document.removeEventListener('pointerdown',closer);
+}
+};
+document.addEventListener('pointerdown',closer);
+},50);
+}
 }
 function canvasPageAction(action){
 var m=document.getElementById('canvasPageMenu');if(m)m.style.display='none';
