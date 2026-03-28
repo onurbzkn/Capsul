@@ -7,7 +7,7 @@
 //   • formspree.io (iletişim formu) → Network Only (offline'da sessizce hata ver)
 // ─────────────────────────────────────────────────────────────────────────────
 
-const CACHE_VERSION = 'capsula-v22';
+const CACHE_VERSION = 'capsula-v23';
 
 // İlk yüklemede cache'e alınacak app shell dosyaları
 const APP_SHELL = [
@@ -43,6 +43,65 @@ self.addEventListener('activate', event => {
       .then(() => self.clients.claim()) // açık sekmeleri hemen kontrol al
   );
 });
+
+// ── PUSH NOTIFICATION ───────────────────────────────────────────────────────
+self.addEventListener('push', event => {
+  const data = event.data ? event.data.json() : {};
+  const title = data.title || 'Capsula ✦';
+  const options = {
+    body: data.body || 'Capsula\'dan bir bildirim',
+    icon: '/app/icon-192.png',
+    badge: '/app/icon-192.png',
+    vibrate: [200, 100, 200],
+    tag: data.tag || 'capsula-notif',
+    renotify: true,
+    data: { url: data.url || '/app/' }
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+// Bildirime tıklanınca uygulamayı aç
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then(windowClients => {
+        for (const client of windowClients) {
+          if (client.url.includes('/app/') && 'focus' in client) return client.focus();
+        }
+        return clients.openWindow(event.notification.data.url || '/app/');
+      })
+  );
+});
+
+// ── PERIODIC SYNC (arka plan görev kontrolü) ────────────────────────────────
+self.addEventListener('periodicsync', event => {
+  if (event.tag === 'capsula-daily-check') {
+    event.waitUntil(dailyCheck());
+  }
+});
+
+async function dailyCheck() {
+  const now = new Date();
+  const hr = now.getHours();
+  if (hr < 7 || hr > 22) return;
+
+  try {
+    const reg = self.registration;
+    if (reg && Notification.permission === 'granted') {
+      await reg.showNotification('Capsula ✦', {
+        body: 'Günlük görevlerini kontrol etmeyi unutma! 💪',
+        icon: '/app/icon-192.png',
+        badge: '/app/icon-192.png',
+        tag: 'capsula-daily',
+        renotify: false,
+        data: { url: '/app/' }
+      });
+    }
+  } catch (e) {
+    // Sessizce geç
+  }
+}
 
 // ── FETCH ────────────────────────────────────────────────────────────────────
 self.addEventListener('fetch', event => {

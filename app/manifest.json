@@ -8,9 +8,48 @@
   "display": "standalone",
   "background_color": "#0d0d12",
   "theme_color": "#7c6ff7",
-  "orientation": "portrait",
+  "orientation": "any",
   "lang": "tr",
   "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Görev Ekle",
+      "short_name": "Görev",
+      "description": "Yeni görev ekle",
+      "url": "/app/#todo",
+      "icons": [{"src": "https://capsulaapp.com/app/icon-192.png", "sizes": "192x192"}]
+    },
+    {
+      "name": "Not Yaz",
+      "short_name": "Not",
+      "description": "Yeni not oluştur",
+      "url": "/app/#notes",
+      "icons": [{"src": "https://capsulaapp.com/app/icon-192.png", "sizes": "192x192"}]
+    },
+    {
+      "name": "Pomodoro",
+      "short_name": "Odak",
+      "description": "Pomodoro zamanlayıcı başlat",
+      "url": "/app/#pomodoro",
+      "icons": [{"src": "https://capsulaapp.com/app/icon-192.png", "sizes": "192x192"}]
+    },
+    {
+      "name": "Günlük Yaz",
+      "short_name": "Günlük",
+      "description": "Günlük girişi yaz",
+      "url": "/app/#diary",
+      "icons": [{"src": "https://capsulaapp.com/app/icon-192.png", "sizes": "192x192"}]
+    }
+  ],
+  "widgets": [
+    {
+      "name": "Günlük Özet",
+      "short_name": "Capsula",
+      "description": "Bugünün görevleri ve streak",
+      "tag": "capsula-daily",
+      "ms_ac_template": "widget-daily"
+    }
+  ],
   "icons": [
     {
       "src": "https://capsulaapp.com/app/icon-192.png",
