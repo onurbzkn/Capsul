@@ -1032,7 +1032,7 @@ document.getElementById('notebookList').innerHTML=filtered.length
 :'<div class="empty-state">Not yok.<br>Üstten ders notu ekle.</div>';
 }
 function saveQuickCapture(){const text=document.getElementById('qcInput').value.trim();if(!text)return;D.notes.unshift({id:Date.now(),title:'Hızlı Not',content:text,media:[],tags:['hızlı'],createdAt:new Date().toISOString()});saveData();document.getElementById('qcInput').value='';showToast('Notlara kaydedildi ✦');renderNotes();}
-function exportData(){const d=JSON.parse(JSON.stringify(D));delete d.profile.avatar;const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const a=document.createElement('a');const _u1=URL.createObjectURL(blob);a.href=_u1;a.download=`capsula_yedek_${new Date().toISOString().split('T')[0]}.json`;a.click();URL.revokeObjectURL(_u1);showToast('Dışa aktarıldı \ud83d\udcc1');}
+function exportData(){const d=JSON.parse(JSON.stringify(D));const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const a=document.createElement('a');const _u1=URL.createObjectURL(blob);a.href=_u1;a.download=`capsula_yedek_${new Date().toISOString().split('T')[0]}.json`;a.click();URL.revokeObjectURL(_u1);showToast('Dışa aktarıldı \ud83d\udcc1');}
 function requestNotif(){if('Notification' in window)Notification.requestPermission().then(p=>showToast(p==='granted'?'Bildirimler aktif ✓':'İzin reddedildi'));else showToast('Tarayıcı desteklemiyor');}
 function renderPro(){
 const tk=new Date().toISOString().split('T')[0];
@@ -1264,7 +1264,7 @@ if(el)el.textContent=t?new Date(t).toLocaleString('tr-TR',{day:'numeric',month:'
 }
 function exportBackup(format){
 if(format==='json'){
-const d=JSON.parse(JSON.stringify(D));delete d.profile.avatar;
+const d=JSON.parse(JSON.stringify(D));
 const meta={exportedAt:new Date().toISOString(),version:'capsula-v4',counts:{todos:D.todos.length,notes:D.notes.length,diary:D.diary.length,reading:D.reading.length}};
 const blob=new Blob([JSON.stringify({meta,...d},null,2)],{type:'application/json'});
 const a=document.createElement('a');const _u2=URL.createObjectURL(blob);a.href=_u2;a.download=`capsula_yedek_${new Date().toISOString().split('T')[0]}.json`;a.click();URL.revokeObjectURL(_u2);
@@ -1315,8 +1315,8 @@ const tarih=meta?.exportedAt?new Date(meta.exportedAt).toLocaleString('tr-TR'):'
 showConfirm(`Yedek geri yüklenecek — mevcut veriler silinecek.
 Yedek tarihi: ${tarih}
 Emin misin?`,()=>{
-const profile=D.profile;Object.assign(D,data);
-D.profile=profile; // import edilen JSON'da ne olursa olsun mevcut profil korunur
+Object.assign(D,data);
+if(data.profile)D.profile=Object.assign({},D.profile,data.profile);
 if(!D.calPlans)D.calPlans={};if(!D.kanban)D.kanban={todo:[],doing:[],done:[]};
 if(!D.reading)D.reading=[];if(!D.completedTodos)D.completedTodos=[];
 if(!D.trash)D.trash=[];if(!D.contentTrash)D.contentTrash=[];
