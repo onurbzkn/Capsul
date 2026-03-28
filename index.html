@@ -338,6 +338,7 @@ footer{
   .privacy-section{padding:60px 20px;}
   .cta-section{padding:70px 20px;}
   .features-grid{grid-template-columns:1fr;}
+  [style*="grid-template-columns:repeat(3"]{grid-template-columns:1fr!important;}
   footer{flex-direction:column;text-align:center;padding:28px 20px;}
   .footer-links{justify-content:center;}
 }
@@ -353,7 +354,7 @@ footer{
       <button class="active" onclick="setLang('tr')" id="btn-tr">TR</button>
       <button onclick="setLang('en')" id="btn-en">EN</button>
     </div>
-    <a href="app/index.html" class="nav-cta" data-tr="Uygulamayı Aç" data-en="Open App">
+    <a href="app/index.html" class="nav-cta">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polyline points="5 12 19 12"/><polyline points="13 6 19 12 13 18"/></svg>
       <span data-tr="Uygulamayı Aç" data-en="Open App">Uygulamayı Aç</span>
     </a>
@@ -365,203 +366,119 @@ footer{
   <div class="hero-glow"></div>
   <div class="hero-badge">
     <span class="hero-badge-dot"></span>
-    <span data-tr="Ücretsiz · Hesap gerekmez · Veriler sende" data-en="Free · No account needed · Your data stays with you">Ücretsiz · Hesap gerekmez · Veriler sende</span>
+    <span data-tr="Ücretsiz · Reklamsız · Veriler sende" data-en="Free · No ads · Your data stays with you">Ücretsiz · Reklamsız · Veriler sende</span>
   </div>
   <h1 class="hero-title">
-    <span data-tr="Her şeyin" data-en="Everything">Her şeyin</span><br>
-    <em><span data-tr="kişisel alanı." data-en="in one place.">kişisel alanı.</span></em>
+    <span data-tr="Üretkenliğin" data-en="Your productivity">Üretkenliğin</span><br>
+    <em><span data-tr="merkezi." data-en="hub.">merkezi.</span></em>
   </h1>
-  <p class="hero-sub" data-tr="Notlar, görevler, okuma listesi, pomodoro, takvim. Hepsi bir arada. Kayıt olmadan, bulut olmadan — sadece sen ve düşüncelerin." data-en="Notes, tasks, reading list, pomodoro, calendar. All in one place. No sign-up, no cloud — just you and your thoughts.">
-    Notlar, görevler, okuma listesi, pomodoro, takvim. Hepsi bir arada. Kayıt olmadan, bulut olmadan — sadece sen ve düşüncelerin.
+  <p class="hero-sub" data-tr="Görevler, notlar, kalemle çizim, alışkanlık takibi, pomodoro, ruh hali, hedefler ve daha fazlası. Tek uygulamada, hesap gerektirmeden." data-en="Tasks, notes, handwriting, habit tracking, pomodoro, mood tracker, goals and more. One app, no account needed.">
+    Görevler, notlar, kalemle çizim, alışkanlık takibi, pomodoro, ruh hali, hedefler ve daha fazlası. Tek uygulamada, hesap gerektirmeden.
   </p>
   <div class="hero-actions">
     <a href="app/index.html" class="btn-primary">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
-      <span data-tr="Hemen Başla" data-en="Get Started">Hemen Başla</span>
+      <span data-tr="Hemen Başla — Ücretsiz" data-en="Get Started — Free">Hemen Başla — Ücretsiz</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><polyline points="5 12 19 12"/><polyline points="13 6 19 12 13 18"/></svg>
     </a>
     <a href="#features" class="btn-secondary">
-      <span data-tr="Özellikleri Gör" data-en="See Features">Özellikleri Gör</span>
+      <span data-tr="Keşfet" data-en="Explore">Keşfet</span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polyline points="6 9 12 15 18 9"/></svg>
     </a>
   </div>
-  <p class="hero-note" data-tr="✦ Tüm veriler cihazında saklanır. Hiçbir şey buluta gitmez." data-en="✦ All data stored on your device. Nothing goes to the cloud.">✦ Tüm veriler cihazında saklanır. Hiçbir şey buluta gitmez.</p>
+  <p class="hero-note" data-tr="✦ AES-256 şifreleme · Bulut yedekleme · 8 tema · Çoklu dil" data-en="✦ AES-256 encryption · Cloud backup · 8 themes · Multi-language">✦ AES-256 şifreleme · Bulut yedekleme · 8 tema · Çoklu dil</p>
 </section>
 
-<!-- SOCIAL PROOF -->
-<div class="reveal" style="padding:0 24px 40px;max-width:800px;margin:0 auto;">
-  <div style="display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;">
-    <div style="display:flex;align-items:center;gap:8px;">
-      <div style="display:flex;">
-        <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#7c6ff7,#f472b6);border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#fff;">OB</div>
-        <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#60a5fa,#818cf8);border:2px solid var(--bg);margin-left:-8px;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#fff;">AK</div>
-        <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#4ade80,#22c55e);border:2px solid var(--bg);margin-left:-8px;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#fff;">EY</div>
-      </div>
-      <span style="font-size:.72rem;color:var(--text2);" data-tr="Kullanıcılar aktif" data-en="Active users">Kullanıcılar aktif</span>
+<!-- TRUST BAR -->
+<div class="reveal" style="padding:0 24px 50px;max-width:800px;margin:0 auto;">
+  <div style="display:flex;align-items:center;justify-content:center;gap:28px;flex-wrap:wrap;">
+    <div style="text-align:center;">
+      <div style="font-size:1.8rem;font-weight:700;color:var(--accent2);font-family:'JetBrains Mono',monospace;">15+</div>
+      <div style="font-size:.62rem;color:var(--text3);" data-tr="Özellik" data-en="Features">Özellik</div>
     </div>
-    <div style="width:1px;height:20px;background:var(--border);"></div>
-    <div style="display:flex;align-items:center;gap:6px;">
-      <span style="color:#fbbf24;">★★★★★</span>
-      <span style="font-size:.72rem;color:var(--text2);" data-tr="Play Store'da yakında" data-en="Coming soon to Play Store">Play Store'da yakında</span>
+    <div style="width:1px;height:32px;background:var(--border);"></div>
+    <div style="text-align:center;">
+      <div style="font-size:1.8rem;font-weight:700;color:#4ade80;font-family:'JetBrains Mono',monospace;">₺0</div>
+      <div style="font-size:.62rem;color:var(--text3);" data-tr="Tamamen Ücretsiz" data-en="Completely Free">Tamamen Ücretsiz</div>
     </div>
-    <div style="width:1px;height:20px;background:var(--border);"></div>
-    <div style="display:flex;align-items:center;gap:6px;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="var(--easy)" stroke-width="2" style="width:16px;height:16px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      <span style="font-size:.72rem;color:var(--text2);" data-tr="AES-256 şifreleme" data-en="AES-256 encryption">AES-256 şifreleme</span>
+    <div style="width:1px;height:32px;background:var(--border);"></div>
+    <div style="text-align:center;">
+      <div style="font-size:1.8rem;font-weight:700;color:#f472b6;font-family:'JetBrains Mono',monospace;">0</div>
+      <div style="font-size:.62rem;color:var(--text3);" data-tr="Sunucuya giden veri" data-en="Data sent to servers">Sunucuya giden veri</div>
     </div>
-  </div>
-</div>
-
-<!-- KEY FEATURES STRIP -->
-<div class="reveal" style="padding:0 24px 50px;max-width:900px;margin:0 auto;">
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;">
-      <div style="font-size:1.6rem;margin-bottom:6px;">📋</div>
-      <div style="font-size:.78rem;font-weight:500;color:var(--text);" data-tr="Görevler" data-en="Tasks">Görevler</div>
-      <div style="font-size:.58rem;color:var(--text3);margin-top:3px;" data-tr="Alt görevler + tekrar" data-en="Subtasks + repeat">Alt görevler + tekrar</div>
-    </div>
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;">
-      <div style="font-size:1.6rem;margin-bottom:6px;">📝</div>
-      <div style="font-size:.78rem;font-weight:500;color:var(--text);" data-tr="Notlar" data-en="Notes">Notlar</div>
-      <div style="font-size:.58rem;color:var(--text3);margin-top:3px;" data-tr="Şablonlar + medya" data-en="Templates + media">Şablonlar + medya</div>
-    </div>
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;">
-      <div style="font-size:1.6rem;margin-bottom:6px;">🍅</div>
-      <div style="font-size:.78rem;font-weight:500;color:var(--text);" data-tr="Pomodoro" data-en="Pomodoro">Pomodoro</div>
-      <div style="font-size:.58rem;color:var(--text3);margin-top:3px;" data-tr="5 saat stili" data-en="5 clock styles">5 saat stili</div>
-    </div>
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;">
-      <div style="font-size:1.6rem;margin-bottom:6px;">💪</div>
-      <div style="font-size:.78rem;font-weight:500;color:var(--text);" data-tr="Alışkanlıklar" data-en="Habits">Alışkanlıklar</div>
-      <div style="font-size:.58rem;color:var(--text3);margin-top:3px;" data-tr="Streak takibi" data-en="Streak tracking">Streak takibi</div>
+    <div style="width:1px;height:32px;background:var(--border);"></div>
+    <div style="text-align:center;">
+      <div style="font-size:1.8rem;font-weight:700;color:#fbbf24;font-family:'JetBrains Mono',monospace;">8</div>
+      <div style="font-size:.62rem;color:var(--text3);" data-tr="Tema seçeneği" data-en="Theme options">Tema seçeneği</div>
     </div>
   </div>
 </div>
 
-<!-- APP PREVIEW -->
-<div class="preview-wrap reveal">
-  <div class="preview-frame">
-    <div class="preview-bar">
-      <div class="preview-dot"></div>
-      <div class="preview-dot"></div>
-      <div class="preview-dot"></div>
-      <div class="preview-url">capsulaapp.com</div>
+<!-- HERO FEATURES GRID -->
+<div class="reveal" style="padding:0 20px 80px;max-width:1000px;margin:0 auto;">
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+    <div style="background:linear-gradient(145deg,rgba(124,111,247,.12),rgba(124,111,247,.03));border:1px solid rgba(124,111,247,.2);border-radius:18px;padding:22px;grid-row:span 2;">
+      <div style="font-size:2rem;margin-bottom:10px;">📋</div>
+      <div style="font-size:.92rem;font-weight:500;color:var(--text);margin-bottom:6px;" data-tr="Görev Yönetimi" data-en="Task Management">Görev Yönetimi</div>
+      <div style="font-size:.7rem;color:var(--text2);line-height:1.7;" data-tr="Alt görevler, tekrarlayan görevler, 3 öncelik seviyesi, sürükle-bırak sıralama. Kanban tahtası ile görsel takip." data-en="Subtasks, recurring tasks, 3 priority levels, drag-and-drop sorting. Visual tracking with Kanban board.">Alt görevler, tekrarlayan görevler, 3 öncelik seviyesi, sürükle-bırak sıralama. Kanban tahtası ile görsel takip.</div>
     </div>
-    <div class="preview-body">
-      <div class="sim-header">
-        <span class="sim-title" data-tr="Notlar" data-en="Notes">Notlar</span>
-        <div class="sim-avatar">OB</div>
-      </div>
-      <div class="sim-grid">
-        <div class="sim-card">
-          <div class="sim-card-label" data-tr="Görev" data-en="Tasks">Görev</div>
-          <div class="sim-card-val accent">12</div>
-        </div>
-        <div class="sim-card">
-          <div class="sim-card-label" data-tr="Seri" data-en="Streak">Seri</div>
-          <div class="sim-card-val amber">7🔥</div>
-        </div>
-        <div class="sim-card">
-          <div class="sim-card-label" data-tr="Kitap" data-en="Books">Kitap</div>
-          <div class="sim-card-val green">3</div>
-        </div>
-      </div>
-      <div class="sim-row">
-        <div class="sim-note">
-          <div class="sim-note-title" data-tr="Proje Fikirleri" data-en="Project Ideas">Proje Fikirleri</div>
-          <div class="sim-note-text" data-tr="Yeni uygulama için tasarım notları. Kullanıcı deneyimi..." data-en="Design notes for new app. User experience flow...">Yeni uygulama için tasarım notları. Kullanıcı deneyimi...</div>
-        </div>
-        <div class="sim-todo">
-          <div class="sim-todo-item"><div class="sim-todo-dot" style="background:#4ade80;"></div><span data-tr="Sabah rutini" data-en="Morning routine">Sabah rutini</span></div>
-          <div class="sim-todo-item"><div class="sim-todo-dot" style="background:#7c6ff7;"></div><span data-tr="Kitap oku — 30dk" data-en="Read book — 30min">Kitap oku — 30dk</span></div>
-          <div class="sim-todo-item"><div class="sim-todo-dot" style="background:#fbbf24;"></div><span data-tr="Haftalık özet" data-en="Weekly review">Haftalık özet</span></div>
-        </div>
-      </div>
-      <div class="sim-nav">
-        <div class="sim-nav-item active"><div class="sim-nav-icon"></div><span>NOT</span></div>
-        <div class="sim-nav-item"><div class="sim-nav-icon"></div><span data-tr="GÖREV" data-en="TASK">GÖREV</span></div>
-        <div class="sim-nav-item"><div class="sim-nav-icon" style="border-radius:50%;"></div><span>ODAK</span></div>
-        <div class="sim-nav-item"><div class="sim-nav-icon"></div><span data-tr="PROGRAM" data-en="SCHED.">PROGRAM</span></div>
-        <div class="sim-nav-item"><div class="sim-nav-icon" style="border-radius:50%;"></div><span>ARA</span></div>
-      </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:22px;">
+      <div style="font-size:2rem;margin-bottom:8px;">✏️</div>
+      <div style="font-size:.88rem;font-weight:500;color:var(--text);margin-bottom:4px;" data-tr="Kalemle Not" data-en="Handwriting">Kalemle Not</div>
+      <div style="font-size:.66rem;color:var(--text3);" data-tr="Tablet kalem desteği, 8 araç, çoklu sayfa" data-en="Stylus support, 8 tools, multiple pages">Tablet kalem desteği, 8 araç, çoklu sayfa</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:22px;">
+      <div style="font-size:2rem;margin-bottom:8px;">💪</div>
+      <div style="font-size:.88rem;font-weight:500;color:var(--text);margin-bottom:4px;" data-tr="Alışkanlık Takibi" data-en="Habit Tracker">Alışkanlık Takibi</div>
+      <div style="font-size:.66rem;color:var(--text3);" data-tr="Günlük streak, haftalık grid, 16 ikon" data-en="Daily streak, weekly grid, 16 icons">Günlük streak, haftalık grid, 16 ikon</div>
+    </div>
+    <div style="background:linear-gradient(145deg,rgba(244,114,182,.1),rgba(244,114,182,.02));border:1px solid rgba(244,114,182,.2);border-radius:18px;padding:22px;">
+      <div style="font-size:2rem;margin-bottom:8px;">😊</div>
+      <div style="font-size:.88rem;font-weight:500;color:var(--text);margin-bottom:4px;" data-tr="Ruh Hali Takibi" data-en="Mood Tracker">Ruh Hali Takibi</div>
+      <div style="font-size:.66rem;color:var(--text3);" data-tr="8 ruh hali, aylık takvim, istatistik" data-en="8 moods, monthly calendar, statistics">8 ruh hali, aylık takvim, istatistik</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:22px;">
+      <div style="font-size:2rem;margin-bottom:8px;">🎯</div>
+      <div style="font-size:.88rem;font-weight:500;color:var(--text);margin-bottom:4px;" data-tr="Hedef Belirleme" data-en="Goal Setting">Hedef Belirleme</div>
+      <div style="font-size:.66rem;color:var(--text3);" data-tr="Otomatik takip, ilerleme çubuğu, geri sayım" data-en="Auto tracking, progress bar, countdown">Otomatik takip, ilerleme çubuğu, geri sayım</div>
     </div>
   </div>
 </div>
 
-<!-- FEATURES -->
+<!-- ALL FEATURES -->
 <section class="section" id="features">
-  <div class="section-label" data-tr="Özellikler" data-en="Features">Özellikler</div>
-  <h2 class="section-title reveal" data-tr="Sana lazım olan <em>her şey</em>" data-en="Everything you <em>need</em>">Sana lazım olan <em>her şey</em></h2>
+  <div class="section-label" data-tr="Tüm Özellikler" data-en="All Features">Tüm Özellikler</div>
+  <h2 class="section-title reveal" data-tr="Bir uygulamada <em>her şey</em>" data-en="Everything in <em>one app</em>">Bir uygulamada <em>her şey</em></h2>
   <div class="features-grid reveal">
-    <div class="feature">
-      <div class="feature-icon">📝</div>
-      <div class="feature-title" data-tr="Akıllı Notlar" data-en="Smart Notes">Akıllı Notlar</div>
-      <div class="feature-desc" data-tr="Fotoğraf, video, ses ekleyebileceğin zengin içerikli notlar. Etiketler ve hızlı arama." data-en="Rich notes with photos, video, audio. Tags and quick search.">Fotoğraf, video, ses ekleyebileceğin zengin içerikli notlar. Etiketler ve hızlı arama.</div>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">✅</div>
-      <div class="feature-title" data-tr="Görev Takibi" data-en="Task Tracking">Görev Takibi</div>
-      <div class="feature-desc" data-tr="Kolay/Orta/Zor kategoriler, tekrarlayan görevler, takvime sürükle-bırak." data-en="Easy/Medium/Hard categories, recurring tasks, drag to calendar.">Kolay/Orta/Zor kategoriler, tekrarlayan görevler, takvime sürükle-bırak.</div>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">🍅</div>
-      <div class="feature-title" data-tr="Pomodoro Odak" data-en="Pomodoro Focus">Pomodoro Odak</div>
-      <div class="feature-desc" data-tr="5 farklı saat stili, ayarlanabilir süreler, görev bağlantısı." data-en="5 clock styles, customizable durations, task linking.">5 farklı saat stili, ayarlanabilir süreler, görev bağlantısı.</div>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">📚</div>
-      <div class="feature-title" data-tr="Okuma Listesi" data-en="Reading List">Okuma Listesi</div>
-      <div class="feature-desc" data-tr="Sayfa takibi, ilerleme çubuğu ve okuma hızına göre bitiş tahmini." data-en="Page tracking, progress bar, and finish date prediction based on your reading speed.">Sayfa takibi, ilerleme çubuğu ve okuma hızına göre bitiş tahmini.</div>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">📅</div>
-      <div class="feature-title" data-tr="Ders Programı" data-en="Class Schedule">Ders Programı</div>
-      <div class="feature-desc" data-tr="Haftalık veya sabit mod. Ders linki, saat, açıklama. Pazar bildirimi." data-en="Weekly or fixed mode. Class link, time, notes. Sunday reminders.">Haftalık veya sabit mod. Ders linki, saat, açıklama. Pazar bildirimi.</div>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">📊</div>
-      <div class="feature-title" data-tr="İstatistikler" data-en="Statistics">İstatistikler</div>
-      <div class="feature-desc" data-tr="30 günlük aktivite grafiği, seri takibi, okuma analizi ve kişisel içgörüler." data-en="30-day activity graph, streak tracking, reading analysis and personal insights.">30 günlük aktivite grafiği, seri takibi, okuma analizi ve kişisel içgörüler.</div>
-    </div>
+    <div class="feature"><div class="feature-icon">📝</div><div class="feature-title" data-tr="Akıllı Notlar" data-en="Smart Notes">Akıllı Notlar</div><div class="feature-desc" data-tr="7 şablon, medya desteği, etiket filtreleme, mühürleme" data-en="7 templates, media support, tag filtering, sealing">7 şablon, medya desteği, etiket filtreleme, mühürleme</div></div>
+    <div class="feature"><div class="feature-icon">✅</div><div class="feature-title" data-tr="Görevler + Alt Görevler" data-en="Tasks + Subtasks">Görevler + Alt Görevler</div><div class="feature-desc" data-tr="3 görünüm (tahta/liste/kompakt), tekrarlayan, alt görevler" data-en="3 views (board/list/compact), recurring, subtasks">3 görünüm (tahta/liste/kompakt), tekrarlayan, alt görevler</div></div>
+    <div class="feature"><div class="feature-icon">🍅</div><div class="feature-title" data-tr="Pomodoro + Kronometre" data-en="Pomodoro + Stopwatch">Pomodoro + Kronometre</div><div class="feature-desc" data-tr="Tam ekran modu, tur kayıt, sınırsız süre ayarı" data-en="Fullscreen mode, lap recording, unlimited duration">Tam ekran modu, tur kayıt, sınırsız süre ayarı</div></div>
+    <div class="feature"><div class="feature-icon">✏️</div><div class="feature-title" data-tr="Kalemle Çizim" data-en="Handwriting">Kalemle Çizim</div><div class="feature-desc" data-tr="Dolma/tükenmez/kurşun kalem, silgi, vurgulayıcı, lazer, lasso" data-en="Fountain/ballpoint/pencil, eraser, highlighter, laser, lasso">Dolma/tükenmez/kurşun kalem, silgi, vurgulayıcı, lazer, lasso</div></div>
+    <div class="feature"><div class="feature-icon">📚</div><div class="feature-title" data-tr="Okuma Listesi" data-en="Reading List">Okuma Listesi</div><div class="feature-desc" data-tr="3 görünüm, sayfa takibi, AI bitiş tahmini" data-en="3 views, page tracking, AI finish prediction">3 görünüm, sayfa takibi, AI bitiş tahmini</div></div>
+    <div class="feature"><div class="feature-icon">📖</div><div class="feature-title" data-tr="Günlük" data-en="Diary">Günlük</div><div class="feature-desc" data-tr="Ruh hali seçimi, medya, düzenleme, ilham soruları" data-en="Mood selection, media, editing, inspiration prompts">Ruh hali seçimi, medya, düzenleme, ilham soruları</div></div>
+    <div class="feature"><div class="feature-icon">📊</div><div class="feature-title" data-tr="Kanban Tahtası" data-en="Kanban Board">Kanban Tahtası</div><div class="feature-desc" data-tr="3 görünüm, görevlerden aktar, sürükle-taşı" data-en="3 views, import from tasks, drag-and-drop">3 görünüm, görevlerden aktar, sürükle-taşı</div></div>
+    <div class="feature"><div class="feature-icon">📅</div><div class="feature-title" data-tr="Ders Programı" data-en="Class Schedule">Ders Programı</div><div class="feature-desc" data-tr="Haftalık/sabit mod, Zoom linki, renk kodlama" data-en="Weekly/fixed mode, Zoom link, color coding">Haftalık/sabit mod, Zoom linki, renk kodlama</div></div>
+    <div class="feature"><div class="feature-icon">⏳</div><div class="feature-title" data-tr="Zaman Kapsülü" data-en="Time Capsule">Zaman Kapsülü</div><div class="feature-desc" data-tr="Geleceğe mesaj yaz, tarih gelince aç" data-en="Write to future self, opens on chosen date">Geleceğe mesaj yaz, tarih gelince aç</div></div>
   </div>
 </section>
 
-<!-- STATS -->
-<div class="stats-section reveal">
-  <div class="stats-inner">
-    <div>
-      <div class="stat-num">∞</div>
-      <div class="stat-label" data-tr="Depolama Limiti" data-en="Storage Limit">Depolama Limiti</div>
-    </div>
-    <div>
-      <div class="stat-num">0</div>
-      <div class="stat-label" data-tr="Sunucuya Giden Veri" data-en="Data to Servers">Sunucuya Giden Veri</div>
-    </div>
-    <div>
-      <div class="stat-num">6</div>
-      <div class="stat-label" data-tr="Dil Desteği" data-en="Supported Languages">Dil Desteği</div>
-    </div>
-    <div>
-      <div class="stat-num">₺0</div>
-      <div class="stat-label" data-tr="Ücret" data-en="Cost">Ücret</div>
-    </div>
-  </div>
-</div>
-
-<!-- PRIVACY -->
+<!-- SECURITY HIGHLIGHT -->
 <section class="privacy-section reveal">
   <div class="privacy-icon">🔒</div>
-  <h2 class="privacy-title" data-tr="Gizlilik <em>önce</em> gelir" data-en="Privacy <em>first</em>">
-    <span data-tr="Gizlilik " data-en="Privacy ">Gizlilik </span><em data-tr="önce" data-en="first">önce</em><span data-tr=" gelir" data-en=""> gelir</span>
+  <h2 class="privacy-title">
+    <span data-tr="Gizlilik " data-en="Privacy ">Gizlilik </span><em data-tr="önce" data-en="first">önce</em><span data-tr=" gelir." data-en="."> gelir.</span>
   </h2>
-  <p class="privacy-text" data-tr="Tüm veriler sadece senin cihazında saklanır. Sunucuya hiçbir şey gitmez, hesap gerekmez, takip yok. Uygulamayı kapatsan da veriler orada durur." data-en="All data is stored only on your device. Nothing goes to servers, no account required, no tracking. Your data stays even when you close the app.">
-    Tüm veriler sadece senin cihazında saklanır. Sunucuya hiçbir şey gitmez, hesap gerekmez, takip yok. Uygulamayı kapatsan da veriler orada durur.
+  <p class="privacy-text" data-tr="AES-256-GCM şifreleme ile tüm veriler cihazında kilitli. Sunucuya hiçbir şey gitmez. Google Drive yedekleme isteğe bağlı. Hesap, reklam, takip yok." data-en="All data locked on your device with AES-256-GCM encryption. Nothing goes to servers. Google Drive backup is optional. No account, no ads, no tracking.">
+    AES-256-GCM şifreleme ile tüm veriler cihazında kilitli. Sunucuya hiçbir şey gitmez. Google Drive yedekleme isteğe bağlı. Hesap, reklam, takip yok.
   </p>
   <div class="privacy-pills">
+    <span class="pill">🔐 AES-256</span>
     <span class="pill" data-tr="Hesap yok" data-en="No account">Hesap yok</span>
     <span class="pill" data-tr="Reklam yok" data-en="No ads">Reklam yok</span>
     <span class="pill" data-tr="Takip yok" data-en="No tracking">Takip yok</span>
-    <span class="pill" data-tr="Bulut yok" data-en="No cloud">Bulut yok</span>
-    <span class="pill" data-tr="Tamamen ücretsiz" data-en="Completely free">Tamamen ücretsiz</span>
+    <span class="pill">☁️ Google Drive</span>
+    <span class="pill" data-tr="PIN kilidi" data-en="PIN lock">PIN kilidi</span>
+    <span class="pill" data-tr="Not mühürleme" data-en="Note sealing">Not mühürleme</span>
+    <span class="pill" data-tr="Tamamen ücretsiz" data-en="100% free">Tamamen ücretsiz</span>
   </div>
 </section>
 
@@ -572,7 +489,7 @@ footer{
     <em data-tr="Şimdi" data-en="Start">Şimdi</em><br>
     <span data-tr="başla." data-en="now.">başla.</span>
   </h2>
-  <p class="cta-sub" data-tr="Kayıt yok. İndirme yok. Sadece aç ve kullan." data-en="No sign-up. No download. Just open and use.">Kayıt yok. İndirme yok. Sadece aç ve kullan.</p>
+  <p class="cta-sub" data-tr="Kayıt yok. Reklam yok. Sadece aç ve kullan." data-en="No sign-up. No ads. Just open and use.">Kayıt yok. Reklam yok. Sadece aç ve kullan.</p>
   <a href="app/index.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;">
     <span data-tr="Capsula'yı Aç" data-en="Open Capsula">Capsula'yı Aç</span>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><polyline points="5 12 19 12"/><polyline points="13 6 19 12 13 18"/></svg>
@@ -587,11 +504,10 @@ footer{
     <a href="privacy.html" data-tr="Gizlilik" data-en="Privacy">Gizlilik</a>
     <a href="mailto:Onurbozkan472@gmail.com" data-tr="İletişim" data-en="Contact">İletişim</a>
   </div>
-  <div class="footer-copy">© 2026 Capsula · <span data-tr="Play Store'da yakında" data-en="Coming soon to Play Store">Play Store'da yakında</span></div>
+  <div class="footer-copy">© 2026 Capsula · <span data-tr="Play Store'da erken erişim" data-en="Early access on Play Store">Play Store'da erken erişim</span></div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-// ── DİL SİSTEMİ ──
+<script>
 let currentLang='tr';
 function setLang(lang){
   currentLang=lang;
@@ -606,23 +522,11 @@ function setLang(lang){
   document.getElementById('btn-en').classList.toggle('active',lang==='en');
   document.documentElement.lang=lang;
 }
-
-// ── SCROLL REVEAL ──
 const observer=new IntersectionObserver(entries=>{
   entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target);}});
 },{threshold:.1,rootMargin:'0px 0px -40px 0px'});
 document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
-
-// ── SECTION TITLE İÇİNDEKİ <em> ──
-document.querySelectorAll('.sec
-
-// ── SERVICE WORKER KAYDI ──
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/app/service-worker.js')
-      .catch(err => console.warn('SW kayıt hatası:', err));
-  });
-}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('/app/service-worker.js').catch(err=>console.warn('SW:',err));});}
 </script>
 </body>
 </html>
